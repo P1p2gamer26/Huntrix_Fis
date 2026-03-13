@@ -1,0 +1,10 @@
+com/marrakech/game/domain/models/Assam.class
+com/marrakech/game/presentation/controllers/BoardController.class
+com/marrakech/game/domain/models/Game.class
+com/marrakech/game/domain/models/Player.class
+com/marrakech/game/presentation/Main.class
+com/marrakech/game/domain/models/Board.class
+com/marrakech/game/presentation/controllers/GameController.class
+com/marrakech/game/presentation/controllers/GameController$Phase.class
+com/marrakech/game/domain/models/Tile.class
+com/marrakech/game/domain/models/Carpet.class

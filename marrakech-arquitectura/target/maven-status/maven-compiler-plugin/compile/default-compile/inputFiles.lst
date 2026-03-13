@@ -1,0 +1,13 @@
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/application/StatsService.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/controllers/BoardController.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Assam.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/application/GameEngine.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/controllers/GameController.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/database/DatabaseConnection.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Player.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Carpet.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Game.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/JdbcUserRepository.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Board.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/Main.java
+/home/estudiante/Downloads/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Tile.java
