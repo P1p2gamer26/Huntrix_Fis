@@ -1,9 +1,11 @@
 package com.marrakech.game.presentation.controllers;
 
+import com.marrakech.game.presentation.views.ConfiguracionView;
 import com.marrakech.game.presentation.views.LoginView;
+import com.marrakech.game.presentation.views.MenuView;
 import com.marrakech.game.presentation.views.RegisterView;
+import com.marrakech.game.presentation.views.ReglasView;
 import com.marrakech.game.presentation.views.WelcomeView;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -30,13 +32,34 @@ public class AuthController {
 
     public void mostrarRegister() {
         RegisterView view = new RegisterView();
-        view.getBtnRegistrar().setOnAction(e -> mostrarJuego());
+        view.getBtnRegistrar().setOnAction(e -> mostrarMenu());
         stage.setScene(new Scene(view, width, height));
     }
 
     public void mostrarLogin() {
         LoginView view = new LoginView();
-        view.getBtnEntrar().setOnAction(e -> mostrarJuego());
+        view.getBtnEntrar().setOnAction(e -> mostrarMenu());
+        stage.setScene(new Scene(view, width, height));
+    }
+
+    public void mostrarMenu() {
+        MenuView view = new MenuView();
+        view.getBtnJugar().setOnAction(e -> mostrarJuego());
+        view.getBtnReglas().setOnAction(e -> mostrarReglas());
+        view.getBtnConfiguracion().setOnAction(e -> mostrarConfiguracion());
+        stage.setScene(new Scene(view, width, height));
+    }
+
+    public void mostrarReglas() {
+        ReglasView view = new ReglasView();
+        view.getBtnVolver().setOnAction(e -> mostrarMenu());
+        stage.setScene(new Scene(view, width, height));
+    }
+
+    public void mostrarConfiguracion() {
+        ConfiguracionView view = new ConfiguracionView();
+        view.getBtnVolver().setOnAction(e -> mostrarMenu());
+        view.getBtnGuardar().setOnAction(e -> mostrarMenu());
         stage.setScene(new Scene(view, width, height));
     }
 
