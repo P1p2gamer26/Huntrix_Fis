@@ -10,6 +10,7 @@ com\marrakech\game\domain\models\Board.class
 com\marrakech\game\presentation\controllers\GameController.class
 com\marrakech\game\domain\models\Assam.class
 com\marrakech\game\domain\models\Player.class
+com\marrakech\game\presentation\controllers\AuthController.class
 com\marrakech\game\presentation\views\LoginView.class
 com\marrakech\game\infrastructure\persistence\TilePersistencia.class
 com\marrakech\game\domain\models\Game.class
