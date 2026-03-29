@@ -1,10 +1,14 @@
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\infrastructure\persistence\BoardPersistencia.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\application\GameEngine.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\domain\models\Assam.java
+C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\presentation\views\UnirsePartidaView.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\domain\models\Carpet.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\presentation\views\ReglasView.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\infrastructure\persistence\CarpetPersistencia.java
+C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\presentation\views\SalaEsperaView.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\domain\models\Game.java
+C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\presentation\views\CrearPartidaView.java
+C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\infrastructure\PartidaRepository.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\presentation\views\WelcomeView.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\infrastructure\persistence\AssamPersistencia.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\infrastructure\persistence\JdbcUserRepository.java
@@ -24,3 +28,4 @@ C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\ma
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\domain\models\Board.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\infrastructure\persistence\PlayerPersistencia.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\presentation\controllers\GameController.java
+C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\presentation\views\ModoOnlineView.java

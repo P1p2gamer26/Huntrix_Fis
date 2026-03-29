@@ -2,11 +2,18 @@ package com.marrakech.game.presentation.views;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
-import javafx.scene.control.Button;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -24,18 +31,12 @@ public class MenuView extends StackPane {
     }
 
     private void configurarFondo() {
-        Image imagen = new Image(
-            getClass().getResourceAsStream("/images/background.jpg")
-        );
-        BackgroundImage bgImage = new BackgroundImage(
-            imagen,
-            BackgroundRepeat.NO_REPEAT,
-            BackgroundRepeat.NO_REPEAT,
+        Image imagen = new Image(getClass().getResourceAsStream("/images/background.jpg"));
+        BackgroundImage bgImage = new BackgroundImage(imagen,
+            BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
             BackgroundPosition.CENTER,
-            new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true)
-        );
+            new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true));
         setBackground(new Background(bgImage));
-
         Pane overlay = new Pane();
         overlay.setStyle("-fx-background-color: rgba(0,0,0,0.62);");
         overlay.prefWidthProperty().bind(widthProperty());
@@ -53,10 +54,7 @@ public class MenuView extends StackPane {
         titulo.setFont(Font.font("Georgia", FontWeight.BOLD, 72));
         titulo.setFill(Color.web("#D4A017"));
         DropShadow sombra = new DropShadow();
-        sombra.setColor(Color.web("#7A4500"));
-        sombra.setRadius(14);
-        sombra.setOffsetX(4);
-        sombra.setOffsetY(4);
+        sombra.setColor(Color.web("#7A4500")); sombra.setRadius(14); sombra.setOffsetX(4); sombra.setOffsetY(4);
         Glow glow = new Glow(0.3);
         glow.setInput(sombra);
         titulo.setEffect(glow);
@@ -65,8 +63,8 @@ public class MenuView extends StackPane {
         subtitulo.setFont(Font.font("Georgia", 12));
         subtitulo.setFill(Color.web("#9E7A3A"));
 
-        btnJugar        = crearBoton("JUGAR");
-        btnReglas       = crearBoton("REGLAS");
+        btnJugar         = crearBoton("JUGAR");
+        btnReglas        = crearBoton("REGLAS");
         btnConfiguracion = crearBoton("CONFIGURACIÓN");
 
         VBox botones = new VBox(14);
@@ -82,22 +80,8 @@ public class MenuView extends StackPane {
         btn.setMaxWidth(Double.MAX_VALUE);
         btn.setPrefHeight(46);
         btn.setFont(Font.font("Arial", FontWeight.BOLD, 13));
-        String normal =
-            "-fx-background-color: transparent;" +
-            "-fx-text-fill: #D4A017;" +
-            "-fx-border-color: #8B6914;" +
-            "-fx-border-width: 1.5;" +
-            "-fx-border-radius: 4;" +
-            "-fx-background-radius: 4;" +
-            "-fx-cursor: hand;";
-        String hover =
-            "-fx-background-color: rgba(201,146,42,0.18);" +
-            "-fx-text-fill: #F0D060;" +
-            "-fx-border-color: #D4A017;" +
-            "-fx-border-width: 1.5;" +
-            "-fx-border-radius: 4;" +
-            "-fx-background-radius: 4;" +
-            "-fx-cursor: hand;";
+        String normal = "-fx-background-color:transparent;-fx-text-fill:#D4A017;-fx-border-color:#8B6914;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
+        String hover  = "-fx-background-color:rgba(201,146,42,0.18);-fx-text-fill:#F0D060;-fx-border-color:#D4A017;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
         btn.setStyle(normal);
         btn.setOnMouseEntered(e -> btn.setStyle(hover));
         btn.setOnMouseExited(e -> btn.setStyle(normal));
