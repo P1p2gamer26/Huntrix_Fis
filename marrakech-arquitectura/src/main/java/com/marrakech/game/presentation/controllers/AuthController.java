@@ -13,7 +13,6 @@ public class AuthController {
     private final Stage stage;
     private final double width;
     private final double height;
-
     private String usuarioActual = "Jugador1";
 
     public AuthController(Stage stage, double width, double height) {
@@ -83,6 +82,7 @@ public class AuthController {
 
     public void mostrarUnirsePartida() {
         UnirsePartidaView view = new UnirsePartidaView();
+        view.setOnVolver(() -> mostrarModoOnline());
         view.setOnUnirse(codigo -> {
             boolean ok = PartidaRepository.unirsePartida(codigo, usuarioActual);
             if (ok) {
@@ -95,6 +95,7 @@ public class AuthController {
 
     public void mostrarSalaEspera(Partida partida) {
         SalaEsperaView view = new SalaEsperaView(partida);
+        view.getBtnSalir().setOnAction(e -> mostrarModoOnline());
         view.getBtnIniciar().setOnAction(e -> mostrarJuego());
         stage.setScene(new Scene(view, width, height));
     }

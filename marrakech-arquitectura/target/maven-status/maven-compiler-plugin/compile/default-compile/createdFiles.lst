@@ -29,3 +29,4 @@ com\marrakech\game\presentation\views\ReglasView.class
 com\marrakech\game\presentation\views\CrearPartidaView.class
 com\marrakech\game\presentation\views\WelcomeView.class
 com\marrakech\game\infrastructure\PartidaRepository$Partida.class
+com\marrakech\game\infrastructure\DatabaseConnection.class

@@ -1,7 +1,11 @@
 package com.marrakech.game.presentation.views;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.PartidaRepository.Partida;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -10,20 +14,27 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 public class UnirsePartidaView extends StackPane {
 
     private TextField campoCodigo;
-    private Button btnUnirPorCodigo;
     private Consumer<String> onUnirse;
+    private Runnable onVolver;
+    private VBox contenedorLista;
 
     public UnirsePartidaView() {
         configurarFondo();
@@ -96,39 +107,50 @@ public class UnirsePartidaView extends StackPane {
             "-fx-font-size: 13;"
         );
 
-        btnUnirPorCodigo = crearBotonRelleno("UNIRSE");
-        btnUnirPorCodigo.setOnAction(e -> {
+        Button btnUnirCodigo = crearBotonRelleno("UNIRSE");
+        btnUnirCodigo.setOnAction(e -> {
             String codigo = campoCodigo.getText().trim().toUpperCase();
             if (!codigo.isEmpty() && onUnirse != null) onUnirse.accept(codigo);
         });
 
-        filaCodigo.getChildren().addAll(campoCodigo, btnUnirPorCodigo);
+        filaCodigo.getChildren().addAll(campoCodigo, btnUnirCodigo);
         seccionCodigo.getChildren().addAll(lblCodigo, filaCodigo);
 
-        VBox listaPartidas = construirListaPartidas();
+        contenedorLista = new VBox(10);
+        contenedorLista.setPadding(new Insets(4, 0, 4, 0));
+        actualizarLista();
 
-        ScrollPane scroll = new ScrollPane(listaPartidas);
+        ScrollPane scroll = new ScrollPane(contenedorLista);
         scroll.setFitToWidth(true);
-        scroll.setMaxHeight(320);
+        scroll.setMaxHeight(280);
         scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
 
-        panel.getChildren().addAll(titulo, seccionCodigo, scroll);
+        HBox botonesInferiores = new HBox(14);
+        botonesInferiores.setAlignment(Pos.CENTER);
+
+        Button btnRefrescar = crearBotonRelleno("↻  REFRESCAR");
+        btnRefrescar.setOnAction(e -> actualizarLista());
+
+        Button btnVolver = crearBotonContorno("VOLVER");
+        btnVolver.setOnAction(e -> { if (onVolver != null) onVolver.run(); });
+
+        botonesInferiores.getChildren().addAll(btnVolver, btnRefrescar);
+
+        panel.getChildren().addAll(titulo, seccionCodigo, scroll, botonesInferiores);
         getChildren().add(panel);
     }
 
-    private VBox construirListaPartidas() {
-        VBox lista = new VBox(10);
-        lista.setPadding(new Insets(4, 0, 4, 0));
-
+    private void actualizarLista() {
+        contenedorLista.getChildren().clear();
         List<Partida> partidas = PartidaRepository.listarPartidas();
 
         if (partidas.isEmpty()) {
             Label vacia = new Label("No hay partidas disponibles. ¡Crea una!");
             vacia.setFont(Font.font("Georgia", 14));
             vacia.setTextFill(Color.web("#9E7A3A"));
-            lista.setAlignment(Pos.CENTER);
-            lista.getChildren().add(vacia);
-            return lista;
+            contenedorLista.setAlignment(Pos.CENTER);
+            contenedorLista.getChildren().add(vacia);
+            return;
         }
 
         for (Partida p : partidas) {
@@ -150,9 +172,8 @@ public class UnirsePartidaView extends StackPane {
             btnUnir.setOnAction(e -> { if (onUnirse != null) onUnirse.accept(p.id); });
 
             fila.getChildren().addAll(info, btnUnir);
-            lista.getChildren().add(fila);
+            contenedorLista.getChildren().add(fila);
         }
-        return lista;
     }
 
     private Button crearBotonRelleno(String texto) {
@@ -167,7 +188,7 @@ public class UnirsePartidaView extends StackPane {
 
     private Button crearBotonContorno(String texto) {
         Button btn = new Button(texto);
-        btn.setPrefWidth(100); btn.setPrefHeight(34);
+        btn.setPrefWidth(110); btn.setPrefHeight(36);
         btn.setFont(Font.font("Arial", FontWeight.BOLD, 12));
         String n = "-fx-background-color:transparent;-fx-text-fill:#D4A017;-fx-border-color:#8B6914;-fx-border-width:1.5;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
         String h = "-fx-background-color:rgba(201,146,42,0.18);-fx-text-fill:#F0D060;-fx-border-color:#D4A017;-fx-border-width:1.5;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
@@ -176,4 +197,5 @@ public class UnirsePartidaView extends StackPane {
     }
 
     public void setOnUnirse(Consumer<String> handler) { this.onUnirse = handler; }
+    public void setOnVolver(Runnable handler)         { this.onVolver = handler; }
 }

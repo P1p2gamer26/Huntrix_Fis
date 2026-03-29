@@ -1,5 +1,6 @@
 package com.marrakech.game.presentation.views;
 
+import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.PartidaRepository.Partida;
 
 import javafx.geometry.Insets;
@@ -28,7 +29,10 @@ import javafx.scene.text.Text;
 public class SalaEsperaView extends StackPane {
 
     private Button btnIniciar;
-    private final Partida partida;
+    private Button btnSalir;
+    private Partida partida;
+    private VBox listaJugadores;
+    private final String[] colores = {"#e74c3c", "#3498db", "#2ecc71", "#f39c12"};
 
     public SalaEsperaView(Partida partida) {
         this.partida = partida;
@@ -70,6 +74,48 @@ public class SalaEsperaView extends StackPane {
         titulo.setFont(Font.font("Georgia", FontWeight.BOLD, 30));
         titulo.setFill(Color.web("#D4A017"));
 
+        VBox infoPartida = construirInfoPartida();
+
+        HBox cabeceraJugadores = new HBox();
+        cabeceraJugadores.setAlignment(Pos.CENTER_LEFT);
+
+        Text tituloJugadores = new Text("Jugadores en sala");
+        tituloJugadores.setFont(Font.font("Georgia", FontWeight.BOLD, 18));
+        tituloJugadores.setFill(Color.web("#C9922A"));
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button btnRefrescar = crearBotonRelleno("↻  REFRESCAR");
+        btnRefrescar.setOnAction(e -> refrescarJugadores());
+        cabeceraJugadores.getChildren().addAll(tituloJugadores, spacer, btnRefrescar);
+
+        listaJugadores = new VBox(10);
+        construirListaJugadores();
+
+        HBox botonesInferiores = new HBox(14);
+        botonesInferiores.setAlignment(Pos.CENTER);
+
+        btnSalir = crearBotonContorno("SALIR DE PARTIDA");
+
+        btnIniciar = new Button("INICIAR PARTIDA");
+        btnIniciar.setMaxWidth(Double.MAX_VALUE);
+        btnIniciar.setPrefHeight(46);
+        btnIniciar.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        String n = "-fx-background-color:transparent;-fx-text-fill:#D4A017;-fx-border-color:#8B6914;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
+        String h = "-fx-background-color:rgba(201,146,42,0.18);-fx-text-fill:#F0D060;-fx-border-color:#D4A017;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
+        btnIniciar.setStyle(n);
+        btnIniciar.setOnMouseEntered(e -> btnIniciar.setStyle(h));
+        btnIniciar.setOnMouseExited(e -> btnIniciar.setStyle(n));
+        HBox.setHgrow(btnIniciar, Priority.ALWAYS);
+
+        botonesInferiores.getChildren().addAll(btnSalir, btnIniciar);
+
+        panel.getChildren().addAll(titulo, infoPartida, cabeceraJugadores, listaJugadores, botonesInferiores);
+        getChildren().add(panel);
+    }
+
+    private VBox construirInfoPartida() {
         VBox infoPartida = new VBox(6);
         infoPartida.setStyle(
             "-fx-background-color: rgba(255,255,255,0.04);" +
@@ -105,14 +151,11 @@ public class SalaEsperaView extends StackPane {
             }
         }
         infoPartida.getChildren().add(grid);
+        return infoPartida;
+    }
 
-        Text tituloJugadores = new Text("Jugadores en sala");
-        tituloJugadores.setFont(Font.font("Georgia", FontWeight.BOLD, 18));
-        tituloJugadores.setFill(Color.web("#C9922A"));
-
-        VBox listaJugadores = new VBox(10);
-        String[] colores = {"#e74c3c", "#3498db", "#2ecc71", "#f39c12"};
-
+    private void construirListaJugadores() {
+        listaJugadores.getChildren().clear();
         for (int i = 0; i < partida.jugadores.size(); i++) {
             String nombre = partida.jugadores.get(i);
             VBox tarjeta = new VBox(6);
@@ -132,38 +175,52 @@ public class SalaEsperaView extends StackPane {
             nombreText.setFont(Font.font("Georgia", FontWeight.BOLD, 14));
             nombreText.setFill(Color.web(i == 0 ? "#D4A017" : "#D4B87A"));
 
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
+            Region sp = new Region();
+            HBox.setHgrow(sp, Priority.ALWAYS);
 
             Label estadoLbl = new Label("● Listo");
             estadoLbl.setFont(Font.font("Georgia", FontWeight.BOLD, 12));
             estadoLbl.setTextFill(Color.web("#2ecc71"));
 
-            cabecera.getChildren().addAll(nombreText, spacer, estadoLbl);
+            cabecera.getChildren().addAll(nombreText, sp, estadoLbl);
 
-            Label detalles = new Label(
-                "Poder especial: " + (partida.poderesActivados ? "Sí" : "No")
-            );
+            Label detalles = new Label("Poder especial: " + (partida.poderesActivados ? "Sí" : "No"));
             detalles.setFont(Font.font("Georgia", 12));
             detalles.setTextFill(Color.web("#9E7A3A"));
 
             tarjeta.getChildren().addAll(cabecera, detalles);
             listaJugadores.getChildren().add(tarjeta);
         }
+    }
 
-        btnIniciar = new Button("INICIAR PARTIDA");
-        btnIniciar.setMaxWidth(Double.MAX_VALUE);
-        btnIniciar.setPrefHeight(46);
-        btnIniciar.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        String n = "-fx-background-color:transparent;-fx-text-fill:#D4A017;-fx-border-color:#8B6914;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
-        String h = "-fx-background-color:rgba(201,146,42,0.18);-fx-text-fill:#F0D060;-fx-border-color:#D4A017;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
-        btnIniciar.setStyle(n);
-        btnIniciar.setOnMouseEntered(e -> btnIniciar.setStyle(h));
-        btnIniciar.setOnMouseExited(e -> btnIniciar.setStyle(n));
+    private void refrescarJugadores() {
+        Partida actualizada = PartidaRepository.obtenerPartida(partida.id);
+        if (actualizada != null) {
+            this.partida = actualizada;
+            construirListaJugadores();
+        }
+    }
 
-        panel.getChildren().addAll(titulo, infoPartida, tituloJugadores, listaJugadores, btnIniciar);
-        getChildren().add(panel);
+    private Button crearBotonRelleno(String texto) {
+        Button btn = new Button(texto);
+        btn.setPrefHeight(34);
+        btn.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        String n = "-fx-background-color:#C9922A;-fx-text-fill:#1A0A00;-fx-border-color:#E8C97A;-fx-border-width:1;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
+        String h = "-fx-background-color:#E8A830;-fx-text-fill:#1A0A00;-fx-border-color:#F0D88A;-fx-border-width:1;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
+        btn.setStyle(n); btn.setOnMouseEntered(e->btn.setStyle(h)); btn.setOnMouseExited(e->btn.setStyle(n));
+        return btn;
+    }
+
+    private Button crearBotonContorno(String texto) {
+        Button btn = new Button(texto);
+        btn.setPrefHeight(46);
+        btn.setFont(Font.font("Arial", FontWeight.BOLD, 13));
+        String n = "-fx-background-color:transparent;-fx-text-fill:#e74c3c;-fx-border-color:#e74c3c;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
+        String h = "-fx-background-color:rgba(231,76,60,0.15);-fx-text-fill:#ff6b6b;-fx-border-color:#ff6b6b;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
+        btn.setStyle(n); btn.setOnMouseEntered(e->btn.setStyle(h)); btn.setOnMouseExited(e->btn.setStyle(n));
+        return btn;
     }
 
     public Button getBtnIniciar() { return btnIniciar; }
+    public Button getBtnSalir()   { return btnSalir; }
 }
