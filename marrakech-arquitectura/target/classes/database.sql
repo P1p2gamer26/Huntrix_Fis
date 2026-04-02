@@ -1,4 +1,4 @@
-CREATE TABLE Jugador(
+CREATE TABLE IF NOT EXISTS Jugador(
     id_jugador INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(50) UNIQUE NOT NULL,
     correo VARCHAR(100) UNIQUE NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE Jugador(
     estado VARCHAR(15)
 );
 
-CREATE TABLE Estadisticas(
+CREATE TABLE IF NOT EXISTS Estadisticas(
     id_estadistica INT AUTO_INCREMENT PRIMARY KEY,
     partidas_jugadas INT DEFAULT 0,
     partidas_ganadas INT DEFAULT 0,
@@ -15,10 +15,10 @@ CREATE TABLE Estadisticas(
     total_monedas INT DEFAULT 0,
     ultima_actualizacion TIMESTAMP,
     id_jugador INT UNIQUE,
-    FOREIGN KEY (id_jugador) REFERENCES Jugador (id_jugador)
+    FOREIGN KEY (id_jugador) REFERENCES Jugador(id_jugador)
 );
 
-CREATE TABLE Sala(
+CREATE TABLE IF NOT EXISTS Sala(
     id_sala INT AUTO_INCREMENT PRIMARY KEY,
     codigo_sala VARCHAR(20) UNIQUE NOT NULL,
     estado VARCHAR(15) NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE Sala(
     FOREIGN KEY (id_host) REFERENCES Jugador(id_jugador)
 );
 
-CREATE TABLE ConfiguracionPartida(
+CREATE TABLE IF NOT EXISTS ConfiguracionPartida(
     id_config INT AUTO_INCREMENT PRIMARY KEY,
     max_jugadores INT NOT NULL CHECK (max_jugadores BETWEEN 2 AND 4),
     poderes_habilitados BOOLEAN NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE ConfiguracionPartida(
     FOREIGN KEY (id_sala) REFERENCES Sala(id_sala)
 );
 
-CREATE TABLE Partida(
+CREATE TABLE IF NOT EXISTS Partida(
     id_partida INT AUTO_INCREMENT PRIMARY KEY,
     estado VARCHAR(15) NOT NULL,
     fecha_inicio TIMESTAMP NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE Partida(
     FOREIGN KEY (id_sala) REFERENCES Sala(id_sala)
 );
 
-CREATE TABLE Participacion(
+CREATE TABLE IF NOT EXISTS Participacion(
     id_participacion INT AUTO_INCREMENT PRIMARY KEY,
     nombre_partida VARCHAR(50) NOT NULL,
     rol VARCHAR(15) NOT NULL,
@@ -64,18 +64,7 @@ CREATE TABLE Participacion(
     FOREIGN KEY (id_jugador) REFERENCES Jugador(id_jugador)
 );
 
-CREATE TABLE Poder(
-    id_poder INT AUTO_INCREMENT PRIMARY KEY,
-    tipo VARCHAR(30) NOT NULL,
-    fila INT NOT NULL,
-    col INT NOT NULL,
-    estado VARCHAR(15),
-    fecha_creacion TIMESTAMP NOT NULL,
-    id_partida INT NOT NULL,
-    FOREIGN KEY (id_partida) REFERENCES Partida(id_partida)
-);
-
-CREATE TABLE EstadoPartida(
+CREATE TABLE IF NOT EXISTS EstadoPartida(
     id_estado INT AUTO_INCREMENT PRIMARY KEY,
     turno_numero INT NOT NULL,
     assam_fila INT NOT NULL,
@@ -87,7 +76,7 @@ CREATE TABLE EstadoPartida(
     FOREIGN KEY (id_partida) REFERENCES Partida(id_partida)
 );
 
-CREATE TABLE Mensajechat(
+CREATE TABLE IF NOT EXISTS Mensajechat(
     id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
     texto VARCHAR(500) NOT NULL,
     fecha_hora TIMESTAMP NOT NULL,
@@ -97,3 +86,22 @@ CREATE TABLE Mensajechat(
     FOREIGN KEY (id_jugador) REFERENCES Jugador(id_jugador)
 );
 
+CREATE TABLE IF NOT EXISTS partidas(
+    id VARCHAR(20) PRIMARY KEY,
+    nombre VARCHAR(100),
+    max_jugadores INT,
+    poderes BOOLEAN,
+    rapida BOOLEAN,
+    dificultad VARCHAR(20)
+);
+
+CREATE TABLE IF NOT EXISTS partida_jugadores(
+    partida_id VARCHAR(20),
+    usuario VARCHAR(100),
+    PRIMARY KEY (partida_id, usuario)
+);
+
+CREATE TABLE IF NOT EXISTS ranking(
+    usuario VARCHAR(100) PRIMARY KEY,
+    victorias INT DEFAULT 0
+);

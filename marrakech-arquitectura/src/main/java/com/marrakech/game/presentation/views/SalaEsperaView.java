@@ -2,29 +2,18 @@ package com.marrakech.game.presentation.views;
 
 import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.PartidaRepository.Partida;
-
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
+import javafx.util.Duration;
 
 public class SalaEsperaView extends StackPane {
 
@@ -32,12 +21,23 @@ public class SalaEsperaView extends StackPane {
     private Button btnSalir;
     private Partida partida;
     private VBox listaJugadores;
-    private final String[] colores = {"#e74c3c", "#3498db", "#2ecc71", "#f39c12"};
+    private Label lblEstado;
+    private Timeline pollingTimeline;
+    private Runnable onJuegoIniciado; // callback cuando la DB dice INICIADA
+    private boolean esHost;
+    private final String[] colores = {"#e74c3c","#3498db","#2ecc71","#f39c12"};
 
-    public SalaEsperaView(Partida partida) {
+    public SalaEsperaView(Partida partida, boolean esHost) {
         this.partida = partida;
+        this.esHost  = esHost;
         configurarFondo();
         configurarContenido();
+        iniciarPolling();
+    }
+
+    // Constructor legacy sin host (por si acaso)
+    public SalaEsperaView(Partida partida) {
+        this(partida, true);
     }
 
     private void configurarFondo() {
@@ -61,11 +61,8 @@ public class SalaEsperaView extends StackPane {
         panel.setMaxWidth(720);
         panel.setStyle(
             "-fx-background-color: rgba(10,4,0,0.90);" +
-            "-fx-border-color: #8B6914;" +
-            "-fx-border-width: 1.5;" +
-            "-fx-border-radius: 8;" +
-            "-fx-background-radius: 8;"
-        );
+            "-fx-border-color: #8B6914;-fx-border-width: 1.5;" +
+            "-fx-border-radius: 8;-fx-background-radius: 8;");
         DropShadow sombra = new DropShadow();
         sombra.setColor(Color.web("#000000", 0.85)); sombra.setRadius(30);
         panel.setEffect(sombra);
@@ -74,21 +71,27 @@ public class SalaEsperaView extends StackPane {
         titulo.setFont(Font.font("Georgia", FontWeight.BOLD, 30));
         titulo.setFill(Color.web("#D4A017"));
 
+        // Código de sala grande y visible
+        VBox codigoBox = new VBox(4);
+        codigoBox.setAlignment(Pos.CENTER);
+        Label lblCodigoTitulo = new Label("CÓDIGO DE SALA");
+        lblCodigoTitulo.setFont(Font.font("Georgia", FontWeight.BOLD, 13));
+        lblCodigoTitulo.setTextFill(Color.web("#9E7A3A"));
+        Label lblCodigo = new Label(partida.id);
+        lblCodigo.setFont(Font.font("Georgia", FontWeight.BOLD, 42));
+        lblCodigo.setTextFill(Color.web("#F0D060"));
+        codigoBox.getChildren().addAll(lblCodigoTitulo, lblCodigo);
+
         VBox infoPartida = construirInfoPartida();
 
-        HBox cabeceraJugadores = new HBox();
-        cabeceraJugadores.setAlignment(Pos.CENTER_LEFT);
+        // Estado dinámico
+        lblEstado = new Label(esHost ? "Esperando jugadores..." : "Esperando que el host inicie...");
+        lblEstado.setFont(Font.font("Georgia", 13));
+        lblEstado.setTextFill(Color.web("#C9922A"));
 
         Text tituloJugadores = new Text("Jugadores en sala");
         tituloJugadores.setFont(Font.font("Georgia", FontWeight.BOLD, 18));
         tituloJugadores.setFill(Color.web("#C9922A"));
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        Button btnRefrescar = crearBotonRelleno("↻  REFRESCAR");
-        btnRefrescar.setOnAction(e -> refrescarJugadores());
-        cabeceraJugadores.getChildren().addAll(tituloJugadores, spacer, btnRefrescar);
 
         listaJugadores = new VBox(10);
         construirListaJugadores();
@@ -98,49 +101,65 @@ public class SalaEsperaView extends StackPane {
 
         btnSalir = crearBotonContorno("SALIR DE PARTIDA");
 
-        btnIniciar = new Button("INICIAR PARTIDA");
-        btnIniciar.setMaxWidth(Double.MAX_VALUE);
-        btnIniciar.setPrefHeight(46);
-        btnIniciar.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        String n = "-fx-background-color:transparent;-fx-text-fill:#D4A017;-fx-border-color:#8B6914;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
-        String h = "-fx-background-color:rgba(201,146,42,0.18);-fx-text-fill:#F0D060;-fx-border-color:#D4A017;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
-        btnIniciar.setStyle(n);
-        btnIniciar.setOnMouseEntered(e -> btnIniciar.setStyle(h));
-        btnIniciar.setOnMouseExited(e -> btnIniciar.setStyle(n));
+        btnIniciar = crearBotonPrimario("INICIAR PARTIDA");
+        // Solo el host puede iniciar, y solo si la sala está llena
+        btnIniciar.setDisable(!esHost || partida.jugadores.size() < partida.maxJugadores);
+        if (!esHost) btnIniciar.setVisible(false);
         HBox.setHgrow(btnIniciar, Priority.ALWAYS);
 
         botonesInferiores.getChildren().addAll(btnSalir, btnIniciar);
 
-        panel.getChildren().addAll(titulo, infoPartida, cabeceraJugadores, listaJugadores, botonesInferiores);
+        panel.getChildren().addAll(titulo, codigoBox, infoPartida, lblEstado, tituloJugadores, listaJugadores, botonesInferiores);
         getChildren().add(panel);
     }
 
+    private void iniciarPolling() {
+        pollingTimeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
+            Partida actualizada = PartidaRepository.obtenerPartida(partida.id);
+            if (actualizada == null) return;
+            this.partida = actualizada;
+            construirListaJugadores();
+
+            boolean salaLlena = actualizada.jugadores.size() >= actualizada.maxJugadores;
+
+            if (esHost) {
+                btnIniciar.setDisable(!salaLlena);
+                lblEstado.setText(salaLlena
+                    ? "¡Sala llena! Puedes iniciar la partida."
+                    : "Esperando jugadores... (" + actualizada.jugadores.size() + "/" + actualizada.maxJugadores + ")");
+            } else {
+                lblEstado.setText("Jugadores: " + actualizada.jugadores.size() + "/" + actualizada.maxJugadores
+                    + " — Esperando que el host inicie...");
+                // Guest detecta cuando el host inicia
+                if ("INICIADA".equals(actualizada.estado)) {
+                    detenerPolling();
+                    if (onJuegoIniciado != null) onJuegoIniciado.run();
+                }
+            }
+        }));
+        pollingTimeline.setCycleCount(Timeline.INDEFINITE);
+        pollingTimeline.play();
+    }
+
+    public void detenerPolling() {
+        if (pollingTimeline != null) pollingTimeline.stop();
+    }
+
+    public void setOnJuegoIniciado(Runnable callback) {
+        this.onJuegoIniciado = callback;
+    }
+
     private VBox construirInfoPartida() {
-        VBox infoPartida = new VBox(6);
-        infoPartida.setStyle(
-            "-fx-background-color: rgba(255,255,255,0.04);" +
-            "-fx-border-color: #4A3000;" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 5;" +
-            "-fx-background-radius: 5;"
-        );
-        infoPartida.setPadding(new Insets(14, 18, 14, 18));
-
+        VBox info = new VBox(6);
+        info.setStyle("-fx-background-color:rgba(255,255,255,0.04);-fx-border-color:#4A3000;-fx-border-width:1;-fx-border-radius:5;-fx-background-radius:5;");
+        info.setPadding(new Insets(14, 18, 14, 18));
         GridPane grid = new GridPane();
-        grid.setHgap(30);
-        grid.setVgap(6);
-
+        grid.setHgap(30); grid.setVgap(6);
         String[][] datos = {
-            {"Código:", partida.id,
-             "Modo:", "Competitivo"},
-            {"Complejidad:", partida.dificultad,
-             "Poderes:", partida.poderesActivados ? "Activados" : "Desactivados"},
-            {"Tiempo por turno:", partida.partidaRapida ? "20s" : "45s",
-             "Rondas máximas:", "20"},
-            {"Jugadores:", partida.jugadores.size() + "/" + partida.maxJugadores,
-             "Estado:", partida.jugadores.size() < partida.maxJugadores ? "Esperando jugadores" : "Sala llena"},
+            {"Modo:", "Competitivo", "Poderes:", partida.poderesActivados ? "Activados" : "Desactivados"},
+            {"Tiempo/turno:", partida.partidaRapida ? "20s" : "45s", "Dificultad:", partida.dificultad},
+            {"Jugadores:", partida.jugadores.size() + "/" + partida.maxJugadores, "Estado:", partida.estado},
         };
-
         for (int row = 0; row < datos.length; row++) {
             for (int col = 0; col < datos[row].length; col++) {
                 Label lbl = new Label(datos[row][col]);
@@ -150,63 +169,41 @@ public class SalaEsperaView extends StackPane {
                 grid.add(lbl, col, row);
             }
         }
-        infoPartida.getChildren().add(grid);
-        return infoPartida;
+        info.getChildren().add(grid);
+        return info;
     }
 
     private void construirListaJugadores() {
         listaJugadores.getChildren().clear();
         for (int i = 0; i < partida.jugadores.size(); i++) {
             String nombre = partida.jugadores.get(i);
-            VBox tarjeta = new VBox(6);
-            tarjeta.setPadding(new Insets(12, 16, 12, 16));
+            VBox tarjeta = new VBox(4);
+            tarjeta.setPadding(new Insets(10, 16, 10, 16));
             tarjeta.setStyle(
-                "-fx-background-color: rgba(255,255,255,0.05);" +
-                "-fx-border-color: " + colores[i % colores.length] + "55;" +
-                "-fx-border-width: 1;" +
-                "-fx-border-radius: 5;" +
-                "-fx-background-radius: 5;"
-            );
-
-            HBox cabecera = new HBox();
-            cabecera.setAlignment(Pos.CENTER_LEFT);
-
-            Text nombreText = new Text(nombre + (i == 0 ? " [HOST]" : ""));
+                "-fx-background-color:rgba(255,255,255,0.05);" +
+                "-fx-border-color:" + colores[i % colores.length] + "55;" +
+                "-fx-border-width:1;-fx-border-radius:5;-fx-background-radius:5;");
+            HBox cab = new HBox();
+            cab.setAlignment(Pos.CENTER_LEFT);
+            Text nombreText = new Text(nombre + (i == 0 ? "  [HOST]" : ""));
             nombreText.setFont(Font.font("Georgia", FontWeight.BOLD, 14));
-            nombreText.setFill(Color.web(i == 0 ? "#D4A017" : "#D4B87A"));
-
-            Region sp = new Region();
-            HBox.setHgrow(sp, Priority.ALWAYS);
-
-            Label estadoLbl = new Label("● Listo");
-            estadoLbl.setFont(Font.font("Georgia", FontWeight.BOLD, 12));
-            estadoLbl.setTextFill(Color.web("#2ecc71"));
-
-            cabecera.getChildren().addAll(nombreText, sp, estadoLbl);
-
-            Label detalles = new Label("Poder especial: " + (partida.poderesActivados ? "Sí" : "No"));
-            detalles.setFont(Font.font("Georgia", 12));
-            detalles.setTextFill(Color.web("#9E7A3A"));
-
-            tarjeta.getChildren().addAll(cabecera, detalles);
+            nombreText.setFill(Color.web(colores[i % colores.length]));
+            Region sp = new Region(); HBox.setHgrow(sp, Priority.ALWAYS);
+            Label listo = new Label("● En sala");
+            listo.setFont(Font.font("Georgia", FontWeight.BOLD, 12));
+            listo.setTextFill(Color.web("#2ecc71"));
+            cab.getChildren().addAll(nombreText, sp, listo);
+            tarjeta.getChildren().add(cab);
             listaJugadores.getChildren().add(tarjeta);
         }
     }
 
-    private void refrescarJugadores() {
-        Partida actualizada = PartidaRepository.obtenerPartida(partida.id);
-        if (actualizada != null) {
-            this.partida = actualizada;
-            construirListaJugadores();
-        }
-    }
-
-    private Button crearBotonRelleno(String texto) {
+    private Button crearBotonPrimario(String texto) {
         Button btn = new Button(texto);
-        btn.setPrefHeight(34);
-        btn.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        String n = "-fx-background-color:#C9922A;-fx-text-fill:#1A0A00;-fx-border-color:#E8C97A;-fx-border-width:1;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
-        String h = "-fx-background-color:#E8A830;-fx-text-fill:#1A0A00;-fx-border-color:#F0D88A;-fx-border-width:1;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
+        btn.setMaxWidth(Double.MAX_VALUE); btn.setPrefHeight(46);
+        btn.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        String n = "-fx-background-color:#C9922A;-fx-text-fill:#1A0A00;-fx-border-color:#E8C97A;-fx-border-width:1;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
+        String h = "-fx-background-color:#E8A830;-fx-text-fill:#1A0A00;-fx-border-color:#F0D88A;-fx-border-width:1;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;";
         btn.setStyle(n); btn.setOnMouseEntered(e->btn.setStyle(h)); btn.setOnMouseExited(e->btn.setStyle(n));
         return btn;
     }
@@ -221,6 +218,8 @@ public class SalaEsperaView extends StackPane {
         return btn;
     }
 
-    public Button getBtnIniciar() { return btnIniciar; }
-    public Button getBtnSalir()   { return btnSalir; }
+    public Button getBtnIniciar()              { return btnIniciar; }
+    public Button getBtnSalir()                { return btnSalir; }
+    public int getNumJugadores()               { return partida.maxJugadores; }
+    public String getPartidaId()               { return partida.id; }
 }

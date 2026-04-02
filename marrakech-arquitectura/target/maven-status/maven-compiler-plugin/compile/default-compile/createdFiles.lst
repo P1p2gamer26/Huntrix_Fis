@@ -37,3 +37,4 @@ com/marrakech/game/presentation/Main.class
 com/marrakech/game/infrastructure/persistence/MovimientoRepository.class
 com/marrakech/game/presentation/views/UnirsePartidaView.class
 com/marrakech/game/infrastructure/persistence/EstadoPartidaRepository.class
+com/marrakech/game/presentation/controllers/GameController$EstadoDB.class
