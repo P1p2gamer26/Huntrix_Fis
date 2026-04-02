@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import com.marrakech.game.infrastructure.database.DatabaseConnection;
 
 public class PartidaRepository {
 

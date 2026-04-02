@@ -2,10 +2,12 @@ package com.marrakech.game.presentation.controllers;
 
 import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.PartidaRepository.Partida;
+import com.marrakech.game.infrastructure.persistence.JugadorRepository;
 import com.marrakech.game.presentation.views.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 public class AuthController {
@@ -14,6 +16,8 @@ public class AuthController {
     private final double width;
     private final double height;
     private String usuarioActual = "Jugador1";
+
+    private final JugadorRepository jugadorRepo = new JugadorRepository();
 
     public AuthController(Stage stage, double width, double height) {
         this.stage  = stage;
@@ -31,8 +35,24 @@ public class AuthController {
     public void mostrarRegister() {
         RegisterView view = new RegisterView();
         view.getBtnRegistrar().setOnAction(e -> {
-            String apodo = view.getCampoApodo().getText().trim();
-            if (!apodo.isEmpty()) usuarioActual = apodo;
+            String apodo  = view.getCampoApodo().getText().trim();
+            String correo = view.getCampoCorreo().getText().trim();
+            String pass   = view.getCampoContrasena().getText().trim();
+
+            if (apodo.isEmpty() || correo.isEmpty() || pass.isEmpty()) {
+                mostrarAlerta("Error", "Todos los campos son obligatorios.");
+                return;
+            }
+            if (jugadorRepo.nombreExiste(apodo)) {
+                mostrarAlerta("Error", "El apodo ya está en uso.");
+                return;
+            }
+            if (jugadorRepo.correoExiste(correo)) {
+                mostrarAlerta("Error", "El correo ya está registrado.");
+                return;
+            }
+            jugadorRepo.crearJugador(apodo, correo, pass);
+            usuarioActual = apodo;
             mostrarMenu();
         });
         stage.setScene(new Scene(view, width, height));
@@ -42,7 +62,18 @@ public class AuthController {
         LoginView view = new LoginView();
         view.getBtnEntrar().setOnAction(e -> {
             String apodo = view.getCampoApodo().getText().trim();
-            if (!apodo.isEmpty()) usuarioActual = apodo;
+            String pass  = view.getCampoContrasena().getText().trim();
+
+            if (apodo.isEmpty() || pass.isEmpty()) {
+                mostrarAlerta("Error", "Ingresa tu apodo y contraseña.");
+                return;
+            }
+            String nombre = jugadorRepo.loginJugador(apodo, pass);
+            if (nombre == null) {
+                mostrarAlerta("Error", "Apodo o contraseña incorrectos.");
+                return;
+            }
+            usuarioActual = nombre;
             mostrarMenu();
         });
         stage.setScene(new Scene(view, width, height));
@@ -127,5 +158,13 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

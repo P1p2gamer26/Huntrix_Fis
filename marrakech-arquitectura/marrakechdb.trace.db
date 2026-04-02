@@ -65,3 +65,43 @@ CREATE TABLE Mensajechat(
 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
 	at java.base/sun.launcher.LauncherHelper$FXHelper.main(LauncherHelper.java:1180)
+2026-04-01 23:08:22.560801-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "JUGADOR" already exists; SQL statement:
+CREATE TABLE Jugador(
+    id_jugador INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) UNIQUE NOT NULL,
+    correo VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    fecha_registro TIMESTAMP NOT NULL,
+    estado VARCHAR(15)
+) [42101-224]
+2026-04-01 23:08:58.243683-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "JUGADOR" already exists; SQL statement:
+CREATE TABLE Jugador(
+    id_jugador INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) UNIQUE NOT NULL,
+    correo VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    fecha_registro TIMESTAMP NOT NULL,
+    estado VARCHAR(15)
+) [42101-224]
+2026-04-01 23:09:27.687698-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "JUGADOR" already exists; SQL statement:
+CREATE TABLE Jugador(
+    id_jugador INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) UNIQUE NOT NULL,
+    correo VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    fecha_registro TIMESTAMP NOT NULL,
+    estado VARCHAR(15)
+) [42101-224]
+2026-04-01 23:09:45.652247-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "JUGADOR" already exists; SQL statement:
+CREATE TABLE Jugador(
+    id_jugador INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) UNIQUE NOT NULL,
+    correo VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    fecha_registro TIMESTAMP NOT NULL,
+    estado VARCHAR(15)
+) [42101-224]

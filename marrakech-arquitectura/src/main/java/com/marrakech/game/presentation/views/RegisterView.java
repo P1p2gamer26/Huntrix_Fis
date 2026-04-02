@@ -7,22 +7,14 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
 
 public class RegisterView extends StackPane {
 
     private TextField campoApodo;
+    private TextField campoCorreo;
     private PasswordField campoContrasena;
     private Button btnRegistrar;
 
@@ -32,18 +24,12 @@ public class RegisterView extends StackPane {
     }
 
     private void configurarFondo() {
-        Image imagen = new Image(
-            getClass().getResourceAsStream("/images/background.jpg")
-        );
-        BackgroundImage bgImage = new BackgroundImage(
-            imagen,
-            BackgroundRepeat.NO_REPEAT,
-            BackgroundRepeat.NO_REPEAT,
+        Image imagen = new Image(getClass().getResourceAsStream("/images/background.jpg"));
+        BackgroundImage bgImage = new BackgroundImage(imagen,
+            BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
             BackgroundPosition.CENTER,
-            new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true)
-        );
+            new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true));
         setBackground(new Background(bgImage));
-
         Pane overlay = new Pane();
         overlay.setStyle("-fx-background-color: rgba(0,0,0,0.45);");
         overlay.prefWidthProperty().bind(widthProperty());
@@ -52,7 +38,6 @@ public class RegisterView extends StackPane {
     }
 
     private void configurarContenido() {
-        // Panel central semitransparente
         VBox panel = new VBox(16);
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(36, 40, 36, 40));
@@ -62,54 +47,34 @@ public class RegisterView extends StackPane {
             "-fx-border-color: #8B6914;" +
             "-fx-border-width: 1.5;" +
             "-fx-border-radius: 6;" +
-            "-fx-background-radius: 6;"
-        );
+            "-fx-background-radius: 6;");
         DropShadow panelSombra = new DropShadow();
         panelSombra.setColor(Color.web("#000000", 0.7));
         panelSombra.setRadius(25);
         panel.setEffect(panelSombra);
 
-        // Título
         Text titulo = new Text("CREAR CUENTA");
         titulo.setFont(Font.font("Georgia", FontWeight.BOLD, 28));
         titulo.setFill(Color.web("#D4A017"));
-        DropShadow sombraTitulo = new DropShadow();
-        sombraTitulo.setColor(Color.web("#7A5000"));
-        sombraTitulo.setRadius(6);
-        sombraTitulo.setOffsetX(2);
-        sombraTitulo.setOffsetY(2);
-        titulo.setEffect(sombraTitulo);
+        DropShadow st = new DropShadow();
+        st.setColor(Color.web("#7A5000")); st.setRadius(6); st.setOffsetX(2); st.setOffsetY(2);
+        titulo.setEffect(st);
 
-        // Campos
-        campoApodo = crearCampoTexto("Apodo");
+        campoApodo      = crearCampoTexto("Apodo");
+        campoCorreo     = crearCampoTexto("Correo");
         campoContrasena = crearCampoPassword("Contraseña");
 
-        // Botón Registrar
         btnRegistrar = new Button("REGISTRAR");
         btnRegistrar.setMaxWidth(Double.MAX_VALUE);
         btnRegistrar.setPrefHeight(42);
         btnRegistrar.setFont(Font.font("Arial", FontWeight.BOLD, 13));
-        String estiloNormal =
-            "-fx-background-color: #C9922A;" +
-            "-fx-text-fill: #1A0A00;" +
-            "-fx-border-color: #E8C97A;" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 3;" +
-            "-fx-background-radius: 3;" +
-            "-fx-cursor: hand;";
-        String estiloHover =
-            "-fx-background-color: #E8A830;" +
-            "-fx-text-fill: #1A0A00;" +
-            "-fx-border-color: #F0D88A;" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 3;" +
-            "-fx-background-radius: 3;" +
-            "-fx-cursor: hand;";
-        btnRegistrar.setStyle(estiloNormal);
-        btnRegistrar.setOnMouseEntered(e -> btnRegistrar.setStyle(estiloHover));
-        btnRegistrar.setOnMouseExited(e -> btnRegistrar.setStyle(estiloNormal));
+        String n = "-fx-background-color:#C9922A;-fx-text-fill:#1A0A00;-fx-border-color:#E8C97A;-fx-border-width:1;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
+        String h = "-fx-background-color:#E8A830;-fx-text-fill:#1A0A00;-fx-border-color:#F0D88A;-fx-border-width:1;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
+        btnRegistrar.setStyle(n);
+        btnRegistrar.setOnMouseEntered(e -> btnRegistrar.setStyle(h));
+        btnRegistrar.setOnMouseExited(e -> btnRegistrar.setStyle(n));
 
-        panel.getChildren().addAll(titulo, campoApodo, campoContrasena, btnRegistrar);
+        panel.getChildren().addAll(titulo, campoApodo, campoCorreo, campoContrasena, btnRegistrar);
         getChildren().add(panel);
     }
 
@@ -117,16 +82,7 @@ public class RegisterView extends StackPane {
         TextField campo = new TextField();
         campo.setPromptText(placeholder);
         campo.setPrefHeight(38);
-        campo.setStyle(
-            "-fx-background-color: rgba(15,5,0,0.65);" +
-            "-fx-text-fill: #E8C97A;" +
-            "-fx-prompt-text-fill: #9E7A3A;" +
-            "-fx-border-color: #8B6914;" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 3;" +
-            "-fx-background-radius: 3;" +
-            "-fx-font-size: 13;"
-        );
+        campo.setStyle("-fx-background-color:rgba(15,5,0,0.65);-fx-text-fill:#E8C97A;-fx-prompt-text-fill:#9E7A3A;-fx-border-color:#8B6914;-fx-border-width:1;-fx-border-radius:3;-fx-background-radius:3;-fx-font-size:13;");
         return campo;
     }
 
@@ -134,20 +90,12 @@ public class RegisterView extends StackPane {
         PasswordField campo = new PasswordField();
         campo.setPromptText(placeholder);
         campo.setPrefHeight(38);
-        campo.setStyle(
-            "-fx-background-color: rgba(15,5,0,0.65);" +
-            "-fx-text-fill: #E8C97A;" +
-            "-fx-prompt-text-fill: #9E7A3A;" +
-            "-fx-border-color: #8B6914;" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 3;" +
-            "-fx-background-radius: 3;" +
-            "-fx-font-size: 13;"
-        );
+        campo.setStyle("-fx-background-color:rgba(15,5,0,0.65);-fx-text-fill:#E8C97A;-fx-prompt-text-fill:#9E7A3A;-fx-border-color:#8B6914;-fx-border-width:1;-fx-border-radius:3;-fx-background-radius:3;-fx-font-size:13;");
         return campo;
     }
 
     public TextField getCampoApodo()          { return campoApodo; }
+    public TextField getCampoCorreo()         { return campoCorreo; }
     public PasswordField getCampoContrasena() { return campoContrasena; }
     public Button getBtnRegistrar()           { return btnRegistrar; }
 }
