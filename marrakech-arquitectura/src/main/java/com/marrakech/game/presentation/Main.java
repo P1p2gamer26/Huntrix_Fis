@@ -6,6 +6,9 @@ import com.marrakech.game.presentation.controllers.AuthController;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import java.io.IOException;
+import com.marrakech.game.infrastructure.database.DatabaseConnection;
+
 
 public class Main extends Application {
 
@@ -23,28 +26,8 @@ public class Main extends Application {
 
         stage.show();
     }
-
-    private void iniciarServidorH2() {
-        try {
-            h2Server = Server.createTcpServer(
-                "-tcpPort", "9092",
-                "-tcpAllowOthers",
-                "-ifNotExists"
-            ).start();
-            System.out.println("Servidor H2 iniciado en puerto 9092");
-        } catch (Exception e) {
-            System.out.println("Servidor H2 ya está corriendo (otra instancia lo inició)");
-        }
-    }
-
-    @Override
-    public void stop() {
-        if (h2Server != null && h2Server.isRunning(true)) {
-            h2Server.stop();
-        }
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args){
+        DatabaseConnection.initDatabase();
         launch();
     }
 }

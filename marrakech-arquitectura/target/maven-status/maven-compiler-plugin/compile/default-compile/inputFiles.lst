@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\infrastructure\persistence\BoardPersistencia.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\application\GameEngine.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\domain\models\Assam.java
@@ -29,3 +30,31 @@ C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\ma
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\infrastructure\persistence\PlayerPersistencia.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\presentation\controllers\GameController.java
 C:\Users\JULIANA\Desktop\Huntrix_Fis\marrakech-arquitectura\src\main\java\com\marrakech\game\presentation\views\ModoOnlineView.java
+=======
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/PartidaRepository.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Carpet.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/application/StatsService.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/PlayerPersistencia.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/ParticipacionRepository.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/CarpetPersistencia.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/JdbcUserRepository.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Assam.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/TilePersistencia.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Player.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/Main.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/BoardPersistencia.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/EstadoPartidaRepository.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Game.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Tile.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Board.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/controllers/GameController.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/EstadisticasRepository.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/controllers/BoardController.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/RankingRepository.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/database/DatabaseConnection.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/JugadorRepository.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/application/GameEngine.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/AssamPersistencia.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/MovimientoRepository.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/GamePersistencia.java
+>>>>>>> develop
