@@ -28,7 +28,7 @@ public class DatabaseConnection{
             System.out.println("La base de datos se ejecuto e inicializo correctamente");
 
 
-        }Catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
