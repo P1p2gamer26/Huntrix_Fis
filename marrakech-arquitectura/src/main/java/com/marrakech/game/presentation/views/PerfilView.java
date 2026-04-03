@@ -1,22 +1,32 @@
 package com.marrakech.game.presentation.views;
 
+import com.marrakech.game.infrastructure.persistence.JugadorRepository;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
 
 public class PerfilView extends StackPane {
 
     private Button btnVolver;
+    private StackPane avatarContainer;
+    private final JugadorRepository jugadorRepo = new JugadorRepository();
 
     private final String nombreUsuario;
     private final String correo;
@@ -78,14 +88,31 @@ public class PerfilView extends StackPane {
         VBox box = new VBox(10);
         box.setAlignment(Pos.CENTER);
 
-        StackPane avatarContainer = new StackPane();
+        avatarContainer = new StackPane();
+        avatarContainer.setMaxWidth(96);
+        avatarContainer.setMaxHeight(96);
+        avatarContainer.setCursor(Cursor.HAND);
+
         Circle circulo = new Circle(48);
         circulo.setFill(Color.web("#1A0800"));
         circulo.setStroke(Color.web("#C9922A"));
         circulo.setStrokeWidth(2.5);
-        Text icono = new Text("👤");
-        icono.setFont(Font.font(42));
-        avatarContainer.getChildren().addAll(circulo, icono);
+
+        actualizarFotoEnAvatar(circulo);
+
+        DropShadow ds = new DropShadow();
+        ds.setColor(Color.web("#C9922A", 0.4)); ds.setRadius(12);
+        avatarContainer.setEffect(ds);
+
+        Text editarHint = new Text("✎ cambiar foto");
+        editarHint.setFont(Font.font("Georgia", 10));
+        editarHint.setFill(Color.web("#9E7A3A"));
+
+        avatarContainer.setOnMouseClicked(e -> abrirSelectorFoto());
+        avatarContainer.setOnMouseEntered(e ->
+            avatarContainer.setStyle("-fx-opacity: 0.80;"));
+        avatarContainer.setOnMouseExited(e ->
+            avatarContainer.setStyle("-fx-opacity: 1.0;"));
 
         Text nombre = new Text(nombreUsuario);
         nombre.setFont(Font.font("Georgia", FontWeight.BOLD, 22));
@@ -96,8 +123,50 @@ public class PerfilView extends StackPane {
         etEstado.setFont(Font.font("Georgia", 13));
         etEstado.setFill(activo ? Color.web("#2ecc71") : Color.web("#e74c3c"));
 
-        box.getChildren().addAll(avatarContainer, nombre, etEstado);
+        box.getChildren().addAll(avatarContainer, editarHint, nombre, etEstado);
         return box;
+    }
+
+    private void actualizarFotoEnAvatar(Circle circulo) {
+        avatarContainer.getChildren().clear();
+        avatarContainer.getChildren().add(circulo);
+
+        byte[] fotoBytes = jugadorRepo.getFoto(nombreUsuario);
+        if (fotoBytes != null && fotoBytes.length > 0) {
+            Image img = new Image(new ByteArrayInputStream(fotoBytes));
+            ImageView iv = new ImageView(img);
+            iv.setFitWidth(96);
+            iv.setFitHeight(96);
+            iv.setPreserveRatio(false);
+            iv.setClip(new Circle(48, 48, 48));
+            avatarContainer.getChildren().add(iv);
+        } else {
+            Text icono = new Text("👤");
+            icono.setFont(Font.font(42));
+            avatarContainer.getChildren().add(icono);
+        }
+    }
+
+    private void abrirSelectorFoto() {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Seleccionar foto de perfil");
+        fc.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
+        );
+
+        Stage ventana = (Stage) getScene().getWindow();
+        File archivo = fc.showOpenDialog(ventana);
+
+        if (archivo != null) {
+            boolean ok = jugadorRepo.guardarFoto(nombreUsuario, archivo);
+            if (ok) {
+                Circle circulo = new Circle(48);
+                circulo.setFill(Color.web("#1A0800"));
+                circulo.setStroke(Color.web("#C9922A"));
+                circulo.setStrokeWidth(2.5);
+                actualizarFotoEnAvatar(circulo);
+            }
+        }
     }
 
     private Separator crearSeparador() {
