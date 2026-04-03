@@ -1,9 +1,10 @@
 package com.marrakech.game.infrastructure.persistence;
 
-import com.marrakech.game.infrastructure.database.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
+import com.marrakech.game.infrastructure.database.DatabaseConnection;
 
 public class JugadorRepository {
 
@@ -67,5 +68,30 @@ public class JugadorRepository {
             if (rs.next()) return rs.getInt("id_jugador");
         } catch (Exception e) { e.printStackTrace(); }
         return -1;
+    }
+
+    public String getCorreo(String nombreUsuario) {
+        String sql = "SELECT correo FROM Jugador WHERE nombre_usuario = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nombreUsuario);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) return rs.getString("correo");
+        } catch (Exception e) { e.printStackTrace(); }
+        return "";
+    }
+
+    public String getFechaRegistro(String nombreUsuario) {
+        String sql = "SELECT fecha_registro FROM Jugador WHERE nombre_usuario = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nombreUsuario);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Object fecha = rs.getObject("fecha_registro");
+                return fecha != null ? fecha.toString().substring(0, 10) : "—";
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return "—";
     }
 }

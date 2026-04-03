@@ -61,11 +61,31 @@ public class AuthController {
     }
 
     public void mostrarMenu() {
-        limpiarSalasViejas(); // ← limpia salas fantasma al volver al menu
-        MenuView v = new MenuView();
+        limpiarSalasViejas();
+        MenuView v = new MenuView(usuarioActual);
         v.getBtnJugar().setOnAction(e -> mostrarModoOnline());
         v.getBtnReglas().setOnAction(e -> mostrarReglas());
         v.getBtnConfiguracion().setOnAction(e -> mostrarConfiguracion());
+        v.getTarjetaUsuario().setOnMouseClicked(e -> mostrarPerfil());
+        stage.setScene(new Scene(v, width, height));
+    }
+
+    public void mostrarPerfil() {
+        String correo        = jugadorRepo.getCorreo(usuarioActual);
+        String fechaRegistro = jugadorRepo.getFechaRegistro(usuarioActual);
+        int victorias        = PartidaRepository.obtenerRanking().stream()
+            .filter(r -> r.usuario.equals(usuarioActual))
+            .mapToInt(r -> r.victorias)
+            .findFirst().orElse(0);
+
+        PerfilView v = new PerfilView(
+            usuarioActual,
+            correo        != null ? correo        : "",
+            "Activo",
+            fechaRegistro != null ? fechaRegistro : "—",
+            victorias
+        );
+        v.getBtnVolver().setOnAction(e -> mostrarMenu());
         stage.setScene(new Scene(v, width, height));
     }
 
@@ -110,8 +130,8 @@ public class AuthController {
         });
         v.setOnJuegoIniciado(() -> {
             Partida act = PartidaRepository.obtenerPartida(partida.id);
-            int n = act != null ? act.maxJugadores : 2;
-            int miIdx = act != null ? act.jugadores.indexOf(usuarioActual) : 1;
+            int n      = act != null ? act.maxJugadores : 2;
+            int miIdx  = act != null ? act.jugadores.indexOf(usuarioActual) : 1;
             mostrarJuego(n, partida.id, usuarioActual, Math.max(0, miIdx));
         });
         stage.setScene(new Scene(v, width, height));
@@ -147,7 +167,6 @@ public class AuthController {
     private void limpiarSalasViejas() {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement st = conn.createStatement()) {
-            // Eliminar salas con más de 2 horas de antigüedad o ya iniciadas
             st.execute("DELETE FROM partida_jugadores WHERE partida_id IN " +
                 "(SELECT id FROM partidas WHERE estado = 'INICIADA')");
             st.execute("DELETE FROM partidas WHERE estado = 'INICIADA'");
