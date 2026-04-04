@@ -82,7 +82,7 @@ CREATE TABLE EstadoPartida(
     assam_col INT NOT NULL,
     assam_direccion VARCHAR(10),
     tablero_estado TEXT NOT NULL,
-    fecha_guardado TIMESTAM NOT NULL,
+    fecha_guardado TIMESTAMP NOT NULL,
     id_partida INT NOT NULL,
     FOREIGN KEY (id_partida) REFERENCES Partida(id_partida)
 );
@@ -90,7 +90,7 @@ CREATE TABLE EstadoPartida(
 CREATE TABLE Mensajechat(
     id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
     texto VARCHAR(500) NOT NULL,
-    fecha_hora TIMETAMP NOT NULL,
+    fecha_hora TIMESTAMP NOT NULL,
     id_sala INT NOT NULL,
     id_jugador INT NOT NULL,
     FOREIGN KEY (id_sala) REFERENCES Sala(id_sala),
