@@ -29,7 +29,7 @@
 /* Estilo para las etiquetas de estadísticas (Dinero, Alfombras) */
 .player-stat-label {
     -fx-font-size: 14px;
-    -fx-text-fill: #cccccc; /* Gris claro */
+    -fx-text-fill: #cccccc; /* Gris*/
 }
 
 /* Estilo para los valores de las estadísticas */
