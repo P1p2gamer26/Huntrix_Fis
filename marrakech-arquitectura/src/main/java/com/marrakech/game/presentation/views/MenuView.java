@@ -2,6 +2,7 @@ package com.marrakech.game.presentation.views;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Glow;
@@ -11,10 +12,13 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -24,10 +28,14 @@ public class MenuView extends StackPane {
     private Button btnJugar;
     private Button btnReglas;
     private Button btnConfiguracion;
+    private HBox   tarjetaUsuario;
+    private final String usuario;
 
-    public MenuView() {
+    public MenuView(String usuario) {
+        this.usuario = usuario == null || usuario.isEmpty() ? "Jugador" : usuario;
         configurarFondo();
         configurarContenido();
+        configurarTarjetaUsuario();
     }
 
     private void configurarFondo() {
@@ -75,6 +83,48 @@ public class MenuView extends StackPane {
         getChildren().add(contenido);
     }
 
+    private void configurarTarjetaUsuario() {
+        tarjetaUsuario = new HBox(8);
+        tarjetaUsuario.setAlignment(Pos.CENTER_LEFT);
+        tarjetaUsuario.setPadding(new Insets(8, 14, 8, 10));
+        tarjetaUsuario.setCursor(Cursor.HAND);
+        tarjetaUsuario.setMaxWidth(Region.USE_PREF_SIZE);
+        tarjetaUsuario.setMaxHeight(Region.USE_PREF_SIZE);
+
+        String estiloNormal = "-fx-background-color:rgba(10,4,0,0.82);-fx-border-color:#8B6914;-fx-border-width:1;-fx-border-radius:20;-fx-background-radius:20;";
+        String estiloHover  = "-fx-background-color:rgba(201,146,42,0.22);-fx-border-color:#D4A017;-fx-border-width:1;-fx-border-radius:20;-fx-background-radius:20;";
+        tarjetaUsuario.setStyle(estiloNormal);
+        tarjetaUsuario.setOnMouseEntered(e -> tarjetaUsuario.setStyle(estiloHover));
+        tarjetaUsuario.setOnMouseExited(e  -> tarjetaUsuario.setStyle(estiloNormal));
+
+        StackPane avatar = new StackPane();
+        avatar.setMaxWidth(28); avatar.setMaxHeight(28);
+        avatar.setMinWidth(28); avatar.setMinHeight(28);
+        Circle circulo = new Circle(14);
+        circulo.setFill(Color.web("#2A1400"));
+        circulo.setStroke(Color.web("#C9922A"));
+        circulo.setStrokeWidth(1.2);
+        Text icono = new Text("👤");
+        icono.setFont(Font.font(12));
+        avatar.getChildren().addAll(circulo, icono);
+
+        VBox info = new VBox(1);
+        info.setAlignment(Pos.CENTER_LEFT);
+        Text nombreText = new Text(usuario);
+        nombreText.setFont(Font.font("Georgia", FontWeight.BOLD, 12));
+        nombreText.setFill(Color.web("#D4A017"));
+        Text subText = new Text("Ver perfil →");
+        subText.setFont(Font.font("Georgia", 9));
+        subText.setFill(Color.web("#9E7A3A"));
+        info.getChildren().addAll(nombreText, subText);
+
+        tarjetaUsuario.getChildren().addAll(avatar, info);
+
+        StackPane.setAlignment(tarjetaUsuario, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(tarjetaUsuario, new Insets(0, 20, 20, 0));
+        getChildren().add(tarjetaUsuario);
+    }
+
     private Button crearBoton(String texto) {
         Button btn = new Button(texto);
         btn.setMaxWidth(Double.MAX_VALUE);
@@ -91,4 +141,5 @@ public class MenuView extends StackPane {
     public Button getBtnJugar()         { return btnJugar; }
     public Button getBtnReglas()        { return btnReglas; }
     public Button getBtnConfiguracion() { return btnConfiguracion; }
+    public HBox   getTarjetaUsuario()   { return tarjetaUsuario; }
 }

@@ -14,6 +14,7 @@
 /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/Main.java
 /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/views/SalaEsperaView.java
 /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/BoardPersistencia.java
+/home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/views/PerfilView.java
 /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/presentation/views/MenuView.java
 /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/infrastructure/persistence/EstadoPartidaRepository.java
 /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Game.java
