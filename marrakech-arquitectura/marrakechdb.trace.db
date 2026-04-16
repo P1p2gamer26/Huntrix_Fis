@@ -1,199 +1,4 @@
-2026-04-16 14:41:55.847178-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:41:57.748712-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE estado = 'ESPERANDO' [42104-224]
-2026-04-16 14:41:57.843639-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:41:58.998836-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE estado = 'ESPERANDO' [42104-224]
-2026-04-16 14:41:59.850603-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:01.850280-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:02.723317-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE estado = 'ESPERANDO' [42104-224]
-2026-04-16 14:42:03.850887-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:04.116540-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE estado = 'ESPERANDO' [42104-224]
-2026-04-16 14:42:04.337230-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE estado = 'ESPERANDO' [42104-224]
-2026-04-16 14:42:04.905483-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE estado = 'ESPERANDO' [42104-224]
-2026-04-16 14:42:05.139317-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE estado = 'ESPERANDO' [42104-224]
-2026-04-16 14:42:05.855483-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:07.853359-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:09.851676-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:11.848418-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:13.843547-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:15.525968-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:15.848588-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:17.844841-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:18.898478-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:19.850465-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:21.850869-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:23.850655-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:25.848230-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:27.850425-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:29.845938-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:31.854187-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:33.842524-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:35.843302-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:37.841855-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:39.852239-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:41.850551-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:43.853467-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:45.840477-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:48.751390-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:50.755120-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:52.751763-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:54.752638-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:56.757060-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:42:58.763772-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:00.750957-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:02.753977-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:04.759183-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:06.749332-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:08.752210-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:10.751876-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:12.758475-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:14.760637-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:16.762746-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:18.762317-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:20.766088-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:22.752334-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:24.766797-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:26.763509-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:28.754898-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:30.757751-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:32.760792-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:34.759344-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:36.761186-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:38.756249-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:40.762237-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:42.760966-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:44.757486-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:43:46.755343-05:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PARTIDAS" not found (this database is empty); SQL statement:
-SELECT * FROM partidas WHERE id = ? [42104-224]
-2026-04-16 14:44:55.903268-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+2026-04-16 16:53:56.853415-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
 org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
 	at org.h2.message.DbException.get(DbException.java:212)
 	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
@@ -210,7 +15,175 @@ org.h2.message.DbException: Error opening database: "Lock file recently modified
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
 	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
+	at com.marrakech.game.infrastructure.PartidaRepository.obtenerPartida(PartidaRepository.java:128)
+	at com.marrakech.game.presentation.views.SalaEsperaView.lambda$iniciarPolling$0(SalaEsperaView.java:118)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
+	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
+	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
+	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
+	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
+	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
+	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 36 more
+2026-04-16 16:54:01.899044-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.get(DbException.java:212)
+	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
+	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
+	at org.h2.store.FileLock.lockFile(FileLock.java:318)
+	at org.h2.store.FileLock.lock(FileLock.java:110)
+	at org.h2.engine.Database.<init>(Database.java:317)
+	at org.h2.engine.Engine.openSession(Engine.java:92)
+	at org.h2.engine.Engine.openSession(Engine.java:222)
+	at org.h2.engine.Engine.createSession(Engine.java:201)
+	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
+	at org.h2.Driver.connect(Driver.java:59)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
+	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
+	at com.marrakech.game.infrastructure.PartidaRepository.obtenerPartida(PartidaRepository.java:128)
+	at com.marrakech.game.presentation.views.SalaEsperaView.lambda$iniciarPolling$0(SalaEsperaView.java:118)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
+	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
+	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
+	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
+	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
+	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
+	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 36 more
+2026-04-16 16:54:05.943666-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.get(DbException.java:212)
+	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
+	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
+	at org.h2.store.FileLock.lockFile(FileLock.java:318)
+	at org.h2.store.FileLock.lock(FileLock.java:110)
+	at org.h2.engine.Database.<init>(Database.java:317)
+	at org.h2.engine.Engine.openSession(Engine.java:92)
+	at org.h2.engine.Engine.openSession(Engine.java:222)
+	at org.h2.engine.Engine.createSession(Engine.java:201)
+	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
+	at org.h2.Driver.connect(Driver.java:59)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
+	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
+	at com.marrakech.game.infrastructure.PartidaRepository.obtenerPartida(PartidaRepository.java:128)
+	at com.marrakech.game.presentation.views.SalaEsperaView.lambda$iniciarPolling$0(SalaEsperaView.java:118)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
+	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
+	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
+	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
+	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
+	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
+	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 36 more
+2026-04-16 16:54:12.944625-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.get(DbException.java:212)
+	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
+	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
+	at org.h2.store.FileLock.lockFile(FileLock.java:318)
+	at org.h2.store.FileLock.lock(FileLock.java:110)
+	at org.h2.engine.Database.<init>(Database.java:317)
+	at org.h2.engine.Engine.openSession(Engine.java:92)
+	at org.h2.engine.Engine.openSession(Engine.java:222)
+	at org.h2.engine.Engine.createSession(Engine.java:201)
+	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
+	at org.h2.Driver.connect(Driver.java:59)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
+	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
+	at com.marrakech.game.infrastructure.PartidaRepository.obtenerPartida(PartidaRepository.java:128)
+	at com.marrakech.game.presentation.views.SalaEsperaView.lambda$iniciarPolling$0(SalaEsperaView.java:118)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
+	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
+	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
+	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
+	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
+	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
+	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 36 more
+2026-04-16 16:54:21.764086-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.get(DbException.java:212)
+	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
+	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
+	at org.h2.store.FileLock.lockFile(FileLock.java:318)
+	at org.h2.store.FileLock.lock(FileLock.java:110)
+	at org.h2.engine.Database.<init>(Database.java:317)
+	at org.h2.engine.Engine.openSession(Engine.java:92)
+	at org.h2.engine.Engine.openSession(Engine.java:222)
+	at org.h2.engine.Engine.createSession(Engine.java:201)
+	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
+	at org.h2.Driver.connect(Driver.java:59)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
+	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
+	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:188)
 	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
@@ -235,7 +208,7 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening dat
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 36 more
-2026-04-16 14:44:59.932787-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+2026-04-16 16:54:26.497023-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
 org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
 	at org.h2.message.DbException.get(DbException.java:212)
 	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
@@ -252,7 +225,7 @@ org.h2.message.DbException: Error opening database: "Lock file recently modified
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
 	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
+	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:188)
 	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
@@ -277,7 +250,7 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening dat
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 36 more
-2026-04-16 14:45:05.521225-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+2026-04-16 16:54:30.535908-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
 org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
 	at org.h2.message.DbException.get(DbException.java:212)
 	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
@@ -294,7 +267,7 @@ org.h2.message.DbException: Error opening database: "Lock file recently modified
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
 	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
+	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:188)
 	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
@@ -319,7 +292,7 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening dat
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 36 more
-2026-04-16 14:45:10.817378-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+2026-04-16 16:54:35.758014-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
 org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
 	at org.h2.message.DbException.get(DbException.java:212)
 	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
@@ -336,7 +309,7 @@ org.h2.message.DbException: Error opening database: "Lock file recently modified
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
 	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
+	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:188)
 	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
@@ -361,7 +334,7 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening dat
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 36 more
-2026-04-16 14:45:14.867096-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+2026-04-16 16:54:39.802571-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
 org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
 	at org.h2.message.DbException.get(DbException.java:212)
 	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
@@ -378,555 +351,9 @@ org.h2.message.DbException: Error opening database: "Lock file recently modified
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
 	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:45:21.036712-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:45:31.663288-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:45:35.704141-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:45:39.744518-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:45:43.780335-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:51:02.684293-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:51:06.721756-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:51:10.756149-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:51:14.779282-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:51:21.972158-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:51:26.006457-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:51:32.667757-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:51:36.703739-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.guardarEstado(GameController.java:161)
-	at com.marrakech.game.presentation.controllers.GameController.pasarTurno(GameController.java:380)
-	at com.marrakech.game.presentation.controllers.GameController.handleTileClick(GameController.java:367)
+	at com.marrakech.game.presentation.controllers.GameController.guardarEstado(GameController.java:159)
+	at com.marrakech.game.presentation.controllers.GameController.pasarTurno(GameController.java:394)
+	at com.marrakech.game.presentation.controllers.GameController.handleTileClick(GameController.java:381)
 	at com.marrakech.game.presentation.controllers.GameController.lambda$startGame$0(GameController.java:113)
 	at javafx.base/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:86)
 	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:234)
@@ -960,7 +387,7 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening dat
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 47 more
-2026-04-16 14:51:39.704307-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+2026-04-16 17:01:11.516055-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
 org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
 	at org.h2.message.DbException.get(DbException.java:212)
 	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
@@ -977,7 +404,117 @@ org.h2.message.DbException: Error opening database: "Lock file recently modified
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
 	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
+	at com.marrakech.game.infrastructure.PartidaRepository.obtenerPartida(PartidaRepository.java:128)
+	at com.marrakech.game.presentation.views.SalaEsperaView.lambda$iniciarPolling$0(SalaEsperaView.java:118)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
+	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
+	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
+	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
+	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
+	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
+	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
+	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
+	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 36 more
+2026-04-16 17:01:14.842644-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.get(DbException.java:212)
+	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
+	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
+	at org.h2.store.FileLock.lockFile(FileLock.java:318)
+	at org.h2.store.FileLock.lock(FileLock.java:110)
+	at org.h2.engine.Database.<init>(Database.java:317)
+	at org.h2.engine.Engine.openSession(Engine.java:92)
+	at org.h2.engine.Engine.openSession(Engine.java:222)
+	at org.h2.engine.Engine.createSession(Engine.java:201)
+	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
+	at org.h2.Driver.connect(Driver.java:59)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
+	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
+	at com.marrakech.game.infrastructure.PartidaRepository.iniciarPartida(PartidaRepository.java:117)
+	at com.marrakech.game.presentation.controllers.AuthController.lambda$mostrarSalaEspera$20(AuthController.java:128)
+	at javafx.base/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:86)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:234)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:191)
+	at javafx.base/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:49)
+	at javafx.base/javafx.event.Event.fireEvent(Event.java:198)
+	at javafx.graphics/javafx.scene.Node.fireEvent(Node.java:8792)
+	at javafx.controls/javafx.scene.control.Button.fire(Button.java:203)
+	at javafx.controls/com.sun.javafx.scene.control.behavior.ButtonBehavior.mouseReleased(ButtonBehavior.java:208)
+	at javafx.controls/com.sun.javafx.scene.control.inputmap.InputMap.handle(InputMap.java:274)
+	at javafx.base/com.sun.javafx.event.CompositeEventHandler$NormalEventHandlerRecord.handleBubblingEvent(CompositeEventHandler.java:247)
+	at javafx.base/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:80)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:234)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:191)
+	at javafx.base/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:54)
+	at javafx.base/javafx.event.Event.fireEvent(Event.java:198)
+	at javafx.graphics/javafx.scene.Scene$MouseHandler.process(Scene.java:3897)
+	at javafx.graphics/javafx.scene.Scene.processMouseEvent(Scene.java:1878)
+	at javafx.graphics/javafx.scene.Scene$ScenePeerListener.mouseEvent(Scene.java:2623)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:411)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:301)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler.lambda$handleMouseEvent$2(GlassViewEventHandler.java:450)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.runWithoutRenderLock(QuantumToolkit.java:424)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler.handleMouseEvent(GlassViewEventHandler.java:449)
+	at javafx.graphics/com.sun.glass.ui.View.handleMouseEvent(View.java:557)
+	at javafx.graphics/com.sun.glass.ui.View.notifyMouse(View.java:943)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
+	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 62 more
+2026-04-16 17:04:54.662491-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
+	at org.h2.message.DbException.get(DbException.java:212)
+	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
+	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
+	at org.h2.store.FileLock.lockFile(FileLock.java:318)
+	at org.h2.store.FileLock.lock(FileLock.java:110)
+	at org.h2.engine.Database.<init>(Database.java:317)
+	at org.h2.engine.Engine.openSession(Engine.java:92)
+	at org.h2.engine.Engine.openSession(Engine.java:222)
+	at org.h2.engine.Engine.createSession(Engine.java:201)
+	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
+	at org.h2.Driver.connect(Driver.java:59)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
+	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
+	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:188)
 	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
@@ -1002,7 +539,7 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening dat
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 36 more
-2026-04-16 14:51:45.903719-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+2026-04-16 17:04:59.230284-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
 org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
 	at org.h2.message.DbException.get(DbException.java:212)
 	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
@@ -1019,7 +556,7 @@ org.h2.message.DbException: Error opening database: "Lock file recently modified
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
 	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
+	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:188)
 	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
 	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
@@ -1044,7 +581,7 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening dat
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 36 more
-2026-04-16 14:51:49.935953-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
+2026-04-16 17:05:03.260823-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
 org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
 	at org.h2.message.DbException.get(DbException.java:212)
 	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
@@ -1061,322 +598,39 @@ org.h2.message.DbException: Error opening database: "Lock file recently modified
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
 	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
 	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
+	at com.marrakech.game.presentation.controllers.GameController.guardarEstado(GameController.java:159)
+	at com.marrakech.game.presentation.controllers.GameController.pasarTurno(GameController.java:394)
+	at com.marrakech.game.presentation.controllers.GameController.handleTileClick(GameController.java:381)
+	at com.marrakech.game.presentation.controllers.GameController.lambda$startGame$0(GameController.java:113)
+	at javafx.base/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:86)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:234)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:191)
+	at javafx.base/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:54)
+	at javafx.base/javafx.event.Event.fireEvent(Event.java:198)
+	at javafx.graphics/javafx.scene.Scene$ClickGenerator.postProcess(Scene.java:3602)
+	at javafx.graphics/javafx.scene.Scene$MouseHandler.process(Scene.java:3906)
+	at javafx.graphics/javafx.scene.Scene.processMouseEvent(Scene.java:1878)
+	at javafx.graphics/javafx.scene.Scene$ScenePeerListener.mouseEvent(Scene.java:2623)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:411)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:301)
 	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler.lambda$handleMouseEvent$2(GlassViewEventHandler.java:450)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.runWithoutRenderLock(QuantumToolkit.java:424)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler.handleMouseEvent(GlassViewEventHandler.java:449)
+	at javafx.graphics/com.sun.glass.ui.View.handleMouseEvent(View.java:557)
+	at javafx.graphics/com.sun.glass.ui.View.notifyMouse(View.java:943)
 	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
 	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
 	at java.base/java.lang.Thread.run(Thread.java:840)
 Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:51:53.971067-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:52:00.967669-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:52:05.009414-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:52:11.658291-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:52:21.587433-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:52:25.617841-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
-2026-04-16 14:52:29.730717-05:00 database: opening /home/Pipe/Downloads/basura/Huntrix_Fis/marrakech-arquitectura/marrakechdb
-org.h2.message.DbException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.get(DbException.java:212)
-	at org.h2.store.FileLock.getExceptionFatal(FileLock.java:429)
-	at org.h2.store.FileLock.waitUntilOld(FileLock.java:301)
-	at org.h2.store.FileLock.lockFile(FileLock.java:318)
-	at org.h2.store.FileLock.lock(FileLock.java:110)
-	at org.h2.engine.Database.<init>(Database.java:317)
-	at org.h2.engine.Engine.openSession(Engine.java:92)
-	at org.h2.engine.Engine.openSession(Engine.java:222)
-	at org.h2.engine.Engine.createSession(Engine.java:201)
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:343)
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:125)
-	at org.h2.Driver.connect(Driver.java:59)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-	at com.marrakech.game.infrastructure.database.DatabaseConnection.getConnection(DatabaseConnection.java:17)
-	at com.marrakech.game.presentation.controllers.GameController.cargarUltimoEstadoDB(GameController.java:182)
-	at com.marrakech.game.presentation.controllers.GameController.lambda$iniciarPolling$2(GameController.java:140)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.visitKeyFrame(TimelineClipCore.java:239)
-	at javafx.graphics/com.sun.scenario.animation.shared.TimelineClipCore.playTo(TimelineClipCore.java:180)
-	at javafx.graphics/javafx.animation.Timeline.doPlayTo(Timeline.java:172)
-	at javafx.graphics/javafx.animation.AnimationAccessorImpl.playTo(AnimationAccessorImpl.java:39)
-	at javafx.graphics/com.sun.scenario.animation.shared.InfiniteClipEnvelope.timePulse(InfiniteClipEnvelope.java:104)
-	at javafx.graphics/javafx.animation.Animation.doTimePulse(Animation.java:1189)
-	at javafx.graphics/javafx.animation.Animation$1.lambda$timePulse$0(Animation.java:207)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
-	at javafx.graphics/javafx.animation.Animation$1.timePulse(Animation.java:206)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:343)
-	at javafx.graphics/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:266)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:571)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:555)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:548)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$11(QuantumToolkit.java:353)
-	at javafx.graphics/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.gtk.GtkApplication.lambda$runLoop$11(GtkApplication.java:290)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Error opening database: "Lock file recently modified" [8000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:516)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	... 36 more
+	... 47 more

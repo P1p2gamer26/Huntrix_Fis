@@ -135,35 +135,39 @@ public class GameController {
 
     // ── Polling ──────────────────────────────────────────────────────────────
 
-    private void iniciarPolling() {
-        pollingTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+private void iniciarPolling() {
+        pollingTimeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
             String estadoJson = cargarUltimoEstadoDB();
             if (estadoJson == null) return;
             EstadoDB est = parsearEstado(estadoJson);
-            if (est == null || est.turno == ultimoTurnoVisto) return;
-            // Solo aplicar si NO es mi turno (el mío ya lo apliqué localmente)
-            if (est.turno != ultimoTurnoVisto && currentPlayerIdx != miIndice) {
+            
+            // LÓGICA CORREGIDA: Solo importa si el turno es mayor al que yo he visto
+            if (est != null && est.turno > ultimoTurnoVisto) {
                 Platform.runLater(() -> aplicarEstado(est));
-            } else if (est.turno != ultimoTurnoVisto) {
-                ultimoTurnoVisto = est.turno;
             }
         }));
         pollingTimeline.setCycleCount(Timeline.INDEFINITE);
         pollingTimeline.play();
     }
 
-    // ── Serialización del estado ─────────────────────────────────────────────
+    private static boolean tablaEstadoCreada = false;
 
     private void guardarEstado() {
         if (!modoMultijugador || partidaId == null) return;
         estadoVersion++;
         String json = serializarEstado();
         try (Connection conn = DatabaseConnection.getConnection()) {
-            conn.createStatement().execute(
-                "CREATE TABLE IF NOT EXISTS estado_juego (" +
-                "partida_id VARCHAR(20), turno_numero INT, assam_x INT, assam_y INT, " +
-                "assam_dir INT, tablero TEXT, ts TIMESTAMP, " +
-                "PRIMARY KEY (partida_id, turno_numero))");
+            
+            // RENDIMIENTO CORREGIDO: Solo crea la tabla la primera vez
+            if (!tablaEstadoCreada) {
+                conn.createStatement().execute(
+                    "CREATE TABLE IF NOT EXISTS estado_juego (" +
+                    "partida_id VARCHAR(20), turno_numero INT, assam_x INT, assam_y INT, " +
+                    "assam_dir INT, tablero TEXT, ts TIMESTAMP, " +
+                    "PRIMARY KEY (partida_id, turno_numero))");
+                tablaEstadoCreada = true;
+            }
+
             try (PreparedStatement ps = conn.prepareStatement(
                 "MERGE INTO estado_juego (partida_id, turno_numero, assam_x, assam_y, assam_dir, tablero, ts) " +
                 "KEY(partida_id, turno_numero) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)")) {
@@ -174,15 +178,19 @@ public class GameController {
                 ps.executeUpdate();
                 ultimoTurnoVisto = estadoVersion;
             }
-        } catch (Exception ex) { ex.printStackTrace(); }
+        } catch (Exception ex) { 
+            ex.printStackTrace(); 
+        }
     }
 
     private String cargarUltimoEstadoDB() {
         if (!modoMultijugador || partidaId == null) return null;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
+                // ¡LA CLAVE! Quitamos "ts DESC" para evitar la confusión de tiempos.
+                // Ahora siempre traerá el movimiento más reciente basado en el número de turno.
                 "SELECT turno_numero, assam_x, assam_y, assam_dir, tablero FROM estado_juego " +
-                "WHERE partida_id = ? ORDER BY ts DESC, turno_numero DESC LIMIT 1")) {
+                "WHERE partida_id = ? ORDER BY turno_numero DESC LIMIT 1")) {
             ps.setString(1, partidaId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -190,9 +198,15 @@ public class GameController {
                        rs.getInt("assam_y") + "|" + rs.getInt("assam_dir") + "|" +
                        rs.getString("tablero");
             }
-        } catch (Exception e) { /* tabla aún no existe */ }
+        } catch (Exception e) { 
+            // Por si la base de datos se bloquea alguna vez, que nos avise en la terminal
+            e.printStackTrace(); 
+        }
         return null;
     }
+
+    // ── Serialización del estado ─────────────────────────────────────────────
+
 
     private String serializarEstado() {
         // formato: money0,money1,...;rugs0,rugs1,...;tileOwner(fila por fila separada por /)

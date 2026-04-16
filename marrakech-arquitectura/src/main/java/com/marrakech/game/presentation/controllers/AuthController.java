@@ -61,7 +61,6 @@ public class AuthController {
     }
 
     public void mostrarMenu() {
-        // limpiarSalasViejas();
         MenuView v = new MenuView(usuarioActual);
         v.getBtnJugar().setOnAction(e -> mostrarModoOnline());
         v.getBtnReglas().setOnAction(e -> mostrarReglas());
@@ -71,9 +70,9 @@ public class AuthController {
     }
 
     public void mostrarPerfil() {
-        String correo        = jugadorRepo.getCorreo(usuarioActual);
+        String correo       = jugadorRepo.getCorreo(usuarioActual);
         String fechaRegistro = jugadorRepo.getFechaRegistro(usuarioActual);
-        int victorias        = PartidaRepository.obtenerRanking().stream()
+        int victorias       = PartidaRepository.obtenerRanking().stream()
             .filter(r -> r.usuario.equals(usuarioActual))
             .mapToInt(r -> r.victorias)
             .findFirst().orElse(0);
@@ -122,17 +121,24 @@ public class AuthController {
     public void mostrarSalaEspera(Partida partida, boolean esHost) {
         SalaEsperaView v = new SalaEsperaView(partida, esHost);
         v.getBtnSalir().setOnAction(e -> { v.detenerPolling(); mostrarModoOnline(); });
+        
+        // EL HOST (El creador de la sala siempre debe ser el Índice 0)
         v.getBtnIniciar().setOnAction(e -> {
             v.detenerPolling();
             PartidaRepository.iniciarPartida(v.getPartidaId());
-            int miIdx = partida.jugadores.indexOf(usuarioActual);
-            mostrarJuego(v.getNumJugadores(), v.getPartidaId(), usuarioActual, Math.max(0, miIdx));
+            Partida fresca = PartidaRepository.obtenerPartida(v.getPartidaId());
+            int miIdx = (fresca != null) ? fresca.jugadores.indexOf(usuarioActual) : 0;
+            if(miIdx == -1) miIdx = 0; // Seguridad absoluta: el Host es el 0
+            mostrarJuego(v.getNumJugadores(), v.getPartidaId(), usuarioActual, miIdx);
         });
+        
+        // LOS INVITADOS (Jamás deben recibir el Índice 0 por error)
         v.setOnJuegoIniciado(() -> {
             Partida act = PartidaRepository.obtenerPartida(partida.id);
             int n      = act != null ? act.maxJugadores : 2;
             int miIdx  = act != null ? act.jugadores.indexOf(usuarioActual) : 1;
-            mostrarJuego(n, partida.id, usuarioActual, Math.max(0, miIdx));
+            if(miIdx <= 0) miIdx = 1; // Seguridad absoluta: el invitado jamás es el 0
+            mostrarJuego(n, partida.id, usuarioActual, miIdx);
         });
         stage.setScene(new Scene(v, width, height));
     }
