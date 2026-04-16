@@ -118,7 +118,11 @@ public class SalaEsperaView extends StackPane {
             Partida actualizada = PartidaRepository.obtenerPartida(partida.id);
             if (actualizada == null) return;
             this.partida = actualizada;
+            
+            // Actualizar lista e info (para ver el estado cambiar en pantalla)
             construirListaJugadores();
+            VBox panelPrincipal = (VBox) getChildren().get(1);
+            panelPrincipal.getChildren().set(2, construirInfoPartida());
 
             boolean salaLlena = actualizada.jugadores.size() >= actualizada.maxJugadores;
 
@@ -128,10 +132,9 @@ public class SalaEsperaView extends StackPane {
                     ? "¡Sala llena! Puedes iniciar la partida."
                     : "Esperando jugadores... (" + actualizada.jugadores.size() + "/" + actualizada.maxJugadores + ")");
             } else {
-                lblEstado.setText("Jugadores: " + actualizada.jugadores.size() + "/" + actualizada.maxJugadores
-                    + " — Esperando que el host inicie...");
+                lblEstado.setText("Esperando que el host inicie... (" + actualizada.jugadores.size() + "/" + actualizada.maxJugadores + ")");
                 // Guest detecta cuando el host inicia
-                if ("INICIADA".equals(actualizada.estado)) {
+                if ("INICIADA".equalsIgnoreCase(actualizada.estado.trim())) {
                     detenerPolling();
                     if (onJuegoIniciado != null) onJuegoIniciado.run();
                 }

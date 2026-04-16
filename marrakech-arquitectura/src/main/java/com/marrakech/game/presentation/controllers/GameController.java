@@ -57,6 +57,7 @@ public class GameController {
     private String miUsuario;
     private int miIndice = 0; // qué jugador soy yo (0-based)
     private int ultimoTurnoVisto = -1;
+    private int estadoVersion = 0;
     private Timeline pollingTimeline;
     private boolean modoMultijugador = false;
 
@@ -69,7 +70,7 @@ public class GameController {
         this.miIndice        = miIndice;
         this.modoMultijugador = true;
         startGame(n);
-        guardarEstado(); // turno 0 inicial
+        if (miIndice == 0) guardarEstado(); // turno 0 inicial (solo host)
         iniciarPolling();
     }
 
@@ -135,7 +136,7 @@ public class GameController {
     // ── Polling ──────────────────────────────────────────────────────────────
 
     private void iniciarPolling() {
-        pollingTimeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
+        pollingTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             String estadoJson = cargarUltimoEstadoDB();
             if (estadoJson == null) return;
             EstadoDB est = parsearEstado(estadoJson);
@@ -155,41 +156,23 @@ public class GameController {
 
     private void guardarEstado() {
         if (!modoMultijugador || partidaId == null) return;
+        estadoVersion++;
         String json = serializarEstado();
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO EstadoPartida (turno_numero, assam_fila, assam_col, assam_direccion, tablero_estado, fecha_guardado, id_partida) " +
-                "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, (SELECT id_partida FROM Partida WHERE id_sala = " +
-                "(SELECT id_sala FROM partidas WHERE id = ?) LIMIT 1))")) {
-            ps.setInt(1, currentPlayerIdx);
-            ps.setInt(2, assamY); ps.setInt(3, assamX);
-            ps.setString(4, String.valueOf(assamDir));
-            ps.setString(5, json);
-            ps.setString(6, partidaId);
-            ps.executeUpdate();
-            ultimoTurnoVisto = currentPlayerIdx;
-        } catch (Exception e) {
-            // Si no hay partida formal en DB todavía, guardar en tabla auxiliar
-            guardarEstadoAuxiliar(json);
-        }
-    }
-
-    private void guardarEstadoAuxiliar(String json) {
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.createStatement().execute(
                 "CREATE TABLE IF NOT EXISTS estado_juego (" +
-                "partida_id VARCHAR(20), turno INT, assam_x INT, assam_y INT, " +
+                "partida_id VARCHAR(20), turno_numero INT, assam_x INT, assam_y INT, " +
                 "assam_dir INT, tablero TEXT, ts TIMESTAMP, " +
-                "PRIMARY KEY (partida_id, turno))");
+                "PRIMARY KEY (partida_id, turno_numero))");
             try (PreparedStatement ps = conn.prepareStatement(
-                "MERGE INTO estado_juego (partida_id, turno, assam_x, assam_y, assam_dir, tablero, ts) " +
-                "KEY(partida_id, turno) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)")) {
+                "MERGE INTO estado_juego (partida_id, turno_numero, assam_x, assam_y, assam_dir, tablero, ts) " +
+                "KEY(partida_id, turno_numero) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)")) {
                 ps.setString(1, partidaId);
-                ps.setInt(2, currentPlayerIdx);
+                ps.setInt(2, estadoVersion);
                 ps.setInt(3, assamX); ps.setInt(4, assamY);
                 ps.setInt(5, assamDir); ps.setString(6, json);
                 ps.executeUpdate();
-                ultimoTurnoVisto = currentPlayerIdx;
+                ultimoTurnoVisto = estadoVersion;
             }
         } catch (Exception ex) { ex.printStackTrace(); }
     }
@@ -198,12 +181,12 @@ public class GameController {
         if (!modoMultijugador || partidaId == null) return null;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                "SELECT turno, assam_x, assam_y, assam_dir, tablero FROM estado_juego " +
-                "WHERE partida_id = ? ORDER BY ts DESC LIMIT 1")) {
+                "SELECT turno_numero, assam_x, assam_y, assam_dir, tablero FROM estado_juego " +
+                "WHERE partida_id = ? ORDER BY ts DESC, turno_numero DESC LIMIT 1")) {
             ps.setString(1, partidaId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getInt("turno") + "|" + rs.getInt("assam_x") + "|" +
+                return rs.getInt("turno_numero") + "|" + rs.getInt("assam_x") + "|" +
                        rs.getInt("assam_y") + "|" + rs.getInt("assam_dir") + "|" +
                        rs.getString("tablero");
             }
@@ -243,8 +226,7 @@ public class GameController {
             return e;
         } catch (Exception ex) { return null; }
     }
-
-    private void aplicarEstado(EstadoDB est) {
+private void aplicarEstado(EstadoDB est) {
         // Assam
         assamX = est.ax; assamY = est.ay; assamDir = est.adir;
         GridPane.setColumnIndex(assamView, assamX);
@@ -262,32 +244,39 @@ public class GameController {
                 rugs[i]  = Integer.parseInt(rs[i]);
             }
             String[] filas = secciones[2].split("/");
-            // Limpiar alfombras visuales (excepto tiles base y assam)
-            boardGrid.getChildren().removeIf(n ->
-                n instanceof ImageView && n != assamView);
+
+            // ¡SOLUCIÓN AL BUG DE JAVA FX!
+            // En lugar de removeIf (que crashea), usamos una lista temporal segura:
+            java.util.List<javafx.scene.Node> paraEliminar = new java.util.ArrayList<>();
+            for (javafx.scene.Node n : boardGrid.getChildren()) {
+                if (n instanceof ImageView && n != assamView) {
+                    paraEliminar.add(n);
+                }
+            }
+            boardGrid.getChildren().removeAll(paraEliminar);
+
+            // Redibujar TODO el tablero desde cero (soluciona alfombras invisibles)
             for (int row = 0; row < 7 && row < filas.length; row++) {
                 String[] celdas = filas[row].split(",");
                 for (int col = 0; col < 7 && col < celdas.length; col++) {
-                    int prev = tileOwner[col][row];
                     tileOwner[col][row] = Integer.parseInt(celdas[col]);
-                    // Si cambió, redibujar alfombra
-                    if (tileOwner[col][row] != prev && tileOwner[col][row] > 0) {
-                        // La redibujamos como 1x1 (la sincronización completa de spans
-                        // requeriría más info; esto muestra el color correctamente)
+                    // Si la celda tiene dueño, la dibujamos siempre
+                    if (tileOwner[col][row] > 0) {
                         redibujarCelda(col, row, tileOwner[col][row]);
                     }
                 }
             }
             currentPlayerIdx = Integer.parseInt(secciones[3]);
+            estadoVersion = est.turno;
             ultimoTurnoVisto = est.turno;
         }
+        
         actualizarUI();
         actualizarControles();
         statusLabel.setText(esMiTurno()
             ? "Tu turno. Rota a Assam y lanza el dado."
             : "Turno de " + playerNames[currentPlayerIdx] + ". Esperando...");
     }
-
     private void redibujarCelda(int col, int row, int player) {
         ImageView iv = new ImageView(carpetImages[player - 1]);
         iv.setFitWidth(CELL); iv.setFitHeight(CELL);
@@ -312,12 +301,14 @@ public class GameController {
         if (!esMiTurno() || currentPhase != Phase.MOVE) return;
         assamDir = (assamDir + 3) % 4;
         assamView.setRotate(assamDir * 90);
+        guardarEstado(); // Sincronizar rotación
     }
 
     @FXML protected void rotateRight() {
         if (!esMiTurno() || currentPhase != Phase.MOVE) return;
         assamDir = (assamDir + 1) % 4;
         assamView.setRotate(assamDir * 90);
+        guardarEstado(); // Sincronizar rotación
     }
 
     @FXML protected void onRollDiceClick() {
@@ -338,6 +329,7 @@ public class GameController {
             statusLabel.setText("Dado: " + pasos + " — Click en casilla adyacente a Assam.");
         }
         actualizarUI();
+        guardarEstado(); // Sincronizar movimiento y pago
         if (rugs[currentPlayerIdx] > 0) {
             currentPhase = Phase.CARPET_1;
             rollDiceBtn.setDisable(true);

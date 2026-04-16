@@ -61,7 +61,7 @@ public class AuthController {
     }
 
     public void mostrarMenu() {
-        limpiarSalasViejas();
+        // limpiarSalasViejas();
         MenuView v = new MenuView(usuarioActual);
         v.getBtnJugar().setOnAction(e -> mostrarModoOnline());
         v.getBtnReglas().setOnAction(e -> mostrarReglas());

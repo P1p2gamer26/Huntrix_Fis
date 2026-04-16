@@ -9,7 +9,7 @@ import java.sql.Statement;
 
 public class DatabaseConnection{
 
-    private static final String URL = "jdbc:h2:./marrakechdb";
+    private static final String URL = "jdbc:h2:./marrakechdb;AUTO_SERVER=TRUE";
     private static final String USER = "sa";
     private static final String PASSWORD = "";
 
