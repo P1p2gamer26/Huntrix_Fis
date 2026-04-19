@@ -5,6 +5,7 @@ import com.marrakech.game.infrastructure.PartidaRepository.Partida;
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
 import com.marrakech.game.infrastructure.persistence.JugadorRepository;
 import com.marrakech.game.presentation.views.*;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -122,22 +123,30 @@ public class AuthController {
         SalaEsperaView v = new SalaEsperaView(partida, esHost);
         v.getBtnSalir().setOnAction(e -> { v.detenerPolling(); mostrarModoOnline(); });
         
-        // EL HOST (El creador de la sala siempre debe ser el Índice 0)
+        // EL HOST: marca la partida como INICIADA y espera 2.5s para que el guest
+        // también haya detectado el cambio por polling, así entran al tablero al mismo tiempo.
         v.getBtnIniciar().setOnAction(e -> {
             v.detenerPolling();
             PartidaRepository.iniciarPartida(v.getPartidaId());
             Partida fresca = PartidaRepository.obtenerPartida(v.getPartidaId());
             int miIdx = (fresca != null) ? fresca.jugadores.indexOf(usuarioActual) : 0;
-            if(miIdx == -1) miIdx = 0; // Seguridad absoluta: el Host es el 0
-            mostrarJuego(v.getNumJugadores(), v.getPartidaId(), usuarioActual, miIdx);
+            if (miIdx == -1) miIdx = 0;
+            final int idxFinal  = miIdx;
+            final int nFinal    = v.getNumJugadores();
+            final String pidFinal = v.getPartidaId();
+            // Esperar 2.5s para que el guest detecte el cambio por polling al mismo tiempo
+            new Thread(() -> {
+                try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
+                Platform.runLater(() -> mostrarJuego(nFinal, pidFinal, usuarioActual, idxFinal));
+            }, "host-delay").start();
         });
         
-        // LOS INVITADOS (Jamás deben recibir el Índice 0 por error)
+        // LOS INVITADOS: entran al tablero cuando detectan la partida INICIADA por polling
         v.setOnJuegoIniciado(() -> {
             Partida act = PartidaRepository.obtenerPartida(partida.id);
             int n      = act != null ? act.maxJugadores : 2;
             int miIdx  = act != null ? act.jugadores.indexOf(usuarioActual) : 1;
-            if(miIdx <= 0) miIdx = 1; // Seguridad absoluta: el invitado jamás es el 0
+            if (miIdx < 0) miIdx = 1;
             mostrarJuego(n, partida.id, usuarioActual, miIdx);
         });
         stage.setScene(new Scene(v, width, height));
