@@ -12,13 +12,16 @@ import com.marrakech.game.infrastructure.database.DatabaseConnection;
 public class ChatRepository {
 
     public static class Mensaje {
+        public final int id;
         public final String usuario;
         public final String texto;
         public final String hora;
-        public Mensaje(String usuario, String texto, String hora) {
+
+        public Mensaje(int id, String usuario, String texto, String hora) {
+            this.id = id;
             this.usuario = usuario;
-            this.texto   = texto;
-            this.hora    = hora;
+            this.texto = texto;
+            this.hora = hora;
         }
     }
 
@@ -52,13 +55,18 @@ public class ChatRepository {
         List<Mensaje> lista = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                "SELECT usuario, texto, hora FROM chat_mensajes " +
+                "SELECT id, usuario, texto, hora FROM chat_mensajes " +
                 "WHERE partida_id = ? AND id > ? ORDER BY id ASC LIMIT 50")) {
             ps.setString(1, partidaId);
             ps.setInt(2, desdeId);
             ResultSet rs = ps.executeQuery();
             while (rs.next())
-                lista.add(new Mensaje(rs.getString("usuario"), rs.getString("texto"), rs.getString("hora")));
+                lista.add(new Mensaje(
+                    rs.getInt("id"),
+                    rs.getString("usuario"),
+                    rs.getString("texto"),
+                    rs.getString("hora")
+            )   );
         } catch (Exception e) { /* tabla aún no existe */ }
         return lista;
     }
@@ -73,4 +81,5 @@ public class ChatRepository {
         } catch (Exception e) { /* ignorar */ }
         return 0;
     }
+
 }

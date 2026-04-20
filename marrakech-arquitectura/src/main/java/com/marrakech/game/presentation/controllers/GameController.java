@@ -43,14 +43,14 @@ public class GameController {
     @FXML private Label     winnerLabel;
     @FXML private Label     finalScores;
 
-    // Chat
-    @FXML private VBox      chatPanel;
-    @FXML private VBox      chatBox;
+    // Chat FXML
+    @FXML private VBox       chatPanel;
+    @FXML private VBox       chatBox;
     @FXML private ScrollPane chatScroll;
-    @FXML private TextField chatInput;
-    @FXML private Button    chatSendBtn;
+    @FXML private TextField  chatInput;
+    @FXML private Button     chatSendBtn;
 
-    // ── Estado del juego (sin cambios) ────────────────────────────────────────
+    // ── Estado del juego ──────────────────────────────────────────────────────
     private ImageView assamView;
     private int assamX = 3, assamY = 3, assamDir = 0;
 
@@ -69,31 +69,36 @@ public class GameController {
     private final String[] playerColors = {"#e74c3c","#3498db","#2ecc71","#f39c12"};
     private final String[] playerNames  = {"J1 (ROJO)","J2 (AZUL)","J3 (VERDE)","J4 (AMARILLO)"};
 
-    // Multijugador
-    private String  partidaId;
-    private String  miUsuario;
-    private int     miIndice = 0;
-    private int     ultimoTurnoVisto = -1;
+    // ── Multijugador ──────────────────────────────────────────────────────────
+    private String   partidaId;
+    private String   usuarioActual;
+    private int      miIndice = 0;
+    private int      ultimoTurnoVisto = -1;
     private Timeline pollingTimeline;
-    private boolean modoMultijugador = false;
+    private boolean  modoMultijugador = false;
 
-    // Chat
-    private int ultimoMensajeId = 0;
+    // ── Chat ──────────────────────────────────────────────────────────────────
+    private int      ultimoMensajeId = 0;
     private Timeline chatTimeline;
 
     public void initialize() {}
 
     // ── Inicio ────────────────────────────────────────────────────────────────
 
-    public void iniciarConJugadores(int n, String partidaId, String miUsuario, int miIndice) {
+    public void iniciarConJugadores(int n, String partidaId, String usuario, int miIndice) {
         this.partidaId        = partidaId;
-        this.miUsuario        = miUsuario;
+        this.usuarioActual    = usuario;
         this.miIndice         = miIndice;
         this.modoMultijugador = true;
         startGame(n);
         guardarEstado();
         iniciarPolling();
-        iniciarChat();
+
+        // Inicializar chat
+        ChatRepository.inicializarTabla();
+        ultimoMensajeId = ChatRepository.obtenerUltimoId(partidaId);
+        cargarHistorialChat();
+        iniciarChatPolling();
     }
 
     public void iniciarConJugadores(int n) {
@@ -104,6 +109,8 @@ public class GameController {
     @FXML private void startWith2() { iniciarConJugadores(2); }
     @FXML private void startWith3() { iniciarConJugadores(3); }
     @FXML private void startWith4() { iniciarConJugadores(4); }
+
+    // ── startGame ─────────────────────────────────────────────────────────────
 
     private void startGame(int n) {
         numPlayers = n;
@@ -123,7 +130,6 @@ public class GameController {
         panelJ3.setVisible(n >= 3); panelJ3.setManaged(n >= 3);
         panelJ4.setVisible(n >= 4); panelJ4.setManaged(n >= 4);
 
-        // Ocultar chat en modo local
         if (chatPanel != null) {
             chatPanel.setVisible(modoMultijugador);
             chatPanel.setManaged(modoMultijugador);
@@ -159,7 +165,6 @@ public class GameController {
         actualizarControles();
         statusLabel.setText("Rota a Assam y lanza el dado.");
 
-        // Enter en el input de chat envía el mensaje
         if (chatInput != null) {
             chatInput.setOnKeyPressed(e -> {
                 if (e.getCode() == KeyCode.ENTER) onSendChat();
@@ -167,20 +172,32 @@ public class GameController {
         }
     }
 
-    // ── CHAT ─────────────────────────────────────────────────────────────────
+    // ── CHAT ──────────────────────────────────────────────────────────────────
 
-    private void iniciarChat() {
-        ChatRepository.inicializarTabla();
-        ultimoMensajeId = ChatRepository.obtenerUltimoId(partidaId);
+    private void cargarHistorialChat() {
+        // Carga todos los mensajes previos al unirse
+        List<Mensaje> todos = ChatRepository.obtenerMensajes(partidaId, 0);
+        for (Mensaje m : todos) agregarBurbuja(m);
+        if (!todos.isEmpty()) {
+            ultimoMensajeId = todos.get(todos.size() - 1).id;
+        }
+        scrollAlFinal();
+    }
 
-        chatTimeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
+    private void iniciarChatPolling() {
+        chatTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+            // Cargar solo mensajes nuevos desde el último ID visto
             List<Mensaje> nuevos = ChatRepository.obtenerMensajes(partidaId, ultimoMensajeId);
             if (!nuevos.isEmpty()) {
                 Platform.runLater(() -> {
-                    for (Mensaje m : nuevos) agregarBurbuja(m);
-                    ultimoMensajeId += nuevos.size();
-                    // Scroll al final
-                    chatScroll.setVvalue(1.0);
+                    for (Mensaje m : nuevos) {
+                        // No agregar los propios que ya mostramos localmente
+                        if (!m.usuario.equals(usuarioActual)) {
+                            agregarBurbuja(m);
+                        }
+                        ultimoMensajeId = m.id;
+                    }
+                    scrollAlFinal();
                 });
             }
         }));
@@ -188,31 +205,39 @@ public class GameController {
         chatTimeline.play();
     }
 
-    @FXML private void onSendChat() {
+    @FXML
+    private void onSendChat() {
         if (!modoMultijugador || chatInput == null) return;
         String texto = chatInput.getText().trim();
         if (texto.isEmpty()) return;
+
         chatInput.clear();
-        ChatRepository.enviarMensaje(partidaId, miUsuario, texto);
-        // Mostrar localmente de inmediato (sin esperar el polling)
+
+        // Guardar en BD
+        ChatRepository.enviarMensaje(partidaId, usuarioActual, texto);
+
+        // Actualizar ultimoMensajeId para no duplicar via polling
+        ultimoMensajeId = ChatRepository.obtenerUltimoId(partidaId);
+
+        // Mostrar burbuja propia inmediatamente
         String hora = new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date());
-        Platform.runLater(() -> {
-            agregarBurbuja(new Mensaje(miUsuario, texto, hora));
-            ultimoMensajeId++;
-            chatScroll.setVvalue(1.0);
-        });
+        Mensaje m = new Mensaje(ultimoMensajeId, usuarioActual, texto, hora);
+        agregarBurbuja(m);
+        scrollAlFinal();
     }
 
     private void agregarBurbuja(Mensaje m) {
-        boolean esPropio = m.usuario.equals(miUsuario);
+        boolean esPropio = m.usuario.equals(usuarioActual);
 
         Label lblTexto = new Label(m.texto);
         lblTexto.setWrapText(true);
         lblTexto.setMaxWidth(160);
-        lblTexto.setStyle("-fx-font-size:12px;-fx-text-fill:" + (esPropio ? "#1A0A00" : "#F0E0B0") + ";");
+        lblTexto.setStyle("-fx-font-size:12px;-fx-text-fill:" +
+            (esPropio ? "#1A0A00" : "#F0E0B0") + ";");
 
         Label lblMeta = new Label(m.usuario + "  " + m.hora);
-        lblMeta.setStyle("-fx-font-size:10px;-fx-text-fill:" + (esPropio ? "#5A3010" : "#9E7A3A") + ";");
+        lblMeta.setStyle("-fx-font-size:10px;-fx-text-fill:" +
+            (esPropio ? "#5A3010" : "#9E7A3A") + ";");
 
         VBox burbuja = new VBox(2, lblTexto, lblMeta);
         burbuja.getStyleClass().add(esPropio ? "burbuja-propia" : "burbuja-ajena");
@@ -225,7 +250,14 @@ public class GameController {
         chatBox.getChildren().add(fila);
     }
 
-    // ── Polling (sin cambios) ─────────────────────────────────────────────────
+    private void scrollAlFinal() {
+        if (chatScroll != null) {
+            chatScroll.layout();
+            chatScroll.setVvalue(1.0);
+        }
+    }
+
+    // ── Polling estado juego ──────────────────────────────────────────────────
 
     private void iniciarPolling() {
         pollingTimeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
@@ -243,7 +275,7 @@ public class GameController {
         pollingTimeline.play();
     }
 
-    // ── Persistencia (sin cambios) ────────────────────────────────────────────
+    // ── Persistencia ──────────────────────────────────────────────────────────
 
     private void guardarEstado() {
         if (!modoMultijugador || partidaId == null) return;
@@ -377,7 +409,7 @@ public class GameController {
         assamView.toFront();
     }
 
-    // ── Lógica del juego (sin cambios) ────────────────────────────────────────
+    // ── Lógica del juego ──────────────────────────────────────────────────────
 
     private boolean esMiTurno() {
         return !modoMultijugador || currentPlayerIdx == miIndice;
@@ -471,8 +503,6 @@ public class GameController {
             : "Turno de " + playerNames[currentPlayerIdx] + ". Esperando...");
     }
 
-    // ── Helpers (sin cambios) ─────────────────────────────────────────────────
-
     private boolean esCarpetValida(int x1, int y1, int x2, int y2) {
         return x1>=0&&x1<=6&&y1>=0&&y1<=6&&x2>=0&&x2<=6&&y2>=0&&y2<=6;
     }
@@ -536,14 +566,14 @@ public class GameController {
     }
 
     private void mostrarFinDeJuego(){
-        if(pollingTimeline!=null)pollingTimeline.stop();
-        if(chatTimeline!=null)chatTimeline.stop();
+        if(pollingTimeline!=null) pollingTimeline.stop();
+        if(chatTimeline!=null)    chatTimeline.stop();
         int[]enTablero=new int[numPlayers];
         for(int r=0;r<7;r++)for(int c=0;c<7;c++)if(tileOwner[c][r]>0)enTablero[tileOwner[c][r]-1]++;
         int win=0;
         for(int i=1;i<numPlayers;i++)
             if(money[i]>money[win]||(money[i]==money[win]&&enTablero[i]>enTablero[win]))win=i;
-        if(modoMultijugador)PartidaRepository.registrarVictoria(miUsuario);
+        if(modoMultijugador) PartidaRepository.registrarVictoria(usuarioActual);
         winnerLabel.setText("GANA: "+playerNames[win]+"!");
         winnerLabel.setStyle("-fx-font-size:36px;-fx-font-weight:bold;-fx-text-fill:"+playerColors[win]+";");
         StringBuilder sb=new StringBuilder();
@@ -554,8 +584,8 @@ public class GameController {
     }
 
     @FXML private void restartGame(){
-        if(pollingTimeline!=null)pollingTimeline.stop();
-        if(chatTimeline!=null)chatTimeline.stop();
+        if(pollingTimeline!=null) pollingTimeline.stop();
+        if(chatTimeline!=null)    chatTimeline.stop();
         endScreen.setVisible(false);gameScreen.setVisible(false);
         boardGrid.getChildren().clear();startScreen.setVisible(true);
     }

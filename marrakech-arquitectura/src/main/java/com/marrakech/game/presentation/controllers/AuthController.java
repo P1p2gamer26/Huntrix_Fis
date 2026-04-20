@@ -1,5 +1,6 @@
 package com.marrakech.game.presentation.controllers;
 
+import com.marrakech.game.infrastructure.ChatRepository;
 import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.PartidaRepository.Partida;
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
@@ -10,14 +11,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import java.sql.*;
+import java.util.List;
 
 public class AuthController {
 
     private final Stage stage;
     private final double width, height;
-    private String usuarioActual = "Jugador1";
+    private String usuarioActual;
     private final JugadorRepository jugadorRepo = new JugadorRepository();
 
     public AuthController(Stage stage, double width, double height) {
@@ -202,6 +205,7 @@ public class AuthController {
 
             stage.setScene(scene);
             gc.iniciarConJugadores(n, partidaId, usuario, miIndice);
+            this.usuarioActual = usuario;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -224,4 +228,5 @@ public class AuthController {
     }
 
     public String getUsuarioActual() { return usuarioActual; }
+
 }
