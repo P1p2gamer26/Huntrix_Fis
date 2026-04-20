@@ -1,20 +1,18 @@
 package com.marrakech.game.presentation.controllers;
 
-import com.marrakech.game.infrastructure.ChatRepository;
 import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.PartidaRepository.Partida;
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
 import com.marrakech.game.infrastructure.persistence.JugadorRepository;
 import com.marrakech.game.presentation.MusicaManager;
 import com.marrakech.game.presentation.views.*;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import java.sql.*;
-import java.util.List;
 
 public class AuthController {
 
@@ -42,14 +40,11 @@ public class AuthController {
             String apodo  = v.getCampoApodo().getText().trim();
             String correo = v.getCampoCorreo().getText().trim();
             String pass   = v.getCampoContrasena().getText().trim();
-            if (apodo.isEmpty() || correo.isEmpty() || pass.isEmpty()) {
-                mostrarAlerta("Error", "Todos los campos son obligatorios."); return;
-            }
-            if (jugadorRepo.nombreExiste(apodo)) { mostrarAlerta("Error", "Apodo en uso."); return; }
-            if (jugadorRepo.correoExiste(correo)) { mostrarAlerta("Error", "Correo ya registrado."); return; }
+            if (apodo.isEmpty()||correo.isEmpty()||pass.isEmpty()){mostrarAlerta("Error","Todos los campos son obligatorios.");return;}
+            if (jugadorRepo.nombreExiste(apodo)){mostrarAlerta("Error","Apodo en uso.");return;}
+            if (jugadorRepo.correoExiste(correo)){mostrarAlerta("Error","Correo ya registrado.");return;}
             jugadorRepo.crearJugador(apodo, correo, pass);
-            usuarioActual = apodo;
-            mostrarMenu();
+            usuarioActual = apodo; mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
     }
@@ -60,13 +55,10 @@ public class AuthController {
         v.getBtnEntrar().setOnAction(e -> {
             String apodo = v.getCampoApodo().getText().trim();
             String pass  = v.getCampoContrasena().getText().trim();
-            if (apodo.isEmpty() || pass.isEmpty()) {
-                mostrarAlerta("Error", "Ingresa apodo y contraseña."); return;
-            }
+            if (apodo.isEmpty()||pass.isEmpty()){mostrarAlerta("Error","Ingresa apodo y contraseña.");return;}
             String nombre = jugadorRepo.loginJugador(apodo, pass);
-            if (nombre == null) { mostrarAlerta("Error", "Credenciales incorrectas."); return; }
-            usuarioActual = nombre;
-            mostrarMenu();
+            if (nombre==null){mostrarAlerta("Error","Credenciales incorrectas.");return;}
+            usuarioActual = nombre; mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
     }
@@ -85,17 +77,15 @@ public class AuthController {
     public void mostrarPerfil() {
         String correo        = jugadorRepo.getCorreo(usuarioActual);
         String fechaRegistro = jugadorRepo.getFechaRegistro(usuarioActual);
-        int victorias        = PartidaRepository.obtenerRanking().stream()
+        int victorias = PartidaRepository.obtenerRanking().stream()
             .filter(r -> r.usuario.equals(usuarioActual))
-            .mapToInt(r -> r.victorias)
-            .findFirst().orElse(0);
+            .mapToInt(r -> r.victorias).findFirst().orElse(0);
         PerfilView v = new PerfilView(
             usuarioActual,
             correo        != null ? correo        : "",
             "Activo",
             fechaRegistro != null ? fechaRegistro : "—",
-            victorias
-        );
+            victorias);
         v.getBtnVolver().setOnAction(e -> mostrarMenu());
         stage.setScene(new Scene(v, width, height));
     }
@@ -146,30 +136,30 @@ public class AuthController {
             mostrarModoOnline();
         });
 
-        // HOST: pulsa "INICIAR PARTIDA"
+        // HOST: marca la partida como INICIADA y espera 2.5s para que el guest
+        // también detecte el cambio, así entran al tablero al mismo tiempo
         v.getBtnIniciar().setOnAction(e -> {
             v.detenerPolling();
-            String pid = v.getPartidaId();
-            PartidaRepository.iniciarPartida(pid);
-
-            // Obtener la partida ACTUALIZADA desde la BD (con todos los jugadores)
-            Partida actualizada = PartidaRepository.obtenerPartida(pid);
-            int n     = actualizada != null ? actualizada.maxJugadores : v.getNumJugadores();
-            int miIdx = actualizada != null ? actualizada.jugadores.indexOf(usuarioActual) : 0;
-            miIdx = Math.max(0, miIdx);
-
-            mostrarJuego(n, pid, usuarioActual, miIdx);
+            PartidaRepository.iniciarPartida(v.getPartidaId());
+            Partida fresca = PartidaRepository.obtenerPartida(v.getPartidaId());
+            int miIdx = (fresca != null) ? fresca.jugadores.indexOf(usuarioActual) : 0;
+            if (miIdx < 0) miIdx = 0;
+            final int    idxFinal = miIdx;
+            final int    nFinal   = v.getNumJugadores();
+            final String pidFinal = v.getPartidaId();
+            new Thread(() -> {
+                try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
+                Platform.runLater(() -> mostrarJuego(nFinal, pidFinal, usuarioActual, idxFinal));
+            }, "host-delay").start();
         });
 
-        // GUEST: el polling detecta estado INICIADA y llama este callback
+        // GUEST: entra al tablero cuando detecta la partida INICIADA por polling
         v.setOnJuegoIniciado(() -> {
-            String pid = v.getPartidaId();
-            Partida actualizada = PartidaRepository.obtenerPartida(pid);
-            int n     = actualizada != null ? actualizada.maxJugadores : 2;
-            int miIdx = actualizada != null ? actualizada.jugadores.indexOf(usuarioActual) : 1;
-            miIdx = Math.max(0, miIdx);
-
-            mostrarJuego(n, pid, usuarioActual, miIdx);
+            Partida act = PartidaRepository.obtenerPartida(partida.id);
+            int n     = act != null ? act.maxJugadores : 2;
+            int miIdx = act != null ? act.jugadores.indexOf(usuarioActual) : 1;
+            if (miIdx < 0) miIdx = 1;
+            mostrarJuego(n, partida.id, usuarioActual, miIdx);
         });
 
         stage.setScene(new Scene(v, width, height));
@@ -195,18 +185,13 @@ public class AuthController {
                 getClass().getResource("/com/marrakech/game/game-view.fxml"));
             Parent root = loader.load();
             GameController gc = loader.getController();
-
-            // Aplicar CSS adicional si existe
             Scene scene = new Scene(root, width, height);
             try {
-                String cssUrl = getClass().getResource("/com/marrakech/game/game.css").toExternalForm();
-                scene.getStylesheets().add(cssUrl);
-            } catch (Exception ignored) { /* game.css opcional */ }
-
+                scene.getStylesheets().add(
+                    getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
+            } catch (Exception ignored) {}
             stage.setScene(scene);
             gc.iniciarConJugadores(n, partidaId, usuario, miIndice);
-            this.usuarioActual = usuario;
-
         } catch (Exception e) {
             e.printStackTrace();
             mostrarAlerta("Error", "No se pudo cargar el juego: " + e.getMessage());
@@ -228,5 +213,4 @@ public class AuthController {
     }
 
     public String getUsuarioActual() { return usuarioActual; }
-
 }
