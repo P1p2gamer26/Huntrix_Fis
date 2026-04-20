@@ -4,6 +4,7 @@ import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.PartidaRepository.Partida;
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
 import com.marrakech.game.infrastructure.persistence.JugadorRepository;
+import com.marrakech.game.presentation.MusicaManager;
 import com.marrakech.game.presentation.views.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,6 +25,7 @@ public class AuthController {
     }
 
     public void mostrarWelcome() {
+        MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
         WelcomeView v = new WelcomeView();
         v.getBtnCrearCuenta().setOnAction(e -> mostrarRegister());
         v.getBtnYaTengoCuenta().setOnAction(e -> mostrarLogin());
@@ -62,6 +64,7 @@ public class AuthController {
 
     public void mostrarMenu() {
         limpiarSalasViejas();
+        MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
         MenuView v = new MenuView(usuarioActual);
         v.getBtnJugar().setOnAction(e -> mostrarModoOnline());
         v.getBtnReglas().setOnAction(e -> mostrarReglas());
@@ -77,7 +80,6 @@ public class AuthController {
             .filter(r -> r.usuario.equals(usuarioActual))
             .mapToInt(r -> r.victorias)
             .findFirst().orElse(0);
-
         PerfilView v = new PerfilView(
             usuarioActual,
             correo        != null ? correo        : "",
@@ -90,6 +92,7 @@ public class AuthController {
     }
 
     public void mostrarModoOnline() {
+        MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
         ModoOnlineView v = new ModoOnlineView();
         v.getBtnCrear().setOnAction(e -> mostrarCrearPartida());
         v.getBtnUnirse().setOnAction(e -> mostrarUnirsePartida());
@@ -120,8 +123,13 @@ public class AuthController {
     }
 
     public void mostrarSalaEspera(Partida partida, boolean esHost) {
+        MusicaManager.getInstance().reproducir(MusicaManager.Track.LOBBY);
         SalaEsperaView v = new SalaEsperaView(partida, esHost);
-        v.getBtnSalir().setOnAction(e -> { v.detenerPolling(); mostrarModoOnline(); });
+        v.getBtnSalir().setOnAction(e -> {
+            v.detenerPolling();
+            MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
+            mostrarModoOnline();
+        });
         v.getBtnIniciar().setOnAction(e -> {
             v.detenerPolling();
             PartidaRepository.iniciarPartida(v.getPartidaId());
@@ -151,6 +159,7 @@ public class AuthController {
     }
 
     private void mostrarJuego(int n, String partidaId, String usuario, int miIndice) {
+        MusicaManager.getInstance().reproducir(MusicaManager.Track.JUEGO);
         try {
             FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/marrakech/game/game-view.fxml"));
