@@ -31,8 +31,18 @@ public class GameController {
     @FXML private VBox panelJ1, panelJ2, panelJ3, panelJ4;
     @FXML private Label rugsJ1, rugsJ2, rugsJ3, rugsJ4;
     @FXML private Label moneyJ1, moneyJ2, moneyJ3, moneyJ4;
+    @FXML private Label resultadoLabel;
     @FXML private Label winnerLabel;
     @FXML private Label finalScores;
+    @FXML private Button btnVolverSala;
+    @FXML private Button btnVolverMenu;
+
+    // Callbacks inyectados desde AuthController
+    private Runnable onVolverSala;
+    private Runnable onVolverMenu;
+
+    public void setOnVolverSala(Runnable r) { this.onVolverSala = r; }
+    public void setOnVolverMenu(Runnable r) { this.onVolverMenu = r; }
 
     private ImageView assamView;
     private int assamX = 3, assamY = 3, assamDir = 0;
@@ -381,6 +391,10 @@ public class GameController {
         actualizarUI();
         actualizarControles();
         actualizarStatus();
+        // Si el juego terminó, mostrar pantalla de fin también en el guest
+        if (juegoTerminado() && !endScreen.isVisible()) {
+            mostrarFinDeJuego();
+        }
     }
 
     private void redibujarCelda(int col, int row, int player) {
@@ -661,8 +675,18 @@ public class GameController {
 
         if (modoMultijugador) PartidaRepository.registrarVictoria(miUsuario);
 
-        winnerLabel.setText("GANA: " + playerNames[win] + "!");
-        winnerLabel.setStyle("-fx-font-size:36px;-fx-font-weight:bold;-fx-text-fill:" + playerColors[win] + ";");
+        // Determinar si este jugador ganó o perdió
+        boolean yoGane = !modoMultijugador || (win == miIndice);
+
+        if (yoGane) {
+            resultadoLabel.setText("¡HAS GANADO!");
+            resultadoLabel.setStyle("-fx-font-size:56px;-fx-font-weight:bold;-fx-text-fill:" + playerColors[win] + ";");
+        } else {
+            resultadoLabel.setText("HAS PERDIDO");
+            resultadoLabel.setStyle("-fx-font-size:56px;-fx-font-weight:bold;-fx-text-fill:#888888;");
+        }
+        winnerLabel.setText("Ganador: " + playerNames[win]);
+        winnerLabel.setStyle("-fx-font-size:28px;-fx-font-weight:bold;-fx-text-fill:" + playerColors[win] + ";");
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numPlayers; i++)
@@ -674,12 +698,14 @@ public class GameController {
         endScreen.setVisible(true);
     }
 
-    @FXML private void restartGame() {
+    @FXML private void volverSala() {
         if (pollingTimeline != null) pollingTimeline.stop();
-        endScreen.setVisible(false);
-        gameScreen.setVisible(false);
-        boardGrid.getChildren().clear();
-        startScreen.setVisible(true);
+        if (onVolverSala != null) onVolverSala.run();
+    }
+
+    @FXML private void volverMenu() {
+        if (pollingTimeline != null) pollingTimeline.stop();
+        if (onVolverMenu != null) onVolverMenu.run();
     }
 
     private int contarContiguas(int x, int y, int owner) {

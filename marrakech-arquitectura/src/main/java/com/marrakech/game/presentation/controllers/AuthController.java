@@ -176,6 +176,10 @@ public class AuthController {
                 getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
             stage.setScene(scene);
             gc.iniciarConJugadores(n, partidaId, usuario, miIndice);
+            // Botón 'Volver a la sala': abre sala de espera para nueva partida
+            gc.setOnVolverSala(() -> mostrarModoOnline());
+            // Botón 'Menú principal': vuelve al menú
+            gc.setOnVolverMenu(() -> mostrarMenu());
         } catch (Exception e) { e.printStackTrace(); }
     }
 
