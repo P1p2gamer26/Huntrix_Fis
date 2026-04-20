@@ -1,82 +1,177 @@
+/* ═══════════════════════════════════════════════════
+   MARRAKECH — styles.css   (juego)
+   ═══════════════════════════════════════════════════ */
+
+/* Fondo general: degradado arena/tierra cálida */
 .root-pane {
-    -fx-background-color: #1a1a2e; /* Fondo oscuro y limpio */
+    -fx-background-color: linear-gradient(to bottom right, #2C1A0E, #4A2C10, #2C1A0E);
     -fx-font-family: "Segoe UI", Arial, sans-serif;
 }
 
+/* Paneles de jugadores y barra de turno */
 .panel {
-    -fx-background-color: rgba(22, 33, 62, 0.9);
-    -fx-border-color: #e94560;
+    -fx-background-color: rgba(30, 15, 5, 0.88);
+    -fx-border-color: #C8922A;
     -fx-border-width: 2px;
-    -fx-border-radius: 12px;
-    -fx-background-radius: 12px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(200,146,42,0.35), 8, 0.3, 0, 0);
 }
 
 .title-label {
-    -fx-font-size: 18px;
+    -fx-font-size: 17px;
     -fx-font-weight: bold;
-    -fx-text-fill: #e94560;
+    -fx-text-fill: #F0C040;
 }
 
 .status-label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #f4e4c1;
+    -fx-font-size: 13px;
+    -fx-text-fill: #E8D4A0;
     -fx-font-style: italic;
 }
 
 .text-label {
-    -fx-font-size: 16px;
-    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-text-fill: #F0E0B0;
 }
 
+/* ── TABLERO ───────────────────────────────────────── */
+
+/* Marco exterior del tablero */
+.board-frame {
+    -fx-background-color: linear-gradient(to bottom, #8B4513, #5C2D0A, #8B4513);
+    -fx-border-color: #D4A017;
+    -fx-border-width: 4px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(212,160,23,0.6), 18, 0.4, 0, 0);
+    -fx-padding: 6px;
+}
+
+/* Grid sin borde visible — solo las tiles lo tienen */
 .grid-overlay {
-    -fx-border-color: rgba(0,0,0,0.5); /* Borde sutil al tablero interno */
-    -fx-border-width: 2px;
+    -fx-background-color: transparent;
 }
 
+/* Celdas del tablero: arena dorada SÓLIDA sin transparencia */
 .tile {
-    -fx-background-color: transparent;
-    -fx-border-color: rgba(0, 0, 0, 0.15); /* Cuadricula invisible pero clickeable */
-    -fx-border-width: 1px;
+    -fx-background-color: #C8A84B;
+    -fx-border-color: #2A1800;
+    -fx-border-width: 1.5px;
     -fx-cursor: hand;
 }
 
 .tile:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Colores de las alfombras puestas en el piso */
-.carpet-p1 {
-    -fx-background-color: rgba(231, 76, 60, 0.85); /* Rojo */
-    -fx-border-color: #c0392b;
+    -fx-background-color: #E8C868;
+    -fx-border-color: #8B6914;
     -fx-border-width: 2px;
 }
 
-.carpet-p2 {
-    -fx-background-color: rgba(52, 152, 219, 0.85); /* Azul */
-    -fx-border-color: #2980b9;
+/* ── CHAT ──────────────────────────────────────────── */
+
+.chat-panel {
+    -fx-background-color: rgba(20, 10, 3, 0.92);
+    -fx-border-color: #C8922A;
     -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
 }
+
+.chat-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #F0C040;
+    -fx-alignment: center;
+}
+
+.chat-area {
+    -fx-background-color: rgba(15, 8, 2, 0.85);
+    -fx-border-color: #5C3A10;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+.chat-input {
+    -fx-background-color: rgba(30, 15, 5, 0.9);
+    -fx-text-fill: #F0E0B0;
+    -fx-border-color: #8B6914;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: #9E7A3A;
+}
+
+.chat-send-btn {
+    -fx-background-color: #C8922A;
+    -fx-text-fill: #1A0A00;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-padding: 4 10;
+}
+
+.chat-send-btn:hover {
+    -fx-background-color: #F0C040;
+}
+
+/* Burbuja mensaje propio */
+.burbuja-propia {
+    -fx-background-color: rgba(180, 130, 30, 0.75);
+    -fx-background-radius: 8px 8px 2px 8px;
+    -fx-padding: 4 8;
+}
+
+/* Burbuja mensaje ajeno */
+.burbuja-ajena {
+    -fx-background-color: rgba(40, 25, 8, 0.85);
+    -fx-background-radius: 8px 8px 8px 2px;
+    -fx-border-color: #5C3A10;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px 8px 8px 2px;
+    -fx-padding: 4 8;
+}
+
+/* ── BOTONES ────────────────────────────────────────── */
 
 .btn {
-    -fx-background-color: #e94560;
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
+    -fx-background-color: #C8922A;
+    -fx-text-fill: #1A0A00;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-padding: 10 20;
+    -fx-padding: 9 22;
     -fx-background-radius: 6px;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(200,146,42,0.4), 6, 0.3, 0, 2);
 }
 
 .btn:hover {
-    -fx-background-color: #f4e4c1;
-    -fx-text-fill: #1a1a2e;
+    -fx-background-color: #F0C040;
+    -fx-text-fill: #1A0A00;
+}
+
+.btn:disabled {
+    -fx-background-color: #4A3010;
+    -fx-text-fill: #6A5030;
+    -fx-cursor: default;
 }
 
 .btn-small {
-    -fx-background-color: #0f3460;
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-padding: 5 15;
+    -fx-background-color: #3A1F08;
+    -fx-text-fill: #C8922A;
+    -fx-border-color: #8B6914;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 4px;
     -fx-background-radius: 4px;
+    -fx-font-size: 13px;
+    -fx-padding: 6 14;
     -fx-cursor: hand;
+}
+
+.btn-small:hover {
+    -fx-background-color: #5A3010;
+    -fx-text-fill: #F0C040;
+    -fx-border-color: #D4A017;
 }

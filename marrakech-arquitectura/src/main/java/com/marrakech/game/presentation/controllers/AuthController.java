@@ -21,7 +21,7 @@ public class AuthController {
     private final JugadorRepository jugadorRepo = new JugadorRepository();
 
     public AuthController(Stage stage, double width, double height) {
-        this.stage=stage; this.width=width; this.height=height;
+        this.stage = stage; this.width = width; this.height = height;
     }
 
     public void mostrarWelcome() {
@@ -36,14 +36,17 @@ public class AuthController {
         RegisterView v = new RegisterView();
         v.getBtnVolver().setOnAction(e -> mostrarWelcome());
         v.getBtnRegistrar().setOnAction(e -> {
-            String apodo=v.getCampoApodo().getText().trim();
-            String correo=v.getCampoCorreo().getText().trim();
-            String pass=v.getCampoContrasena().getText().trim();
-            if(apodo.isEmpty()||correo.isEmpty()||pass.isEmpty()){mostrarAlerta("Error","Todos los campos son obligatorios.");return;}
-            if(jugadorRepo.nombreExiste(apodo)){mostrarAlerta("Error","Apodo en uso.");return;}
-            if(jugadorRepo.correoExiste(correo)){mostrarAlerta("Error","Correo ya registrado.");return;}
-            jugadorRepo.crearJugador(apodo,correo,pass);
-            usuarioActual=apodo; mostrarMenu();
+            String apodo  = v.getCampoApodo().getText().trim();
+            String correo = v.getCampoCorreo().getText().trim();
+            String pass   = v.getCampoContrasena().getText().trim();
+            if (apodo.isEmpty() || correo.isEmpty() || pass.isEmpty()) {
+                mostrarAlerta("Error", "Todos los campos son obligatorios."); return;
+            }
+            if (jugadorRepo.nombreExiste(apodo)) { mostrarAlerta("Error", "Apodo en uso."); return; }
+            if (jugadorRepo.correoExiste(correo)) { mostrarAlerta("Error", "Correo ya registrado."); return; }
+            jugadorRepo.crearJugador(apodo, correo, pass);
+            usuarioActual = apodo;
+            mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
     }
@@ -52,12 +55,15 @@ public class AuthController {
         LoginView v = new LoginView();
         v.getBtnVolver().setOnAction(e -> mostrarWelcome());
         v.getBtnEntrar().setOnAction(e -> {
-            String apodo=v.getCampoApodo().getText().trim();
-            String pass=v.getCampoContrasena().getText().trim();
-            if(apodo.isEmpty()||pass.isEmpty()){mostrarAlerta("Error","Ingresa apodo y contraseña.");return;}
-            String nombre=jugadorRepo.loginJugador(apodo,pass);
-            if(nombre==null){mostrarAlerta("Error","Credenciales incorrectas.");return;}
-            usuarioActual=nombre; mostrarMenu();
+            String apodo = v.getCampoApodo().getText().trim();
+            String pass  = v.getCampoContrasena().getText().trim();
+            if (apodo.isEmpty() || pass.isEmpty()) {
+                mostrarAlerta("Error", "Ingresa apodo y contraseña."); return;
+            }
+            String nombre = jugadorRepo.loginJugador(apodo, pass);
+            if (nombre == null) { mostrarAlerta("Error", "Credenciales incorrectas."); return; }
+            usuarioActual = nombre;
+            mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
     }
@@ -106,7 +112,8 @@ public class AuthController {
             String id = PartidaRepository.crearPartida(
                 usuarioActual, v.getCantidadJugadores(),
                 v.isPoderesActivados(), v.isPartidaRapida(), v.getDificultad());
-            mostrarSalaEspera(PartidaRepository.obtenerPartida(id), true);
+            Partida creada = PartidaRepository.obtenerPartida(id);
+            if (creada != null) mostrarSalaEspera(creada, true);
         });
         stage.setScene(new Scene(v, width, height));
     }
@@ -116,8 +123,12 @@ public class AuthController {
         v.setOnVolver(() -> mostrarModoOnline());
         v.setOnUnirse(codigo -> {
             boolean ok = PartidaRepository.unirsePartida(codigo, usuarioActual);
-            if(ok) mostrarSalaEspera(PartidaRepository.obtenerPartida(codigo), false);
-            else   mostrarAlerta("Error","Código inválido o sala llena.");
+            if (ok) {
+                Partida p = PartidaRepository.obtenerPartida(codigo);
+                if (p != null) mostrarSalaEspera(p, false);
+            } else {
+                mostrarAlerta("Error", "Código inválido o sala llena.");
+            }
         });
         stage.setScene(new Scene(v, width, height));
     }
@@ -125,23 +136,39 @@ public class AuthController {
     public void mostrarSalaEspera(Partida partida, boolean esHost) {
         MusicaManager.getInstance().reproducir(MusicaManager.Track.LOBBY);
         SalaEsperaView v = new SalaEsperaView(partida, esHost);
+
         v.getBtnSalir().setOnAction(e -> {
             v.detenerPolling();
             MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
             mostrarModoOnline();
         });
+
+        // HOST: pulsa "INICIAR PARTIDA"
         v.getBtnIniciar().setOnAction(e -> {
             v.detenerPolling();
-            PartidaRepository.iniciarPartida(v.getPartidaId());
-            int miIdx = partida.jugadores.indexOf(usuarioActual);
-            mostrarJuego(v.getNumJugadores(), v.getPartidaId(), usuarioActual, Math.max(0, miIdx));
+            String pid = v.getPartidaId();
+            PartidaRepository.iniciarPartida(pid);
+
+            // Obtener la partida ACTUALIZADA desde la BD (con todos los jugadores)
+            Partida actualizada = PartidaRepository.obtenerPartida(pid);
+            int n     = actualizada != null ? actualizada.maxJugadores : v.getNumJugadores();
+            int miIdx = actualizada != null ? actualizada.jugadores.indexOf(usuarioActual) : 0;
+            miIdx = Math.max(0, miIdx);
+
+            mostrarJuego(n, pid, usuarioActual, miIdx);
         });
+
+        // GUEST: el polling detecta estado INICIADA y llama este callback
         v.setOnJuegoIniciado(() -> {
-            Partida act = PartidaRepository.obtenerPartida(partida.id);
-            int n      = act != null ? act.maxJugadores : 2;
-            int miIdx  = act != null ? act.jugadores.indexOf(usuarioActual) : 1;
-            mostrarJuego(n, partida.id, usuarioActual, Math.max(0, miIdx));
+            String pid = v.getPartidaId();
+            Partida actualizada = PartidaRepository.obtenerPartida(pid);
+            int n     = actualizada != null ? actualizada.maxJugadores : 2;
+            int miIdx = actualizada != null ? actualizada.jugadores.indexOf(usuarioActual) : 1;
+            miIdx = Math.max(0, miIdx);
+
+            mostrarJuego(n, pid, usuarioActual, miIdx);
         });
+
         stage.setScene(new Scene(v, width, height));
     }
 
@@ -165,12 +192,21 @@ public class AuthController {
                 getClass().getResource("/com/marrakech/game/game-view.fxml"));
             Parent root = loader.load();
             GameController gc = loader.getController();
+
+            // Aplicar CSS adicional si existe
             Scene scene = new Scene(root, width, height);
-            scene.getStylesheets().add(
-                getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
+            try {
+                String cssUrl = getClass().getResource("/com/marrakech/game/game.css").toExternalForm();
+                scene.getStylesheets().add(cssUrl);
+            } catch (Exception ignored) { /* game.css opcional */ }
+
             stage.setScene(scene);
             gc.iniciarConJugadores(n, partidaId, usuario, miIndice);
-        } catch (Exception e) { e.printStackTrace(); }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo cargar el juego: " + e.getMessage());
+        }
     }
 
     private void limpiarSalasViejas() {

@@ -1,39 +1,56 @@
 package com.marrakech.game.presentation.controllers;
 
+import com.marrakech.game.infrastructure.ChatRepository;
+import com.marrakech.game.infrastructure.ChatRepository.Mensaje;
 import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Random;
 
 public class GameController {
 
-    @FXML private VBox startScreen;
-    @FXML private HBox gameScreen;
-    @FXML private VBox endScreen;
-    @FXML private GridPane boardGrid;
-    @FXML private Label turnLabel;
-    @FXML private Label statusLabel;
-    @FXML private Button rollDiceBtn;
-    @FXML private VBox panelJ1, panelJ2, panelJ3, panelJ4;
-    @FXML private Label rugsJ1, rugsJ2, rugsJ3, rugsJ4;
-    @FXML private Label moneyJ1, moneyJ2, moneyJ3, moneyJ4;
-    @FXML private Label winnerLabel;
-    @FXML private Label finalScores;
+    // ── FXML ─────────────────────────────────────────────────────────────────
+    @FXML private VBox      startScreen;
+    @FXML private HBox      gameScreen;
+    @FXML private VBox      endScreen;
+    @FXML private GridPane  boardGrid;
+    @FXML private Label     turnLabel;
+    @FXML private Label     statusLabel;
+    @FXML private Button    rollDiceBtn;
+    @FXML private VBox      panelJ1, panelJ2, panelJ3, panelJ4;
+    @FXML private Label     rugsJ1, rugsJ2, rugsJ3, rugsJ4;
+    @FXML private Label     moneyJ1, moneyJ2, moneyJ3, moneyJ4;
+    @FXML private Label     winnerLabel;
+    @FXML private Label     finalScores;
 
+    // Chat
+    @FXML private VBox      chatPanel;
+    @FXML private VBox      chatBox;
+    @FXML private ScrollPane chatScroll;
+    @FXML private TextField chatInput;
+    @FXML private Button    chatSendBtn;
+
+    // ── Estado del juego (sin cambios) ────────────────────────────────────────
     private ImageView assamView;
     private int assamX = 3, assamY = 3, assamDir = 0;
 
@@ -49,31 +66,36 @@ public class GameController {
     private int firstCarpetX = -1, firstCarpetY = -1;
 
     private static final int CELL = 61;
-    private String[] playerColors = {"#e74c3c","#3498db","#2ecc71","#f39c12"};
-    private String[] playerNames  = {"J1 (ROJO)","J2 (AZUL)","J3 (VERDE)","J4 (AMARILLO)"};
+    private final String[] playerColors = {"#e74c3c","#3498db","#2ecc71","#f39c12"};
+    private final String[] playerNames  = {"J1 (ROJO)","J2 (AZUL)","J3 (VERDE)","J4 (AMARILLO)"};
 
     // Multijugador
-    private String partidaId;
-    private String miUsuario;
-    private int miIndice = 0; // qué jugador soy yo (0-based)
-    private int ultimoTurnoVisto = -1;
+    private String  partidaId;
+    private String  miUsuario;
+    private int     miIndice = 0;
+    private int     ultimoTurnoVisto = -1;
     private Timeline pollingTimeline;
     private boolean modoMultijugador = false;
 
+    // Chat
+    private int ultimoMensajeId = 0;
+    private Timeline chatTimeline;
+
     public void initialize() {}
 
-    // Llamado desde AuthController — modo multijugador
+    // ── Inicio ────────────────────────────────────────────────────────────────
+
     public void iniciarConJugadores(int n, String partidaId, String miUsuario, int miIndice) {
-        this.partidaId       = partidaId;
-        this.miUsuario       = miUsuario;
-        this.miIndice        = miIndice;
+        this.partidaId        = partidaId;
+        this.miUsuario        = miUsuario;
+        this.miIndice         = miIndice;
         this.modoMultijugador = true;
         startGame(n);
-        guardarEstado(); // turno 0 inicial
+        guardarEstado();
         iniciarPolling();
+        iniciarChat();
     }
 
-    // Llamado sin multijugador (fallback local)
     public void iniciarConJugadores(int n) {
         this.modoMultijugador = false;
         startGame(n);
@@ -100,6 +122,12 @@ public class GameController {
 
         panelJ3.setVisible(n >= 3); panelJ3.setManaged(n >= 3);
         panelJ4.setVisible(n >= 4); panelJ4.setManaged(n >= 4);
+
+        // Ocultar chat en modo local
+        if (chatPanel != null) {
+            chatPanel.setVisible(modoMultijugador);
+            chatPanel.setManaged(modoMultijugador);
+        }
 
         boardGrid.getChildren().clear();
         for (int row = 0; row < 7; row++) {
@@ -130,9 +158,74 @@ public class GameController {
         actualizarUI();
         actualizarControles();
         statusLabel.setText("Rota a Assam y lanza el dado.");
+
+        // Enter en el input de chat envía el mensaje
+        if (chatInput != null) {
+            chatInput.setOnKeyPressed(e -> {
+                if (e.getCode() == KeyCode.ENTER) onSendChat();
+            });
+        }
     }
 
-    // ── Polling ──────────────────────────────────────────────────────────────
+    // ── CHAT ─────────────────────────────────────────────────────────────────
+
+    private void iniciarChat() {
+        ChatRepository.inicializarTabla();
+        ultimoMensajeId = ChatRepository.obtenerUltimoId(partidaId);
+
+        chatTimeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
+            List<Mensaje> nuevos = ChatRepository.obtenerMensajes(partidaId, ultimoMensajeId);
+            if (!nuevos.isEmpty()) {
+                Platform.runLater(() -> {
+                    for (Mensaje m : nuevos) agregarBurbuja(m);
+                    ultimoMensajeId += nuevos.size();
+                    // Scroll al final
+                    chatScroll.setVvalue(1.0);
+                });
+            }
+        }));
+        chatTimeline.setCycleCount(Timeline.INDEFINITE);
+        chatTimeline.play();
+    }
+
+    @FXML private void onSendChat() {
+        if (!modoMultijugador || chatInput == null) return;
+        String texto = chatInput.getText().trim();
+        if (texto.isEmpty()) return;
+        chatInput.clear();
+        ChatRepository.enviarMensaje(partidaId, miUsuario, texto);
+        // Mostrar localmente de inmediato (sin esperar el polling)
+        String hora = new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date());
+        Platform.runLater(() -> {
+            agregarBurbuja(new Mensaje(miUsuario, texto, hora));
+            ultimoMensajeId++;
+            chatScroll.setVvalue(1.0);
+        });
+    }
+
+    private void agregarBurbuja(Mensaje m) {
+        boolean esPropio = m.usuario.equals(miUsuario);
+
+        Label lblTexto = new Label(m.texto);
+        lblTexto.setWrapText(true);
+        lblTexto.setMaxWidth(160);
+        lblTexto.setStyle("-fx-font-size:12px;-fx-text-fill:" + (esPropio ? "#1A0A00" : "#F0E0B0") + ";");
+
+        Label lblMeta = new Label(m.usuario + "  " + m.hora);
+        lblMeta.setStyle("-fx-font-size:10px;-fx-text-fill:" + (esPropio ? "#5A3010" : "#9E7A3A") + ";");
+
+        VBox burbuja = new VBox(2, lblTexto, lblMeta);
+        burbuja.getStyleClass().add(esPropio ? "burbuja-propia" : "burbuja-ajena");
+        burbuja.setMaxWidth(170);
+
+        HBox fila = new HBox(burbuja);
+        fila.setAlignment(esPropio ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        fila.setPadding(new Insets(1, 0, 1, 0));
+
+        chatBox.getChildren().add(fila);
+    }
+
+    // ── Polling (sin cambios) ─────────────────────────────────────────────────
 
     private void iniciarPolling() {
         pollingTimeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
@@ -140,7 +233,6 @@ public class GameController {
             if (estadoJson == null) return;
             EstadoDB est = parsearEstado(estadoJson);
             if (est == null || est.turno == ultimoTurnoVisto) return;
-            // Solo aplicar si NO es mi turno (el mío ya lo apliqué localmente)
             if (est.turno != ultimoTurnoVisto && currentPlayerIdx != miIndice) {
                 Platform.runLater(() -> aplicarEstado(est));
             } else if (est.turno != ultimoTurnoVisto) {
@@ -151,7 +243,7 @@ public class GameController {
         pollingTimeline.play();
     }
 
-    // ── Serialización del estado ─────────────────────────────────────────────
+    // ── Persistencia (sin cambios) ────────────────────────────────────────────
 
     private void guardarEstado() {
         if (!modoMultijugador || partidaId == null) return;
@@ -169,7 +261,6 @@ public class GameController {
             ps.executeUpdate();
             ultimoTurnoVisto = currentPlayerIdx;
         } catch (Exception e) {
-            // Si no hay partida formal en DB todavía, guardar en tabla auxiliar
             guardarEstadoAuxiliar(json);
         }
     }
@@ -212,7 +303,6 @@ public class GameController {
     }
 
     private String serializarEstado() {
-        // formato: money0,money1,...;rugs0,rugs1,...;tileOwner(fila por fila separada por /)
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numPlayers; i++) sb.append(money[i]).append(i<numPlayers-1?",":"");
         sb.append(";");
@@ -226,10 +316,7 @@ public class GameController {
         return sb.toString();
     }
 
-    private static class EstadoDB {
-        int turno, ax, ay, adir;
-        String tableroJson;
-    }
+    private static class EstadoDB { int turno, ax, ay, adir; String tableroJson; }
 
     private EstadoDB parsearEstado(String raw) {
         try {
@@ -245,14 +332,12 @@ public class GameController {
     }
 
     private void aplicarEstado(EstadoDB est) {
-        // Assam
         assamX = est.ax; assamY = est.ay; assamDir = est.adir;
         GridPane.setColumnIndex(assamView, assamX);
         GridPane.setRowIndex(assamView, assamY);
         assamView.setRotate(assamDir * 90);
         assamView.toFront();
 
-        // Tablero desde JSON
         String[] secciones = est.tableroJson.split(";");
         if (secciones.length >= 4) {
             String[] ms = secciones[0].split(",");
@@ -262,18 +347,13 @@ public class GameController {
                 rugs[i]  = Integer.parseInt(rs[i]);
             }
             String[] filas = secciones[2].split("/");
-            // Limpiar alfombras visuales (excepto tiles base y assam)
-            boardGrid.getChildren().removeIf(n ->
-                n instanceof ImageView && n != assamView);
+            boardGrid.getChildren().removeIf(n -> n instanceof ImageView && n != assamView);
             for (int row = 0; row < 7 && row < filas.length; row++) {
                 String[] celdas = filas[row].split(",");
                 for (int col = 0; col < 7 && col < celdas.length; col++) {
                     int prev = tileOwner[col][row];
                     tileOwner[col][row] = Integer.parseInt(celdas[col]);
-                    // Si cambió, redibujar alfombra
                     if (tileOwner[col][row] != prev && tileOwner[col][row] > 0) {
-                        // La redibujamos como 1x1 (la sincronización completa de spans
-                        // requeriría más info; esto muestra el color correctamente)
                         redibujarCelda(col, row, tileOwner[col][row]);
                     }
                 }
@@ -297,7 +377,7 @@ public class GameController {
         assamView.toFront();
     }
 
-    // ── Lógica del juego ─────────────────────────────────────────────────────
+    // ── Lógica del juego (sin cambios) ────────────────────────────────────────
 
     private boolean esMiTurno() {
         return !modoMultijugador || currentPlayerIdx == miIndice;
@@ -359,7 +439,7 @@ public class GameController {
                 statusLabel.setText("Sin espacio para la 2da mitad. Elige otra.");
             }
         } else if (currentPhase == Phase.CARPET_2) {
-            boolean adj    = Math.abs(firstCarpetX-x) + Math.abs(firstCarpetY-y) == 1;
+            boolean adj     = Math.abs(firstCarpetX-x) + Math.abs(firstCarpetY-y) == 1;
             boolean noAssam = !(x==assamX && y==assamY);
             boolean dentro  = esCarpetValida(firstCarpetX, firstCarpetY, x, y);
             boolean horiz   = (y == firstCarpetY);
@@ -385,13 +465,13 @@ public class GameController {
         currentPhase = Phase.MOVE;
         actualizarUI();
         actualizarControles();
-        guardarEstado(); // ← sincronizar con DB
+        guardarEstado();
         statusLabel.setText(esMiTurno()
             ? "Tu turno. Rota a Assam y lanza el dado."
             : "Turno de " + playerNames[currentPlayerIdx] + ". Esperando...");
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
+    // ── Helpers (sin cambios) ─────────────────────────────────────────────────
 
     private boolean esCarpetValida(int x1, int y1, int x2, int y2) {
         return x1>=0&&x1<=6&&y1>=0&&y1<=6&&x2>=0&&x2<=6&&y2>=0&&y2<=6;
@@ -414,7 +494,6 @@ public class GameController {
         if (horizontal) {
             iv.setFitWidth(CELL*2); iv.setFitHeight(CELL);
             GridPane.setColumnSpan(iv, 2); GridPane.setRowSpan(iv, 1);
-            iv.setRotate(90);
         } else {
             iv.setFitWidth(CELL); iv.setFitHeight(CELL*2);
             GridPane.setColumnSpan(iv, 1); GridPane.setRowSpan(iv, 2);
@@ -423,81 +502,79 @@ public class GameController {
         assamView.toFront();
     }
 
-    private int borderIndex(int x, int y) {
-        if (y==0&&x<6) return x;
-        if (x==6&&y<6) return 6+y;
-        if (y==6&&x>0) return 12+(6-x);
-        if (x==0&&y>0) return 18+(6-y);
-        return -1;
+    private int borderIndex(int x,int y){
+        if(y==0&&x<6)return x;if(x==6&&y<6)return 6+y;
+        if(y==6&&x>0)return 12+(6-x);if(x==0&&y>0)return 18+(6-y);return -1;
     }
-    private int[] borderPos(int idx) {
+    private int[] borderPos(int idx){
         idx=((idx%24)+24)%24;
-        if(idx<6)  return new int[]{idx,0};
-        if(idx<12) return new int[]{6,idx-6};
-        if(idx<18) return new int[]{6-(idx-12),6};
-        return new int[]{0,6-(idx-18)};
+        if(idx<6)return new int[]{idx,0};if(idx<12)return new int[]{6,idx-6};
+        if(idx<18)return new int[]{6-(idx-12),6};return new int[]{0,6-(idx-18)};
     }
-    private int borderDir(int idx) {
+    private int borderDir(int idx){
         idx=((idx%24)+24)%24;
-        if(idx<6)  return 1;
-        if(idx<12) return 2;
-        if(idx<18) return 3;
-        return 0;
+        if(idx<6)return 1;if(idx<12)return 2;if(idx<18)return 3;return 0;
     }
-    private void moverAssam(int pasos) {
-        for (int p=0; p<pasos; p++) {
-            int nx=assamX, ny=assamY;
+    private void moverAssam(int pasos){
+        for(int p=0;p<pasos;p++){
+            int nx=assamX,ny=assamY;
             switch(assamDir){case 0:ny--;break;case 1:nx++;break;case 2:ny++;break;case 3:nx--;break;}
             if(nx<0||nx>6||ny<0||ny>6){
                 int bi=borderIndex(assamX,assamY);
                 if(bi==-1){nx=Math.max(0,Math.min(6,nx));ny=Math.max(0,Math.min(6,ny));}
                 else{bi++;int[]pos=borderPos(bi);nx=pos[0];ny=pos[1];assamDir=borderDir(bi);}
             }
-            assamX=nx; assamY=ny;
+            assamX=nx;assamY=ny;
         }
         int bi=borderIndex(assamX,assamY);
-        if(bi!=-1) assamDir=borderDir(bi);
+        if(bi!=-1)assamDir=borderDir(bi);
         assamView.setRotate(assamDir*90);
     }
-    private boolean juegoTerminado() {
-        for(int i=0;i<numPlayers;i++) if(rugs[i]>0) return false;
-        return true;
+
+    private boolean juegoTerminado(){
+        for(int i=0;i<numPlayers;i++)if(rugs[i]>0)return false;return true;
     }
-    private void mostrarFinDeJuego() {
-        if (pollingTimeline != null) pollingTimeline.stop();
-        int[] enTablero=new int[numPlayers];
-        for(int r=0;r<7;r++) for(int c=0;c<7;c++) if(tileOwner[c][r]>0) enTablero[tileOwner[c][r]-1]++;
+
+    private void mostrarFinDeJuego(){
+        if(pollingTimeline!=null)pollingTimeline.stop();
+        if(chatTimeline!=null)chatTimeline.stop();
+        int[]enTablero=new int[numPlayers];
+        for(int r=0;r<7;r++)for(int c=0;c<7;c++)if(tileOwner[c][r]>0)enTablero[tileOwner[c][r]-1]++;
         int win=0;
         for(int i=1;i<numPlayers;i++)
-            if(money[i]>money[win]||(money[i]==money[win]&&enTablero[i]>enTablero[win])) win=i;
-        if (modoMultijugador) PartidaRepository.registrarVictoria(miUsuario);
+            if(money[i]>money[win]||(money[i]==money[win]&&enTablero[i]>enTablero[win]))win=i;
+        if(modoMultijugador)PartidaRepository.registrarVictoria(miUsuario);
         winnerLabel.setText("GANA: "+playerNames[win]+"!");
         winnerLabel.setStyle("-fx-font-size:36px;-fx-font-weight:bold;-fx-text-fill:"+playerColors[win]+";");
         StringBuilder sb=new StringBuilder();
         for(int i=0;i<numPlayers;i++)
             sb.append(playerNames[i]).append(": ").append(money[i]).append(" Dh | Tiles: ").append(enTablero[i]).append("\n");
         finalScores.setText(sb.toString());
-        gameScreen.setVisible(false); endScreen.setVisible(true);
+        gameScreen.setVisible(false);endScreen.setVisible(true);
     }
-    @FXML private void restartGame() {
-        if(pollingTimeline!=null) pollingTimeline.stop();
-        endScreen.setVisible(false); gameScreen.setVisible(false);
-        boardGrid.getChildren().clear(); startScreen.setVisible(true);
+
+    @FXML private void restartGame(){
+        if(pollingTimeline!=null)pollingTimeline.stop();
+        if(chatTimeline!=null)chatTimeline.stop();
+        endScreen.setVisible(false);gameScreen.setVisible(false);
+        boardGrid.getChildren().clear();startScreen.setVisible(true);
     }
+
     private int contarContiguas(int x,int y,int owner){return dfs(x,y,owner,new boolean[7][7]);}
     private int dfs(int x,int y,int owner,boolean[][]vis){
-        if(x<0||x>6||y<0||y>6||vis[x][y]||tileOwner[x][y]!=owner) return 0;
+        if(x<0||x>6||y<0||y>6||vis[x][y]||tileOwner[x][y]!=owner)return 0;
         vis[x][y]=true;
         return 1+dfs(x+1,y,owner,vis)+dfs(x-1,y,owner,vis)+dfs(x,y+1,owner,vis)+dfs(x,y-1,owner,vis);
     }
-    private void actualizarUI() {
+
+    private void actualizarUI(){
         Label[]rl={rugsJ1,rugsJ2,rugsJ3,rugsJ4};
         Label[]ml={moneyJ1,moneyJ2,moneyJ3,moneyJ4};
         VBox[]pl={panelJ1,panelJ2,panelJ3,panelJ4};
         for(int i=0;i<numPlayers;i++){
-            if(rl[i]!=null) rl[i].setText(String.valueOf(rugs[i]));
-            if(ml[i]!=null) ml[i].setText(money[i]+" Dh");
-            if(pl[i]!=null) pl[i].setStyle(i==currentPlayerIdx
+            if(rl[i]!=null)rl[i].setText(String.valueOf(rugs[i]));
+            if(ml[i]!=null)ml[i].setText(money[i]+" Dh");
+            if(pl[i]!=null)pl[i].setStyle(i==currentPlayerIdx
                 ?"-fx-border-color:"+playerColors[i]+";-fx-border-width:3px;-fx-border-radius:10px;":"");
         }
         turnLabel.setText(esMiTurno()?"TU TURNO":"TURNO: "+playerNames[currentPlayerIdx]);
