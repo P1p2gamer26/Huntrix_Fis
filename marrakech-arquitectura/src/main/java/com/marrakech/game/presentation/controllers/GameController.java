@@ -155,7 +155,7 @@ public class GameController {
     // ── Polling ──────────────────────────────────────────────────────────────
 
     private void iniciarPolling() {
-        pollingTimeline = new Timeline(new KeyFrame(Duration.millis(800), e -> {
+        pollingTimeline = new Timeline(new KeyFrame(Duration.millis(1200), e -> {
             new Thread(() -> {
                 String raw = cargarUltimoEstadoDB();
                 if (raw == null) return;
@@ -349,13 +349,20 @@ public class GameController {
             if (n instanceof ImageView && n != assamView) paraEliminar.add(n);
         boardGrid.getChildren().removeAll(paraEliminar);
 
-        // Redibujar tablero con orientaciones ya cargadas
+        // Paso 1: cargar tileOwner
         String[] filas = secciones[2].split("/");
         for (int row = 0; row < 7 && row < filas.length; row++) {
             String[] celdas = filas[row].split(",");
-            for (int col = 0; col < 7 && col < celdas.length; col++) {
+            for (int col = 0; col < 7 && col < celdas.length; col++)
                 tileOwner[col][row] = Integer.parseInt(celdas[col]);
-                if (tileOwner[col][row] > 0) redibujarCelda(col, row, tileOwner[col][row]);
+        }
+        // Paso 2: redibujar SOLO desde celdas top-left (ori=1 o ori=2)
+        // Así cada alfombra se dibuja exactamente una vez con el span correcto
+        for (int row = 0; row < 7; row++) {
+            for (int col = 0; col < 7; col++) {
+                int ori = carpetOrientation[col][row];
+                if ((ori == 1 || ori == 2 || ori == 3) && tileOwner[col][row] > 0)
+                    redibujarCelda(col, row, tileOwner[col][row]);
             }
         }
 
@@ -379,9 +386,15 @@ public class GameController {
     private void redibujarCelda(int col, int row, int player) {
         if (carpetImages == null || carpetImages[player - 1] == null) return;
         int ori = carpetOrientation[col][row];
-        // 0 = celda vacía (sin alfombra aquí), -1 = 2da celda: en ambos casos no dibujar
+        // 0=vacía, -1=2da celda: no dibujar
         if (ori == 0 || ori == -1) return;
-        boolean horizontal = (ori == 2); // 2=horizontal, 1=vertical
+        if (ori == 3) {
+            // Celda única (la otra mitad fue cubierta): dibujar como 1×1
+            colocarImagenAlfombraSpan(col, row, false, player, false);
+            return;
+        }
+        // ori=1 → vertical 2 celdas, ori=2 → horizontal 2 celdas
+        boolean horizontal = (ori == 2);
         colocarImagenAlfombra(col, row, horizontal, player);
     }
 
@@ -464,14 +477,17 @@ public class GameController {
         if (!esMiTurno()) return;
 
         if (currentPhase == PHASE_CARPET_1) {
-            boolean adj = Math.abs(assamX - x) + Math.abs(assamY - y) == 1;
-            if (adj && tiene2daOpcionValida(x, y)) {
+            // Permitir las 8 celdas alrededor de Assam (4 ortogonales + 4 diagonales)
+            int dx = Math.abs(assamX - x), dy = Math.abs(assamY - y);
+            boolean adj = dx <= 1 && dy <= 1 && !(dx == 0 && dy == 0); // 8 vecinos, excluir la propia celda
+            boolean noEsAssam = !(x == assamX && y == assamY);
+            if (adj && noEsAssam && tiene2daOpcionValida(x, y)) {
                 firstCarpetX = x; firstCarpetY = y;
                 tiles[x][y].setStyle("-fx-background-color: rgba(255,255,255,0.25);");
                 currentPhase = PHASE_CARPET_2;
                 actualizarStatus();
                 guardarEstado();
-            } else if (adj) {
+            } else if (adj && noEsAssam) {
                 statusLabel.setText("Sin espacio para la 2da mitad. Elige otra casilla.");
             }
 
@@ -484,19 +500,25 @@ public class GameController {
             if (adj && noAssam && dentro) {
                 tiles[firstCarpetX][firstCarpetY].setStyle("");
                 int player = currentPlayerIdx + 1;
+
+                // Antes de sobrescribir, reparar la alfombra vieja si solo se cubre 1 de sus 2 celdas.
+                // Si cubrimos la celda top-left (orientación > 0), mover su orientación a la 2da celda.
+                // Si cubrimos la 2da celda (-1), promover la top-left como alfombra de 1 celda visible.
+                repararAlfombraAfectada(firstCarpetX, firstCarpetY);
+                repararAlfombraAfectada(x, y);
+
                 tileOwner[firstCarpetX][firstCarpetY] = player;
                 tileOwner[x][y] = player;
-                // Guardar orientación: top-left = 0(vertical) o 1(horizontal), 2da celda = -1
                 int topCol  = Math.min(firstCarpetX, x);
                 int topRow  = Math.min(firstCarpetY, y);
                 int bot2Col = Math.max(firstCarpetX, x);
                 int bot2Row = Math.max(firstCarpetY, y);
-                // Limpiar orientación previa de ambas celdas antes de asignar
                 carpetOrientation[firstCarpetX][firstCarpetY] = 0;
                 carpetOrientation[x][y] = 0;
-                carpetOrientation[topCol][topRow]   = horiz ? 2 : 1; // 2=horiz, 1=vert
-                carpetOrientation[bot2Col][bot2Row] = -1; // 2da celda, no dibujar desde aquí
-                colocarImagenAlfombra(topCol, topRow, horiz, player);
+                carpetOrientation[topCol][topRow]   = horiz ? 2 : 1;
+                carpetOrientation[bot2Col][bot2Row] = -1;
+                // Redibujar todo el tablero para eliminar alfombras viejas cubiertas
+                redibujarTableroCompleto();
                 rugs[currentPlayerIdx]--;
                 actualizarUI();
                 if (juegoTerminado()) {
@@ -534,20 +556,29 @@ public class GameController {
     }
 
     private boolean tiene2daOpcionValida(int x1, int y1) {
+        // La 2da celda debe ser ortogonalmente adyacente a la 1ra (no diagonal)
         for (int[] d : new int[][]{{1,0},{-1,0},{0,1},{0,-1}}) {
             int x2 = x1 + d[0], y2 = y1 + d[1];
-            if (x2 == assamX && y2 == assamY) continue;
+            if (x2 == assamX && y2 == assamY) continue; // no poner sobre Assam
             if (esCarpetValida(x1, y1, x2, y2)) return true;
         }
         return false;
     }
 
     private void colocarImagenAlfombra(int col, int row, boolean horizontal, int player) {
+        colocarImagenAlfombraSpan(col, row, horizontal, player, true);
+    }
+
+    private void colocarImagenAlfombraSpan(int col, int row, boolean horizontal, int player, boolean dosCeldas) {
         if (carpetImages[player - 1] == null) return;
         ImageView iv = new ImageView(carpetImages[player - 1]);
         iv.setMouseTransparent(true);
         iv.setPreserveRatio(false);
-        if (horizontal) {
+        if (!dosCeldas) {
+            // Solo 1 celda visible (la otra fue cubierta)
+            iv.setFitWidth(CELL); iv.setFitHeight(CELL);
+            GridPane.setColumnSpan(iv, 1); GridPane.setRowSpan(iv, 1);
+        } else if (horizontal) {
             iv.setFitWidth(CELL * 2); iv.setFitHeight(CELL);
             GridPane.setColumnSpan(iv, 2); GridPane.setRowSpan(iv, 1);
             iv.setRotate(90);
@@ -684,6 +715,57 @@ public class GameController {
         }
         turnLabel.setStyle("-fx-font-size:20px;-fx-font-weight:bold;-fx-text-fill:" + miColorFijo + ";");
     }
+    /**
+     * Cuando la nueva alfombra va a cubrir la celda (col,row), repara visualmente
+     * la alfombra vieja que pueda estar ahí para que su otra celda siga visible.
+     * - Si (col,row) era top-left (ori > 0): la 2da celda pasa a ser top-left autónoma.
+     * - Si (col,row) era 2da celda (-1): la top-left queda como celda única visible.
+     */
+    private void repararAlfombraAfectada(int col, int row) {
+        int ori = carpetOrientation[col][row];
+        if (ori == 0 || ori == 3) return; // vacía o celda única sin pareja, nada que reparar
+
+        if (ori == 1) {
+            // Era top-left VERTICAL → 2da celda está en (col, row+1)
+            if (row + 1 < 7 && carpetOrientation[col][row + 1] == -1) {
+                // La 2da celda sobrevive: se convierte en celda única (no puede estirar hacia abajo sin su pareja)
+                carpetOrientation[col][row + 1] = 3; // celda única visible
+            }
+        } else if (ori == 2) {
+            // Era top-left HORIZONTAL → 2da celda está en (col+1, row)
+            if (col + 1 < 7 && carpetOrientation[col + 1][row] == -1) {
+                carpetOrientation[col + 1][row] = 3; // celda única visible
+            }
+        } else if (ori == -1) {
+            // Era 2da celda → su top-left queda como celda única
+            if (row > 0 && carpetOrientation[col][row - 1] == 1) {
+                carpetOrientation[col][row - 1] = 3; // top-left pasa a celda única
+            } else if (col > 0 && carpetOrientation[col - 1][row] == 2) {
+                carpetOrientation[col - 1][row] = 3; // top-left pasa a celda única
+            }
+        }
+        // Limpiar esta celda
+        carpetOrientation[col][row] = 0;
+    }
+
+    /** Limpia todos los ImageView del grid (excepto Assam) y redibuja todas las alfombras
+     *  desde sus celdas top-left. Garantiza que no queden alfombras fantasma. */
+    private void redibujarTableroCompleto() {
+        // Eliminar todos los ImageView de alfombras
+        java.util.List<javafx.scene.Node> paraEliminar = new java.util.ArrayList<>();
+        for (javafx.scene.Node n : boardGrid.getChildren())
+            if (n instanceof ImageView && n != assamView) paraEliminar.add(n);
+        boardGrid.getChildren().removeAll(paraEliminar);
+        // Redibujar solo desde celdas top-left (ori=1 o ori=2)
+        for (int row = 0; row < 7; row++)
+            for (int col = 0; col < 7; col++) {
+                int ori = carpetOrientation[col][row];
+                if ((ori == 1 || ori == 2 || ori == 3) && tileOwner[col][row] > 0)
+                    redibujarCelda(col, row, tileOwner[col][row]);
+            }
+        assamView.toFront();
+    }
+
     private String hexToRgba(String hex, double alpha) {
         // Convierte #RRGGBB a rgba(r,g,b,alpha) que JavaFX sí soporta
         int r = Integer.parseInt(hex.substring(1, 3), 16);
