@@ -23,7 +23,12 @@ public class AuthController {
 
     public AuthController(Stage stage, double width, double height) {
         this.stage = stage; this.width = width; this.height = height;
+
+        // Cerrar sesión limpiamente si el usuario cierra la ventana
+        stage.setOnCloseRequest(e -> cerrarSesionYSalir());
     }
+
+    // ── Pantallas de acceso ───────────────────────────────────────────────────
 
     public void mostrarWelcome() {
         MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
@@ -37,14 +42,27 @@ public class AuthController {
         RegisterView v = new RegisterView();
         v.getBtnVolver().setOnAction(e -> mostrarWelcome());
         v.getBtnRegistrar().setOnAction(e -> {
+            // Validar campos en pantalla antes de tocar la BD
+            if (!v.validarTodo()) return;
+
             String apodo  = v.getCampoApodo().getText().trim();
             String correo = v.getCampoCorreo().getText().trim();
             String pass   = v.getCampoContrasena().getText().trim();
-            if (apodo.isEmpty()||correo.isEmpty()||pass.isEmpty()){mostrarAlerta("Error","Todos los campos son obligatorios.");return;}
-            if (jugadorRepo.nombreExiste(apodo)){mostrarAlerta("Error","Apodo en uso.");return;}
-            if (jugadorRepo.correoExiste(correo)){mostrarAlerta("Error","Correo ya registrado.");return;}
-            jugadorRepo.crearJugador(apodo,correo,pass);
-            usuarioActual=apodo; mostrarMenu();
+
+            if (jugadorRepo.nombreExiste(apodo)) {
+                v.mostrarError("Ese apodo ya está en uso. Elige otro.");
+                return;
+            }
+            if (jugadorRepo.correoExiste(correo)) {
+                v.mostrarError("Ese correo ya está registrado.");
+                return;
+            }
+
+            jugadorRepo.crearJugador(apodo, correo, pass);
+            // Login automático tras registro
+            jugadorRepo.loginJugador(apodo, pass); // marca sesión activa
+            usuarioActual = apodo;
+            mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
     }
@@ -53,15 +71,30 @@ public class AuthController {
         LoginView v = new LoginView();
         v.getBtnVolver().setOnAction(e -> mostrarWelcome());
         v.getBtnEntrar().setOnAction(e -> {
+            if (!v.validarCampos()) return;
+
             String apodo = v.getCampoApodo().getText().trim();
             String pass  = v.getCampoContrasena().getText().trim();
-            if (apodo.isEmpty()||pass.isEmpty()){mostrarAlerta("Error","Ingresa apodo y contraseña.");return;}
-            String nombre = jugadorRepo.loginJugador(apodo,pass);
-            if (nombre==null){mostrarAlerta("Error","Credenciales incorrectas.");return;}
-            usuarioActual=nombre; mostrarMenu();
+
+            String resultado = jugadorRepo.loginJugador(apodo, pass);
+
+            if (resultado == null) {
+                v.mostrarError("Apodo o contraseña incorrectos.");
+                return;
+            }
+            if ("SESION_ACTIVA".equals(resultado)) {
+                v.mostrarError("Esta cuenta ya tiene una sesión abierta en otro dispositivo. " +
+                               "Cierra esa sesión primero.");
+                return;
+            }
+
+            usuarioActual = resultado;
+            mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
     }
+
+    // ── Menú principal ────────────────────────────────────────────────────────
 
     public void mostrarMenu() {
         limpiarSalasViejas();
@@ -89,6 +122,8 @@ public class AuthController {
         v.getBtnVolver().setOnAction(e -> mostrarMenu());
         stage.setScene(new Scene(v, width, height));
     }
+
+    // ── Modo online ───────────────────────────────────────────────────────────
 
     public void mostrarModoOnline() {
         MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
@@ -136,7 +171,6 @@ public class AuthController {
             mostrarModoOnline();
         });
 
-        // HOST: marca INICIADA, espera 2.5s para que el guest detecte el cambio
         v.getBtnIniciar().setOnAction(e -> {
             v.detenerPolling();
             PartidaRepository.iniciarPartida(v.getPartidaId());
@@ -152,7 +186,6 @@ public class AuthController {
             }, "host-delay").start();
         });
 
-        // GUEST: entra cuando detecta estado INICIADA por polling
         v.setOnJuegoIniciado(() -> {
             Partida act = PartidaRepository.obtenerPartida(partida.id);
             int n     = act != null ? act.maxJugadores : 2;
@@ -164,6 +197,8 @@ public class AuthController {
         stage.setScene(new Scene(v, width, height));
     }
 
+    // ── Configuración y reglas ────────────────────────────────────────────────
+
     public void mostrarReglas() {
         ReglasView v = new ReglasView();
         v.getBtnVolver().setOnAction(e -> mostrarMenu());
@@ -173,9 +208,15 @@ public class AuthController {
     public void mostrarConfiguracion() {
         ConfiguracionView v = new ConfiguracionView();
         v.getBtnVolver().setOnAction(e -> mostrarMenu());
-        v.getBtnGuardar().setOnAction(e -> mostrarMenu());
+        // Guardar ya está conectado internamente en ConfiguracionView
+        v.getBtnGuardar().setOnAction(e -> {
+            // El botón ya aplica la config internamente; volvemos al menú
+            mostrarMenu();
+        });
         stage.setScene(new Scene(v, width, height));
     }
+
+    // ── Juego ─────────────────────────────────────────────────────────────────
 
     private void mostrarJuego(int n, String partidaId, String usuario, int miIndice) {
         MusicaManager.getInstance().reproducir(MusicaManager.Track.JUEGO);
@@ -197,6 +238,15 @@ public class AuthController {
             e.printStackTrace();
             mostrarAlerta("Error", "No se pudo cargar el juego: " + e.getMessage());
         }
+    }
+
+    // ── Sesión y limpieza ─────────────────────────────────────────────────────
+
+    private void cerrarSesionYSalir() {
+        if (usuarioActual != null) {
+            jugadorRepo.cerrarSesion(usuarioActual);
+        }
+        MusicaManager.getInstance().detener();
     }
 
     private void limpiarSalasViejas() {
