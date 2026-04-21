@@ -11,8 +11,6 @@ Formado por
 
 -Juliana Aguirre Ballesteros 
 
--Luna Valentina Leon Gonzales 
-
 -Diego Alejandro Melgarejo 
 
 Marrakesh Juego – Arquitectura de Software
