@@ -40,8 +40,20 @@ public class GameController {
     @FXML private VBox      panelJ1, panelJ2, panelJ3, panelJ4;
     @FXML private Label     rugsJ1, rugsJ2, rugsJ3, rugsJ4;
     @FXML private Label     moneyJ1, moneyJ2, moneyJ3, moneyJ4;
+
+    // Pantalla fin de juego — de probando-logica-vieja
+    @FXML private Label     resultadoLabel;
     @FXML private Label     winnerLabel;
     @FXML private Label     finalScores;
+    @FXML private Button    btnVolverSala;
+    @FXML private Button    btnVolverMenu;
+
+    // Callbacks inyectados desde AuthController — de probando-logica-vieja
+    private Runnable onVolverSala;
+    private Runnable onVolverMenu;
+
+    public void setOnVolverSala(Runnable r) { this.onVolverSala = r; }
+    public void setOnVolverMenu(Runnable r) { this.onVolverMenu = r; }
 
     // Chat FXML
     @FXML private VBox       chatPanel;
@@ -54,7 +66,6 @@ public class GameController {
     private ImageView assamView;
     private int assamX = 3, assamY = 3, assamDir = 0;
 
-    // Fase como int para poder serializarla
     private int currentPhase = 0;
     private static final int PHASE_MOVE     = 0;
     private static final int PHASE_CARPET_1 = 1;
@@ -64,9 +75,9 @@ public class GameController {
     private int currentPlayerIdx = 0;
     private int[] money, rugs;
     private Image[] carpetImages;
-    private int[][] tileOwner          = new int[7][7];
-    private int[][] carpetOrientation  = new int[7][7];
-    private StackPane[][] tiles        = new StackPane[7][7];
+    private int[][] tileOwner         = new int[7][7];
+    private int[][] carpetOrientation = new int[7][7];
+    private StackPane[][] tiles       = new StackPane[7][7];
     private int firstCarpetX = -1, firstCarpetY = -1;
 
     private static final int CELL = 61;
@@ -97,10 +108,8 @@ public class GameController {
         this.miIndice         = miIndice;
         this.modoMultijugador = true;
         startGame(n);
-        // Solo el host guarda el estado inicial
         if (miIndice == 0) guardarEstadoSincrono();
         iniciarPolling();
-        // Chat
         ChatRepository.inicializarTabla();
         ultimoMensajeId = ChatRepository.obtenerUltimoId(partidaId);
         cargarHistorialChat();
@@ -144,7 +153,7 @@ public class GameController {
         boardGrid.getChildren().clear();
         for (int row = 0; row < 7; row++) {
             for (int col = 0; col < 7; col++) {
-                tileOwner[col][row]        = 0;
+                tileOwner[col][row]         = 0;
                 carpetOrientation[col][row] = 0;
                 StackPane tile = new StackPane();
                 tile.setPrefSize(CELL, CELL);
@@ -177,11 +186,9 @@ public class GameController {
             chatInput.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ENTER) onSendChat(); });
         }
 
-        if (modoMultijugador) {
-            statusLabel.setText("Conectando... Eres " + playerNames[miIndice] + ". Espera el inicio.");
-        } else {
-            statusLabel.setText("Rota a Assam y lanza el dado.");
-        }
+        statusLabel.setText(modoMultijugador
+            ? "Conectando... Eres " + playerNames[miIndice] + ". Espera el inicio."
+            : "Rota a Assam y lanza el dado.");
     }
 
     // ── CHAT ──────────────────────────────────────────────────────────────────
@@ -251,7 +258,7 @@ public class GameController {
         if (chatScroll != null) { chatScroll.layout(); chatScroll.setVvalue(1.0); }
     }
 
-    // ── Polling estado juego (hilo de fondo para no bloquear UI) ─────────────
+    // ── Polling estado juego ──────────────────────────────────────────────────
 
     private void iniciarPolling() {
         pollingTimeline = new Timeline(new KeyFrame(Duration.millis(1200), e -> {
@@ -285,7 +292,7 @@ public class GameController {
         if (!modoMultijugador || partidaId == null) return;
         estadoVersion++;
         final String json = serializarEstado();
-        final int turno   = estadoVersion;
+        final int turno = estadoVersion;
         final int ax = assamX, ay = assamY, adir = assamDir;
         java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
         new Thread(() -> {
@@ -313,7 +320,7 @@ public class GameController {
         if (!modoMultijugador || partidaId == null) return;
         estadoVersion++;
         final String json = serializarEstado();
-        final int turno   = estadoVersion;
+        final int turno = estadoVersion;
         final int ax = assamX, ay = assamY, adir = assamDir;
         new Thread(() -> {
             try (Connection conn = DatabaseConnection.getConnection()) {
@@ -329,7 +336,7 @@ public class GameController {
                     Platform.runLater(() -> ultimoTurnoVisto = turno);
                 }
             } catch (Exception ex) {
-                System.err.println("Error guardando estado (no crítico): " + ex.getMessage());
+                System.err.println("Error guardando estado: " + ex.getMessage());
             }
         }, "db-writer").start();
     }
@@ -350,14 +357,12 @@ public class GameController {
         return null;
     }
 
-    // ── Serialización ─────────────────────────────────────────────────────────
     // Formato: money;rugs;tablero/;playerIdx;phase;firstCarpetX;firstCarpetY;orientaciones/
-
     private String serializarEstado() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < numPlayers; i++) sb.append(money[i]).append(i<numPlayers-1?",":"");
+        for (int i = 0; i < numPlayers; i++) sb.append(money[i]).append(i < numPlayers-1 ? "," : "");
         sb.append(";");
-        for (int i = 0; i < numPlayers; i++) sb.append(rugs[i]).append(i<numPlayers-1?",":"");
+        for (int i = 0; i < numPlayers; i++) sb.append(rugs[i]).append(i < numPlayers-1 ? "," : "");
         sb.append(";");
         for (int row = 0; row < 7; row++) {
             for (int col = 0; col < 7; col++) sb.append(tileOwner[col][row]).append(",");
@@ -402,21 +407,17 @@ public class GameController {
             money[i] = Integer.parseInt(ms[i]);
             rugs[i]  = Integer.parseInt(rs[i]);
         }
-
-        // Cargar tileOwner
         String[] filas = secciones[2].split("/");
         for (int row = 0; row < 7 && row < filas.length; row++) {
             String[] celdas = filas[row].split(",");
             for (int col = 0; col < 7 && col < celdas.length; col++)
                 tileOwner[col][row] = Integer.parseInt(celdas[col]);
         }
-
         currentPlayerIdx = Integer.parseInt(secciones[3]);
         currentPhase     = Integer.parseInt(secciones[4]);
         firstCarpetX     = Integer.parseInt(secciones[5]);
         firstCarpetY     = Integer.parseInt(secciones[6]);
 
-        // Cargar orientaciones
         if (secciones.length > 7) {
             String[] ofilas = secciones[7].split("/");
             for (int row = 0; row < 7 && row < ofilas.length; row++) {
@@ -425,14 +426,11 @@ public class GameController {
                     carpetOrientation[col][row] = Integer.parseInt(oceldas[col]);
             }
         }
-
         estadoVersion    = est.turno;
         ultimoTurnoVisto = est.turno;
 
-        // Redibujar tablero completo desde orientaciones
         redibujarTableroCompleto();
 
-        // Limpiar resaltados y aplicar si corresponde
         for (int row = 0; row < 7; row++)
             for (int col = 0; col < 7; col++)
                 if (tiles[col][row] != null) tiles[col][row].setStyle("");
@@ -444,9 +442,10 @@ public class GameController {
         actualizarUI();
         actualizarControles();
         actualizarStatus();
+        if (juegoTerminado() && !endScreen.isVisible()) mostrarFinDeJuego();
     }
 
-    // ── Redibujado completo sin duplicados ────────────────────────────────────
+    // ── Redibujado ────────────────────────────────────────────────────────────
 
     private void redibujarTableroCompleto() {
         java.util.List<javafx.scene.Node> eliminar = new java.util.ArrayList<>();
@@ -467,9 +466,7 @@ public class GameController {
         if (carpetImages == null || carpetImages[player - 1] == null) return;
         int ori = carpetOrientation[col][row];
         if (ori == 0 || ori == -1) return;
-        if (ori == 3) {
-            colocarImagenAlfombraSpan(col, row, false, player, false); return;
-        }
+        if (ori == 3) { colocarImagenAlfombraSpan(col, row, false, player, false); return; }
         colocarImagenAlfombra(col, row, ori == 2, player);
     }
 
@@ -490,12 +487,9 @@ public class GameController {
             return;
         }
         switch (currentPhase) {
-            case PHASE_MOVE:
-                statusLabel.setText("Tu turno. Rota a Assam y lanza el dado."); break;
-            case PHASE_CARPET_1:
-                statusLabel.setText("Haz click en una casilla adyacente a Assam para la 1ra mitad."); break;
-            case PHASE_CARPET_2:
-                statusLabel.setText("1ra mitad lista. Haz click en la casilla contigua para la 2da mitad."); break;
+            case PHASE_MOVE:     statusLabel.setText("Tu turno. Rota a Assam y lanza el dado."); break;
+            case PHASE_CARPET_1: statusLabel.setText("Haz click en una casilla adyacente a Assam para la 1ra mitad."); break;
+            case PHASE_CARPET_2: statusLabel.setText("1ra mitad lista. Haz click en la casilla contigua para la 2da mitad."); break;
         }
     }
 
@@ -651,92 +645,106 @@ public class GameController {
 
     // ── Movimiento Assam ──────────────────────────────────────────────────────
 
-    private int borderIndex(int x, int y) {
-        if (y==0&&x<6) return x; if (x==6&&y<6) return 6+y;
-        if (y==6&&x>0) return 12+(6-x); if (x==0&&y>0) return 18+(6-y); return -1;
+    private int borderIndex(int x,int y){
+        if(y==0&&x<6)return x;if(x==6&&y<6)return 6+y;
+        if(y==6&&x>0)return 12+(6-x);if(x==0&&y>0)return 18+(6-y);return -1;
     }
-    private int[] borderPos(int idx) {
+    private int[] borderPos(int idx){
         idx=((idx%24)+24)%24;
-        if(idx<6) return new int[]{idx,0}; if(idx<12) return new int[]{6,idx-6};
-        if(idx<18) return new int[]{6-(idx-12),6}; return new int[]{0,6-(idx-18)};
+        if(idx<6)return new int[]{idx,0};if(idx<12)return new int[]{6,idx-6};
+        if(idx<18)return new int[]{6-(idx-12),6};return new int[]{0,6-(idx-18)};
     }
-    private int borderDir(int idx) {
+    private int borderDir(int idx){
         idx=((idx%24)+24)%24;
-        if(idx<6) return 1; if(idx<12) return 2; if(idx<18) return 3; return 0;
+        if(idx<6)return 1;if(idx<12)return 2;if(idx<18)return 3;return 0;
     }
-    private void moverAssam(int pasos) {
-        for (int p=0; p<pasos; p++) {
-            int nx=assamX, ny=assamY;
+    private void moverAssam(int pasos){
+        for(int p=0;p<pasos;p++){
+            int nx=assamX,ny=assamY;
             switch(assamDir){case 0:ny--;break;case 1:nx++;break;case 2:ny++;break;case 3:nx--;break;}
             if(nx<0||nx>6||ny<0||ny>6){
                 int bi=borderIndex(assamX,assamY);
                 if(bi==-1){nx=Math.max(0,Math.min(6,nx));ny=Math.max(0,Math.min(6,ny));}
                 else{bi++;int[]pos=borderPos(bi);nx=pos[0];ny=pos[1];assamDir=borderDir(bi);}
             }
-            assamX=nx; assamY=ny;
+            assamX=nx;assamY=ny;
         }
         int bi=borderIndex(assamX,assamY);
-        if(bi!=-1) assamDir=borderDir(bi);
+        if(bi!=-1)assamDir=borderDir(bi);
         assamView.setRotate(assamDir*90);
     }
 
     // ── Fin del juego ─────────────────────────────────────────────────────────
 
-    private boolean juegoTerminado() {
-        for(int i=0;i<numPlayers;i++) if(rugs[i]>0) return false; return true;
+    private boolean juegoTerminado(){
+        for(int i=0;i<numPlayers;i++)if(rugs[i]>0)return false;return true;
     }
 
-    private void mostrarFinDeJuego() {
-        if(pollingTimeline!=null) pollingTimeline.stop();
-        if(chatTimeline!=null)    chatTimeline.stop();
+    private void mostrarFinDeJuego(){
+        if(pollingTimeline!=null)pollingTimeline.stop();
+        if(chatTimeline!=null)   chatTimeline.stop();
         int[] enTablero=new int[numPlayers];
-        for(int r=0;r<7;r++) for(int c=0;c<7;c++)
-            if(tileOwner[c][r]>0) enTablero[tileOwner[c][r]-1]++;
+        for(int r=0;r<7;r++)for(int c=0;c<7;c++)
+            if(tileOwner[c][r]>0)enTablero[tileOwner[c][r]-1]++;
         int win=0;
         for(int i=1;i<numPlayers;i++)
-            if(money[i]>money[win]||(money[i]==money[win]&&enTablero[i]>enTablero[win])) win=i;
-        if(modoMultijugador) PartidaRepository.registrarVictoria(usuarioActual);
-        winnerLabel.setText("GANA: "+playerNames[win]+"!");
-        winnerLabel.setStyle("-fx-font-size:36px;-fx-font-weight:bold;-fx-text-fill:"+playerColors[win]+";");
+            if(money[i]>money[win]||(money[i]==money[win]&&enTablero[i]>enTablero[win]))win=i;
+        if(modoMultijugador)PartidaRepository.registrarVictoria(usuarioActual);
+
+        boolean yoGane = !modoMultijugador || (win == miIndice);
+        if(resultadoLabel != null){
+            resultadoLabel.setText(yoGane ? "¡HAS GANADO!" : "HAS PERDIDO");
+            resultadoLabel.setStyle("-fx-font-size:56px;-fx-font-weight:bold;-fx-text-fill:"
+                + (yoGane ? playerColors[win] : "#888888") + ";");
+        }
+        if(winnerLabel != null){
+            winnerLabel.setText("Ganador: "+playerNames[win]);
+            winnerLabel.setStyle("-fx-font-size:28px;-fx-font-weight:bold;-fx-text-fill:"+playerColors[win]+";");
+        }
         StringBuilder sb=new StringBuilder();
         for(int i=0;i<numPlayers;i++)
             sb.append(playerNames[i]).append(": ").append(money[i])
               .append(" Dh | Alfombras en tablero: ").append(enTablero[i]).append("\n");
         finalScores.setText(sb.toString());
-        gameScreen.setVisible(false); endScreen.setVisible(true);
+        gameScreen.setVisible(false);endScreen.setVisible(true);
     }
 
-    @FXML private void restartGame() {
-        if(pollingTimeline!=null) pollingTimeline.stop();
-        if(chatTimeline!=null)    chatTimeline.stop();
-        endScreen.setVisible(false); gameScreen.setVisible(false);
-        boardGrid.getChildren().clear(); startScreen.setVisible(true);
+    @FXML private void volverSala(){
+        if(pollingTimeline!=null)pollingTimeline.stop();
+        if(chatTimeline!=null)   chatTimeline.stop();
+        if(onVolverSala!=null)   onVolverSala.run();
+    }
+
+    @FXML private void volverMenu(){
+        if(pollingTimeline!=null)pollingTimeline.stop();
+        if(chatTimeline!=null)   chatTimeline.stop();
+        if(onVolverMenu!=null)   onVolverMenu.run();
     }
 
     private int contarContiguas(int x,int y,int owner){return dfs(x,y,owner,new boolean[7][7]);}
     private int dfs(int x,int y,int owner,boolean[][]vis){
-        if(x<0||x>6||y<0||y>6||vis[x][y]||tileOwner[x][y]!=owner) return 0;
+        if(x<0||x>6||y<0||y>6||vis[x][y]||tileOwner[x][y]!=owner)return 0;
         vis[x][y]=true;
         return 1+dfs(x+1,y,owner,vis)+dfs(x-1,y,owner,vis)+dfs(x,y+1,owner,vis)+dfs(x,y-1,owner,vis);
     }
 
-    private void actualizarUI() {
-        Label[] rl={rugsJ1,rugsJ2,rugsJ3,rugsJ4};
-        Label[] ml={moneyJ1,moneyJ2,moneyJ3,moneyJ4};
-        VBox[]  pl={panelJ1,panelJ2,panelJ3,panelJ4};
+    private void actualizarUI(){
+        Label[]rl={rugsJ1,rugsJ2,rugsJ3,rugsJ4};
+        Label[]ml={moneyJ1,moneyJ2,moneyJ3,moneyJ4};
+        VBox[] pl={panelJ1,panelJ2,panelJ3,panelJ4};
         for(int i=0;i<numPlayers;i++){
-            if(rl[i]!=null) rl[i].setText(String.valueOf(rugs[i]));
-            if(ml[i]!=null) ml[i].setText(money[i]+" Dh");
-            if(pl[i]!=null) pl[i].setStyle(i==currentPlayerIdx
-                ? "-fx-border-color:"+playerColors[i]+";-fx-border-width:3px;-fx-border-radius:10px;"
-                : "-fx-border-color:"+hexToRgba(playerColors[i],0.35)+";-fx-border-width:1.5px;-fx-border-radius:10px;");
+            if(rl[i]!=null)rl[i].setText(String.valueOf(rugs[i]));
+            if(ml[i]!=null)ml[i].setText(money[i]+" Dh");
+            if(pl[i]!=null)pl[i].setStyle(i==currentPlayerIdx
+                ?"-fx-border-color:"+playerColors[i]+";-fx-border-width:3px;-fx-border-radius:10px;"
+                :"-fx-border-color:"+hexToRgba(playerColors[i],0.35)+";-fx-border-width:1.5px;-fx-border-radius:10px;");
         }
-        String miColor = modoMultijugador ? playerColors[miIndice] : playerColors[currentPlayerIdx];
-        turnLabel.setText(esMiTurno() ? "TU TURNO" : "TURNO: "+playerNames[currentPlayerIdx]);
-        turnLabel.setStyle("-fx-font-size:20px;-fx-font-weight:bold;-fx-text-fill:"+miColor+";");
+        turnLabel.setText(esMiTurno()?"TU TURNO":"TURNO: "+playerNames[currentPlayerIdx]);
+        turnLabel.setStyle("-fx-font-size:20px;-fx-font-weight:bold;-fx-text-fill:"
+            +(modoMultijugador?playerColors[miIndice]:playerColors[currentPlayerIdx])+";");
     }
 
-    private String hexToRgba(String hex, double alpha) {
+    private String hexToRgba(String hex,double alpha){
         int r=Integer.parseInt(hex.substring(1,3),16);
         int g=Integer.parseInt(hex.substring(3,5),16);
         int b=Integer.parseInt(hex.substring(5,7),16);

@@ -7,6 +7,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import com.marrakech.game.domain.valdata.Email;
+import com.marrakech.game.domain.valdata.Nombre;
+import com.marrakech.game.domain.valdata.Password;
+
 
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
 
@@ -14,23 +18,33 @@ public class JugadorRepository {
 
     private final EstadisticasRepository estadisticasRepo = new EstadisticasRepository();
 
-    public void crearJugador(String nombre, String correo, String password) {
-        agregarColumnaFotoSiNoExiste();
-        String sql = "INSERT INTO Jugador (nombre_usuario, correo, password, fecha_registro, estado) VALUES (?, ?, ?, CURRENT_TIMESTAMP, 'ACTIVO')";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, nombre);
-            stmt.setString(2, correo);
-            stmt.setString(3, password);
-            stmt.executeUpdate();
-            ResultSet keys = stmt.getGeneratedKeys();
-            if (keys.next()) {
-                estadisticasRepo.inicializarEstadisticas(keys.getInt(1));
+    public void crearJugador(String nombre, String correo, String password){
+
+        try{
+            Nombre nombreValido = new Nombre(nombre);
+            Email emailValido = new Email(correo);
+            Password passwordValido = new Password(password);
+
+            String sql = "INSERT INTO Jugador (nombre_usuario, correo, password, fecha_registro, estado) VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)";
+
+            try(Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)){
+
+                stmt.setString(1, nombreValido.value());
+                stmt.setString(2, emailValido.value());
+                stmt.setString(3, passwordValido.value());
+                stmt.setString(4, "ACTIVO");
+
+                stmt.executeUpdate();
             }
-        } catch (Exception e) {
+
+        }catch (IllegalArgumentException e){
+            System.out.println("Error de validacion: " + e.getMessage());
+        }catch(Exception e){
             e.printStackTrace();
         }
     }
+
 
     public boolean correoExiste(String correo) {
         String sql = "SELECT id_jugador FROM Jugador WHERE correo = ?";

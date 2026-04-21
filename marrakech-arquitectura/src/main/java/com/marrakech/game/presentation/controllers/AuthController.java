@@ -43,8 +43,8 @@ public class AuthController {
             if (apodo.isEmpty()||correo.isEmpty()||pass.isEmpty()){mostrarAlerta("Error","Todos los campos son obligatorios.");return;}
             if (jugadorRepo.nombreExiste(apodo)){mostrarAlerta("Error","Apodo en uso.");return;}
             if (jugadorRepo.correoExiste(correo)){mostrarAlerta("Error","Correo ya registrado.");return;}
-            jugadorRepo.crearJugador(apodo, correo, pass);
-            usuarioActual = apodo; mostrarMenu();
+            jugadorRepo.crearJugador(apodo,correo,pass);
+            usuarioActual=apodo; mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
     }
@@ -56,9 +56,9 @@ public class AuthController {
             String apodo = v.getCampoApodo().getText().trim();
             String pass  = v.getCampoContrasena().getText().trim();
             if (apodo.isEmpty()||pass.isEmpty()){mostrarAlerta("Error","Ingresa apodo y contraseña.");return;}
-            String nombre = jugadorRepo.loginJugador(apodo, pass);
+            String nombre = jugadorRepo.loginJugador(apodo,pass);
             if (nombre==null){mostrarAlerta("Error","Credenciales incorrectas.");return;}
-            usuarioActual = nombre; mostrarMenu();
+            usuarioActual=nombre; mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
     }
@@ -136,8 +136,7 @@ public class AuthController {
             mostrarModoOnline();
         });
 
-        // HOST: marca la partida como INICIADA y espera 2.5s para que el guest
-        // también detecte el cambio, así entran al tablero al mismo tiempo
+        // HOST: marca INICIADA, espera 2.5s para que el guest detecte el cambio
         v.getBtnIniciar().setOnAction(e -> {
             v.detenerPolling();
             PartidaRepository.iniciarPartida(v.getPartidaId());
@@ -153,7 +152,7 @@ public class AuthController {
             }, "host-delay").start();
         });
 
-        // GUEST: entra al tablero cuando detecta la partida INICIADA por polling
+        // GUEST: entra cuando detecta estado INICIADA por polling
         v.setOnJuegoIniciado(() -> {
             Partida act = PartidaRepository.obtenerPartida(partida.id);
             int n     = act != null ? act.maxJugadores : 2;
@@ -192,6 +191,8 @@ public class AuthController {
             } catch (Exception ignored) {}
             stage.setScene(scene);
             gc.iniciarConJugadores(n, partidaId, usuario, miIndice);
+            gc.setOnVolverSala(() -> mostrarModoOnline());
+            gc.setOnVolverMenu(() -> mostrarMenu());
         } catch (Exception e) {
             e.printStackTrace();
             mostrarAlerta("Error", "No se pudo cargar el juego: " + e.getMessage());
