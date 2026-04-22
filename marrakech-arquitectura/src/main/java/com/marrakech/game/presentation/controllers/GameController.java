@@ -32,7 +32,7 @@ public class GameController {
     // ── FXML ─────────────────────────────────────────────────────────────────
     @FXML private VBox      startScreen;
     @FXML private HBox      gameScreen;
-    @FXML private VBox      endScreen;
+    @FXML private StackPane endScreen;
     @FXML private GridPane  boardGrid;
     @FXML private Label     turnLabel;
     @FXML private Label     statusLabel;
@@ -41,14 +41,12 @@ public class GameController {
     @FXML private Label     rugsJ1, rugsJ2, rugsJ3, rugsJ4;
     @FXML private Label     moneyJ1, moneyJ2, moneyJ3, moneyJ4;
 
-    // Pantalla fin de juego — de probando-logica-vieja
     @FXML private Label     resultadoLabel;
     @FXML private Label     winnerLabel;
     @FXML private Label     finalScores;
     @FXML private Button    btnVolverSala;
     @FXML private Button    btnVolverMenu;
 
-    // Callbacks inyectados desde AuthController — de probando-logica-vieja
     private Runnable onVolverSala;
     private Runnable onVolverMenu;
 
@@ -258,7 +256,7 @@ public class GameController {
         if (chatScroll != null) { chatScroll.layout(); chatScroll.setVvalue(1.0); }
     }
 
-    // ── Polling estado juego ──────────────────────────────────────────────────
+    // ── Polling ───────────────────────────────────────────────────────────────
 
     private void iniciarPolling() {
         pollingTimeline = new Timeline(new KeyFrame(Duration.millis(1200), e -> {
@@ -357,7 +355,6 @@ public class GameController {
         return null;
     }
 
-    // Formato: money;rugs;tablero/;playerIdx;phase;firstCarpetX;firstCarpetY;orientaciones/
     private String serializarEstado() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numPlayers; i++) sb.append(money[i]).append(i < numPlayers-1 ? "," : "");
@@ -452,7 +449,6 @@ public class GameController {
         for (javafx.scene.Node n : boardGrid.getChildren())
             if (n instanceof ImageView && n != assamView) eliminar.add(n);
         boardGrid.getChildren().removeAll(eliminar);
-
         for (int row = 0; row < 7; row++)
             for (int col = 0; col < 7; col++) {
                 int ori = carpetOrientation[col][row];
@@ -554,10 +550,8 @@ public class GameController {
             if (adj && noAssam && dentro) {
                 tiles[firstCarpetX][firstCarpetY].setStyle("");
                 int player = currentPlayerIdx + 1;
-
                 repararAlfombraAfectada(firstCarpetX, firstCarpetY);
                 repararAlfombraAfectada(x, y);
-
                 tileOwner[firstCarpetX][firstCarpetY] = player;
                 tileOwner[x][y]                       = player;
                 int topCol  = Math.min(firstCarpetX, x);
@@ -568,7 +562,6 @@ public class GameController {
                 carpetOrientation[x][y]                       = 0;
                 carpetOrientation[topCol][topRow]             = horiz ? 2 : 1;
                 carpetOrientation[bot2Col][bot2Row]           = -1;
-
                 redibujarTableroCompleto();
                 rugs[currentPlayerIdx]--;
                 actualizarUI();
@@ -683,30 +676,56 @@ public class GameController {
     private void mostrarFinDeJuego(){
         if(pollingTimeline!=null)pollingTimeline.stop();
         if(chatTimeline!=null)   chatTimeline.stop();
+
         int[] enTablero=new int[numPlayers];
         for(int r=0;r<7;r++)for(int c=0;c<7;c++)
             if(tileOwner[c][r]>0)enTablero[tileOwner[c][r]-1]++;
+
         int win=0;
         for(int i=1;i<numPlayers;i++)
             if(money[i]>money[win]||(money[i]==money[win]&&enTablero[i]>enTablero[win]))win=i;
+
         if(modoMultijugador)PartidaRepository.registrarVictoria(usuarioActual);
 
         boolean yoGane = !modoMultijugador || (win == miIndice);
+
+        // ── Estilo resultado: ganaste = dorado brillante, perdiste = plateado apagado
         if(resultadoLabel != null){
-            resultadoLabel.setText(yoGane ? "¡HAS GANADO!" : "HAS PERDIDO");
-            resultadoLabel.setStyle("-fx-font-size:56px;-fx-font-weight:bold;-fx-text-fill:"
-                + (yoGane ? playerColors[win] : "#888888") + ";");
+            if(yoGane){
+                resultadoLabel.setText("✦  ¡HAS GANADO!  ✦");
+                resultadoLabel.setStyle(
+                    "-fx-font-size:54px;-fx-font-weight:bold;" +
+                    "-fx-text-fill:" + playerColors[win] + ";" +
+                    "-fx-effect:dropshadow(gaussian,rgba(212,160,23,0.8),24,0.6,0,0);");
+            } else {
+                resultadoLabel.setText("HAS PERDIDO");
+                resultadoLabel.setStyle(
+                    "-fx-font-size:54px;-fx-font-weight:bold;" +
+                    "-fx-text-fill:#707070;" +
+                    "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.6),12,0.4,0,0);");
+            }
         }
+
         if(winnerLabel != null){
-            winnerLabel.setText("Ganador: "+playerNames[win]);
-            winnerLabel.setStyle("-fx-font-size:28px;-fx-font-weight:bold;-fx-text-fill:"+playerColors[win]+";");
+            winnerLabel.setText("Ganador: " + playerNames[win]);
+            winnerLabel.setStyle(
+                "-fx-font-size:26px;-fx-font-weight:bold;" +
+                "-fx-text-fill:" + playerColors[win] + ";" +
+                "-fx-effect:dropshadow(gaussian,rgba(240,208,96,0.5),8,0.3,0,0);");
         }
-        StringBuilder sb=new StringBuilder();
-        for(int i=0;i<numPlayers;i++)
-            sb.append(playerNames[i]).append(": ").append(money[i])
-              .append(" Dh | Alfombras en tablero: ").append(enTablero[i]).append("\n");
-        finalScores.setText(sb.toString());
-        gameScreen.setVisible(false);endScreen.setVisible(true);
+
+        // Tabla de puntuaciones
+        StringBuilder sb = new StringBuilder();
+        for(int i=0;i<numPlayers;i++){
+            sb.append(playerNames[i])
+              .append(":  ").append(money[i]).append(" Dh")
+              .append("   |   Alfombras en tablero: ").append(enTablero[i]);
+            if(i < numPlayers-1) sb.append("\n");
+        }
+        if(finalScores != null) finalScores.setText(sb.toString());
+
+        gameScreen.setVisible(false);
+        endScreen.setVisible(true);
     }
 
     @FXML private void volverSala(){
