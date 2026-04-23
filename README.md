@@ -10,8 +10,11 @@
 | Nombre |
 
 | Daniel Camilo Cedeño Chavarro |
+
 | Julián Felipe Africano Preciado |
+
 | Juliana Aguirre Ballesteros |
+
 | Diego Alejandro Melgarejo |
 
 ---
