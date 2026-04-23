@@ -156,7 +156,7 @@ git clone https://github.com/P1p2gamer26/Huntrix_Fis.git
 cd Huntrix_Fis/marrakech-arquitectura
 
 # 3. Compilar y correr
-mvn clean javafx:run
+mvn javafx:run
 ```
 
 ### Para jugar en dos terminales (multijugador)
@@ -203,6 +203,10 @@ El proyecto usa música libre de derechos de autor. Las pistas se descargaron de
 | `fix` | Rama principal de Juliana — diseño, estética y funcionalidades de UI |
 | `probando-logica-vieja` | Rama de Diego — lógica del juego y multijugador |
 | `main` | Rama de entrega oficial |
+| `DB` | Rama de daniel-base de datos |
+| `develop` | Rama de julian africano-implementacion |
+| `screen` | Rama de desarrollo de pantallas |
+
 
 ---
 
@@ -221,4 +225,4 @@ El proyecto usa música libre de derechos de autor. Las pistas se descargaron de
 
 ---
 
-*Pontificia Universidad Javeriana — Ingeniería de Sistemas — Arquitectura de Software 2025*
+*Pontificia Universidad Javeriana — Ingeniería de Sistemas — Arquitectura de Software 2026*
