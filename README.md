@@ -8,10 +8,11 @@
 ##  Equipo de desarrollo — Huntrix_Fis
 
 | Nombre |
-| Daniel Camilo Cedeño Chavarro 
-| Julián Felipe Africano Preciado 
-| Juliana Aguirre Ballesteros 
-| Diego Alejandro Melgarejo 
+
+| Daniel Camilo Cedeño Chavarro |
+| Julián Felipe Africano Preciado |
+| Juliana Aguirre Ballesteros |
+| Diego Alejandro Melgarejo |
 
 ---
 
