@@ -119,6 +119,9 @@
               <children>
                 <Button mnemonicParsing="false" onAction="#rotateLeft"
                         styleClass="btn-small" text="↶  Girar Izq"/>
+                <Label fx:id="diceResultLabel" text=""
+                       style="-fx-font-size:40px;-fx-min-width:52px;-fx-alignment:center;
+                              -fx-text-fill:#F0D060;-fx-effect:dropshadow(gaussian,rgba(212,160,23,0.8),10,0.4,0,0);"/>
                 <Button fx:id="rollDiceBtn" mnemonicParsing="false"
                         onAction="#onRollDiceClick" styleClass="btn" text="🎲  Lanzar Dado"/>
                 <Button mnemonicParsing="false" onAction="#rotateRight"

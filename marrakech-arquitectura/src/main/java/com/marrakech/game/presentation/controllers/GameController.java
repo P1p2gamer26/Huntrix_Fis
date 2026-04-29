@@ -5,8 +5,10 @@ import com.marrakech.game.infrastructure.ChatRepository.Mensaje;
 import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
 import javafx.animation.KeyFrame;
+import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.geometry.Rectangle2D;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -60,8 +62,11 @@ public class GameController {
     @FXML private TextField  chatInput;
     @FXML private Button     chatSendBtn;
 
+    @FXML private Label diceResultLabel;
+
     // ── Estado del juego ──────────────────────────────────────────────────────
     private ImageView assamView;
+    private Image[] assamImages = new Image[4];
     private int assamX = 3, assamY = 3, assamDir = 0;
 
     private int currentPhase = 0;
@@ -164,7 +169,23 @@ public class GameController {
         }
 
         assamX = 3; assamY = 3; assamDir = 0;
-        try { assamView = new ImageView(new Image(getClass().getResourceAsStream("/images/assam.png"))); }
+
+        // Cargar imágenes direccionales de Assam
+        String[] assamPaths = {
+            "/images/marrakesh de atras.png",          // dir 0: norte
+            "/images/marrakesh perfil derecho.png",    // dir 1: este
+            "/images/marrakesh de frente.png",         // dir 2: sur
+            "/images/marrakesh perfil izquierdo.png"   // dir 3: oeste
+        };
+        for (int i = 0; i < 4; i++) {
+            try { assamImages[i] = new Image(getClass().getResourceAsStream(assamPaths[i])); }
+            catch (Exception e) { assamImages[i] = null; }
+        }
+
+        Image imgInicial = assamImages[assamDir] != null
+            ? assamImages[assamDir]
+            : new Image(getClass().getResourceAsStream("/images/assam.png"));
+        try { assamView = new ImageView(imgInicial); }
         catch (Exception e) { assamView = new ImageView(); }
         assamView.setFitWidth(50); assamView.setFitHeight(58);
         assamView.setMouseTransparent(true);
@@ -393,7 +414,7 @@ public class GameController {
         assamX = est.ax; assamY = est.ay; assamDir = est.adir;
         GridPane.setColumnIndex(assamView, assamX);
         GridPane.setRowIndex(assamView, assamY);
-        assamView.setRotate(assamDir * 90);
+        setAssamImage(assamDir);
 
         String[] secciones = est.tableroJson.split(";");
         if (secciones.length < 7) return;
@@ -491,38 +512,113 @@ public class GameController {
 
     @FXML protected void rotateLeft() {
         if (!esMiTurno() || currentPhase != PHASE_MOVE) return;
-        assamDir = (assamDir + 3) % 4; assamView.setRotate(assamDir * 90); guardarEstado();
+        assamDir = (assamDir + 3) % 4; setAssamImage(assamDir); guardarEstado();
     }
 
     @FXML protected void rotateRight() {
         if (!esMiTurno() || currentPhase != PHASE_MOVE) return;
-        assamDir = (assamDir + 1) % 4; assamView.setRotate(assamDir * 90); guardarEstado();
+        assamDir = (assamDir + 1) % 4; setAssamImage(assamDir); guardarEstado();
     }
 
     @FXML protected void onRollDiceClick() {
         if (!esMiTurno() || currentPhase != PHASE_MOVE) return;
         int pasos = new Random().nextInt(4) + 1;
-        moverAssam(pasos);
-        GridPane.setColumnIndex(assamView, assamX);
-        GridPane.setRowIndex(assamView, assamY);
-        assamView.toFront();
+        rollDiceBtn.setDisable(true);
 
-        int dueno = tileOwner[assamX][assamY];
-        if (dueno != 0 && dueno != currentPlayerIdx + 1) {
-            int pago = contarContiguas(assamX, assamY, dueno);
-            money[currentPlayerIdx] = Math.max(0, money[currentPlayerIdx] - pago);
-            money[dueno - 1] += pago;
-            statusLabel.setText("Dado: " + pasos + " — Pagas " + pago + " Dh a " + playerNames[dueno - 1] + ". Coloca tu alfombra.");
-        } else {
-            statusLabel.setText("Dado: " + pasos + " — Haz click en una casilla adyacente a Assam.");
-        }
+        animarDado(pasos, () -> animarMovimientoAssam(pasos, () -> {
+            assamView.toFront();
+            int dueno = tileOwner[assamX][assamY];
+            if (dueno != 0 && dueno != currentPlayerIdx + 1) {
+                int pago = contarContiguas(assamX, assamY, dueno);
+                money[currentPlayerIdx] = Math.max(0, money[currentPlayerIdx] - pago);
+                money[dueno - 1] += pago;
+                statusLabel.setText("Dado: " + pasos + " — Pagas " + pago + " Dh a " + playerNames[dueno - 1] + ". Coloca tu alfombra.");
+            } else {
+                statusLabel.setText("Dado: " + pasos + " — Haz click en una casilla adyacente a Assam.");
+            }
+            if (rugs[currentPlayerIdx] > 0) {
+                currentPhase = PHASE_CARPET_1;
+            } else {
+                pasarTurno(); return;
+            }
+            actualizarUI(); actualizarControles(); guardarEstado();
+        }));
+    }
 
-        if (rugs[currentPlayerIdx] > 0) {
-            currentPhase = PHASE_CARPET_1;
+    /** Cambia la imagen de Assam según su dirección. */
+    private void setAssamImage(int dir) {
+        if (assamImages[dir] != null) {
+            assamView.setImage(assamImages[dir]);
+            assamView.setRotate(0);
         } else {
-            pasarTurno(); return;
+            assamView.setRotate(dir * 90);
         }
-        actualizarUI(); actualizarControles(); guardarEstado();
+    }
+
+    /** Pre-calcula el camino de Assam paso a paso (incluye rebotes en bordes). */
+    private int[][] computePath(int pasos) {
+        int[][] path = new int[pasos + 1][3]; // [x, y, dir]
+        path[0][0] = assamX; path[0][1] = assamY; path[0][2] = assamDir;
+        for (int p = 0; p < pasos; p++) {
+            int x = path[p][0], y = path[p][1], dir = path[p][2];
+            int nx = x, ny = y;
+            switch (dir) { case 0: ny--; break; case 1: nx++; break; case 2: ny++; break; case 3: nx--; break; }
+            if (nx < 0 || nx > 6 || ny < 0 || ny > 6) {
+                int bi = borderIndex(x, y);
+                if (bi != -1) { bi++; int[] pos = borderPos(bi); nx = pos[0]; ny = pos[1]; dir = borderDir(bi); }
+                else { nx = Math.max(0, Math.min(6, nx)); ny = Math.max(0, Math.min(6, ny)); }
+            }
+            path[p+1][0] = nx; path[p+1][1] = ny; path[p+1][2] = dir;
+        }
+        int biFinal = borderIndex(path[pasos][0], path[pasos][1]);
+        if (biFinal != -1) path[pasos][2] = borderDir(biFinal);
+        return path;
+    }
+
+    /** Anima el dado: muestra caras aleatorias y termina mostrando el resultado. */
+    private void animarDado(int resultado, Runnable onFinished) {
+        if (diceResultLabel != null) diceResultLabel.setVisible(true);
+        String[] caras = {"⚀", "⚁", "⚂", "⚃"};
+        Random rng = new Random();
+        Timeline anim = new Timeline();
+        int totalFrames = 16;
+        for (int i = 0; i < totalFrames; i++) {
+            final int fi = i;
+            anim.getKeyFrames().add(new KeyFrame(Duration.millis(50 + fi * 22), e -> {
+                if (diceResultLabel != null)
+                    diceResultLabel.setText(caras[rng.nextInt(4)]);
+            }));
+        }
+        anim.getKeyFrames().add(new KeyFrame(Duration.millis(50 + totalFrames * 22), e -> {
+            if (diceResultLabel != null) {
+                diceResultLabel.setText(caras[resultado - 1]);
+                // Pequeño pulso al mostrar el resultado
+                ScaleTransition pulse = new ScaleTransition(Duration.millis(180), diceResultLabel);
+                pulse.setFromX(1.0); pulse.setFromY(1.0);
+                pulse.setToX(1.35);  pulse.setToY(1.35);
+                pulse.setAutoReverse(true); pulse.setCycleCount(2); pulse.play();
+            }
+            onFinished.run();
+        }));
+        anim.play();
+    }
+
+    /** Anima a Assam moviéndose celda a celda hasta llegar al destino final. */
+    private void animarMovimientoAssam(int pasos, Runnable onFinished) {
+        int[][] path = computePath(pasos);
+        Timeline anim = new Timeline();
+        for (int p = 1; p <= pasos; p++) {
+            final int px = path[p][0], py = path[p][1], pd = path[p][2];
+            anim.getKeyFrames().add(new KeyFrame(Duration.millis(p * 280L), e -> {
+                assamX = px; assamY = py; assamDir = pd;
+                GridPane.setColumnIndex(assamView, assamX);
+                GridPane.setRowIndex(assamView, assamY);
+                setAssamImage(assamDir);
+                assamView.toFront();
+            }));
+        }
+        anim.getKeyFrames().add(new KeyFrame(Duration.millis(pasos * 280L + 60), e -> onFinished.run()));
+        anim.play();
     }
 
     private void handleTileClick(int x, int y) {
@@ -664,7 +760,7 @@ public class GameController {
         }
         int bi=borderIndex(assamX,assamY);
         if(bi!=-1)assamDir=borderDir(bi);
-        assamView.setRotate(assamDir*90);
+        setAssamImage(assamDir);
     }
 
     // ── Fin del juego ─────────────────────────────────────────────────────────
