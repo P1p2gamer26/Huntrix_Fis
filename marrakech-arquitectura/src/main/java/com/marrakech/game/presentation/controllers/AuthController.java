@@ -1,5 +1,8 @@
 package com.marrakech.game.presentation.controllers;
 
+import java.sql.Connection;
+import java.sql.Statement;
+
 import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.PartidaRepository.Partida;
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
@@ -12,7 +15,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import java.sql.*;
 
 public class AuthController {
 

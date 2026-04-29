@@ -158,6 +158,12 @@
     -fx-cursor: default;
 }
 
+.btn:disabled {
+    -fx-background-color: #555555;
+    -fx-text-fill: #888888;
+    -fx-cursor: default;
+}
+
 .btn-small {
     -fx-background-color: #3A1F08;
     -fx-text-fill: #C8922A;
