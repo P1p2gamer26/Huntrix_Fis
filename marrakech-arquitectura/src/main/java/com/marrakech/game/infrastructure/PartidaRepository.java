@@ -117,7 +117,7 @@ public class PartidaRepository {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
                 "UPDATE partidas SET estado = 'INICIADA' WHERE id = ?")) {
-            ps.setString(1, id);
+            ps.setString(1, id.toUpperCase());
             ps.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error iniciando partida: " + e.getMessage());
