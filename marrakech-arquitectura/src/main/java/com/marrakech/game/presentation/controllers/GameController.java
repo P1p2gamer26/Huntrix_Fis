@@ -1,17 +1,24 @@
 package com.marrakech.game.presentation.controllers;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.Random;
+
 import com.marrakech.game.infrastructure.ChatRepository;
 import com.marrakech.game.infrastructure.ChatRepository.Mensaje;
 import com.marrakech.game.infrastructure.PartidaRepository;
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
+
 import javafx.animation.KeyFrame;
-import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.geometry.Rectangle2D;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -23,11 +30,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
-
-import java.sql.*;
-import java.util.List;
-import java.util.Random;
 
 public class GameController {
 
@@ -48,6 +54,10 @@ public class GameController {
     @FXML private Label     finalScores;
     @FXML private Button    btnVolverSala;
     @FXML private Button    btnVolverMenu;
+
+    // ── NUEVO: dado grande ────────────────────────────────────────────────────
+    @FXML private Canvas diceCanvas;
+    @FXML private Label  diceValueLabel;
 
     private Runnable onVolverSala;
     private Runnable onVolverMenu;
@@ -198,6 +208,10 @@ public class GameController {
         startScreen.setVisible(false);
         endScreen.setVisible(false);
         gameScreen.setVisible(true);
+
+        // Dibujar dado inicial (vacío / en espera)
+        dibujarDadoInicial();
+
         actualizarUI();
         actualizarControles();
 
@@ -469,6 +483,9 @@ public class GameController {
         java.util.List<javafx.scene.Node> eliminar = new java.util.ArrayList<>();
         for (javafx.scene.Node n : boardGrid.getChildren())
             if (n instanceof ImageView && n != assamView) eliminar.add(n);
+        // También eliminar Canvas de alfombras anteriores
+        for (javafx.scene.Node n : boardGrid.getChildren())
+            if (n instanceof Canvas) eliminar.add(n);
         boardGrid.getChildren().removeAll(eliminar);
         for (int row = 0; row < 7; row++)
             for (int col = 0; col < 7; col++) {
@@ -480,11 +497,10 @@ public class GameController {
     }
 
     private void redibujarCelda(int col, int row, int player) {
-        if (carpetImages == null || carpetImages[player - 1] == null) return;
         int ori = carpetOrientation[col][row];
         if (ori == 0 || ori == -1) return;
-        if (ori == 3) { colocarImagenAlfombraSpan(col, row, false, player, false); return; }
-        colocarImagenAlfombra(col, row, ori == 2, player);
+        if (ori == 3) { colocarAlfombraCanvas(col, row, false, player, false); return; }
+        colocarAlfombraCanvas(col, row, ori == 2, player, true);
     }
 
     // ── Lógica del juego ──────────────────────────────────────────────────────
@@ -575,32 +591,139 @@ public class GameController {
         return path;
     }
 
-    /** Anima el dado: muestra caras aleatorias y termina mostrando el resultado. */
+    // ── NUEVO: Dado grande con chancletas ─────────────────────────────────────
+
+    /** Dibuja el dado en estado inicial (en espera, sin valor). */
+    private void dibujarDadoInicial() {
+        if (diceCanvas == null) return;
+        GraphicsContext gc = diceCanvas.getGraphicsContext2D();
+        double w = diceCanvas.getWidth();
+        double h = diceCanvas.getHeight();
+        double m = 8;
+
+        gc.clearRect(0, 0, w, h);
+
+        // Sombra
+        gc.setFill(Color.rgb(0, 0, 0, 0.35));
+        gc.fillRoundRect(m + 3, m + 3, w - m*2, h - m*2, 18, 18);
+
+        // Cara madera
+        gc.setFill(Color.rgb(185, 120, 55));
+        gc.fillRoundRect(m, m, w - m*2, h - m*2, 16, 16);
+
+        // Borde
+        gc.setStroke(Color.rgb(140, 80, 20));
+        gc.setLineWidth(2);
+        gc.strokeRoundRect(m, m, w - m*2, h - m*2, 16, 16);
+
+        // Veta de madera
+        gc.setStroke(Color.rgb(160, 95, 35, 0.3));
+        gc.setLineWidth(1);
+        for (int i = 0; i < 4; i++) {
+            double lx = m + 10 + i * 18;
+            gc.strokeLine(lx, m + 6, lx + 5, h - m - 6);
+        }
+
+        // Signo de interrogación (esperando lanzar)
+        gc.setFill(Color.rgb(240, 200, 100, 0.6));
+        gc.setFont(Font.font(28));
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.fillText("?", w / 2, h / 2 + 10);
+    }
+
+    /** Anima el dado grande con chancletas y termina mostrando el resultado. */
     private void animarDado(int resultado, Runnable onFinished) {
-        if (diceResultLabel != null) diceResultLabel.setVisible(true);
-        String[] caras = {"⚀", "⚁", "⚂", "⚃"};
+        // Ocultar el label pequeño del dado (ya tenemos el dado grande)
+        if (diceResultLabel != null) diceResultLabel.setVisible(false);
+
         Random rng = new Random();
         Timeline anim = new Timeline();
-        int totalFrames = 16;
+        int totalFrames = 18;
+
         for (int i = 0; i < totalFrames; i++) {
             final int fi = i;
-            anim.getKeyFrames().add(new KeyFrame(Duration.millis(50 + fi * 22), e -> {
-                if (diceResultLabel != null)
-                    diceResultLabel.setText(caras[rng.nextInt(4)]);
+            anim.getKeyFrames().add(new KeyFrame(Duration.millis(50 + fi * 28), e -> {
+                int r = rng.nextInt(4) + 1;
+                dibujarDadoCanvas(r, true);
             }));
         }
-        anim.getKeyFrames().add(new KeyFrame(Duration.millis(50 + totalFrames * 22), e -> {
-            if (diceResultLabel != null) {
-                diceResultLabel.setText(caras[resultado - 1]);
-                // Pequeño pulso al mostrar el resultado
-                ScaleTransition pulse = new ScaleTransition(Duration.millis(180), diceResultLabel);
-                pulse.setFromX(1.0); pulse.setFromY(1.0);
-                pulse.setToX(1.35);  pulse.setToY(1.35);
-                pulse.setAutoReverse(true); pulse.setCycleCount(2); pulse.play();
-            }
+
+        anim.getKeyFrames().add(new KeyFrame(Duration.millis(50 + totalFrames * 28), e -> {
+            dibujarDadoCanvas(resultado, false);
+            if (diceValueLabel != null)
+                diceValueLabel.setText("Resultado: " + resultado);
             onFinished.run();
         }));
         anim.play();
+    }
+
+    /** Dibuja el dado estilo madera con chancletas en el Canvas. */
+    private void dibujarDadoCanvas(int valor, boolean animando) {
+        if (diceCanvas == null) return;
+        GraphicsContext gc = diceCanvas.getGraphicsContext2D();
+        double w = diceCanvas.getWidth();
+        double h = diceCanvas.getHeight();
+        double m = 8;
+
+        gc.clearRect(0, 0, w, h);
+
+        // Sombra exterior
+        gc.setFill(Color.rgb(0, 0, 0, 0.4));
+        gc.fillRoundRect(m + 3, m + 3, w - m*2, h - m*2, 18, 18);
+
+        // Cara del dado — color madera (más vivo cuando animando)
+        gc.setFill(animando ? Color.rgb(220, 155, 75) : Color.rgb(205, 140, 70));
+        gc.fillRoundRect(m, m, w - m*2, h - m*2, 16, 16);
+
+        // Borde del dado
+        gc.setStroke(animando ? Color.rgb(255, 220, 100, 0.9) : Color.rgb(160, 90, 20));
+        gc.setLineWidth(animando ? 2.5 : 2);
+        gc.strokeRoundRect(m, m, w - m*2, h - m*2, 16, 16);
+
+        // Veta de madera (decorativa)
+        gc.setStroke(Color.rgb(180, 110, 45, 0.3));
+        gc.setLineWidth(1);
+        for (int i = 0; i < 4; i++) {
+            double lx = m + 10 + i * 18;
+            gc.strokeLine(lx, m + 6, lx + 5, h - m - 6);
+        }
+
+        // Chancletas según valor
+        gc.setFont(Font.font(animando ? 20 : 22));
+        gc.setTextAlign(TextAlignment.CENTER);
+        dibujarChancletas(gc, valor, w, h);
+    }
+
+    /** Posiciona las chancletas exactamente como un dado real (distribución clásica). */
+    private void dibujarChancletas(GraphicsContext gc, int valor, double w, double h) {
+        double cx  = w / 2;
+        double cy  = h / 2;
+        double off = 20;
+
+        double[][] pos;
+        switch (valor) {
+            case 1:
+                pos = new double[][]{{cx, cy}};
+                break;
+            case 2:
+                pos = new double[][]{{cx - off, cy - off}, {cx + off, cy + off}};
+                break;
+            case 3:
+                pos = new double[][]{{cx - off, cy - off}, {cx, cy}, {cx + off, cy + off}};
+                break;
+            case 4:
+                pos = new double[][]{{cx-off, cy-off}, {cx+off, cy-off},
+                                     {cx-off, cy+off}, {cx+off, cy+off}};
+                break;
+            default:
+                pos = new double[][]{{cx, cy}};
+                break;
+        }
+
+        gc.setFill(Color.rgb(30, 10, 0, 0.85));
+        for (double[] p : pos) {
+            gc.fillText("🥿", p[0], p[1] + 8);
+        }
     }
 
     /** Anima a Assam moviéndose celda a celda hasta llegar al destino final. */
@@ -710,26 +833,99 @@ public class GameController {
         return false;
     }
 
-    private void colocarImagenAlfombra(int col, int row, boolean horizontal, int player) {
-        colocarImagenAlfombraSpan(col, row, horizontal, player, true);
+    // ── NUEVO: Alfombras dibujadas con Canvas (sin imagen PNG) ─────────────────
+
+    /** Llamado desde redibujarCelda — reemplaza colocarImagenAlfombra */
+    private void colocarAlfombraCanvas(int col, int row, boolean horizontal,
+                                        int player, boolean dosCeldas) {
+        int spanC = 1, spanR = 1;
+        double anchoReal, altoReal;
+
+        if (!dosCeldas) {
+            anchoReal = CELL;
+            altoReal  = CELL;
+        } else if (horizontal) {
+            spanC     = 2;
+            anchoReal = CELL * 2;
+            altoReal  = CELL;
+        } else {
+            spanR     = 2;
+            anchoReal = CELL;
+            altoReal  = CELL * 2;
+        }
+
+        Canvas canvas = new Canvas(anchoReal, altoReal);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Colores base por jugador
+        Color[] coloresBase = {
+            Color.rgb(231, 76,  60,  0.82),  // J1 rojo
+            Color.rgb(52,  152, 219, 0.82),  // J2 azul
+            Color.rgb(46,  204, 113, 0.82),  // J3 verde
+            Color.rgb(243, 156, 18,  0.82)   // J4 amarillo
+        };
+        Color[] bordeColores = {
+            Color.rgb(180, 30,  10),
+            Color.rgb(20,  90,  180),
+            Color.rgb(20,  140, 70),
+            Color.rgb(180, 110, 5)
+        };
+
+        Color base  = coloresBase[player - 1];
+        Color borde = bordeColores[player - 1];
+
+        double ox = 2, oy = 2;
+        double iw = anchoReal - 4;
+        double ih = altoReal  - 4;
+
+        // Fondo principal
+        gc.setFill(base);
+        gc.fillRoundRect(ox, oy, iw, ih, 6, 6);
+
+        // Borde exterior
+        gc.setStroke(borde);
+        gc.setLineWidth(2.5);
+        gc.strokeRoundRect(ox, oy, iw, ih, 6, 6);
+
+        // ── Diseño árabe geométrico ──────────────────────────────────────────
+        gc.setStroke(Color.color(1, 1, 1, 0.28));
+        gc.setLineWidth(1.0);
+
+        // Marco interior
+        double inset = 6;
+        gc.strokeRect(ox + inset, oy + inset, iw - inset*2, ih - inset*2);
+
+        // Cruz central
+        gc.strokeLine(ox + iw/2, oy + inset,      ox + iw/2, oy + ih - inset);
+        gc.strokeLine(ox + inset, oy + ih/2,       ox + iw - inset, oy + ih/2);
+
+        // Esquinas decorativas (diagonales)
+        double cs = Math.min(iw, ih) * 0.20;
+        gc.strokeLine(ox + inset,       oy + inset,       ox + inset + cs,    oy + inset + cs);
+        gc.strokeLine(ox + iw - inset,  oy + inset,       ox + iw - inset-cs, oy + inset + cs);
+        gc.strokeLine(ox + inset,       oy + ih - inset,  ox + inset + cs,    oy + ih - inset-cs);
+        gc.strokeLine(ox + iw - inset,  oy + ih - inset,  ox + iw - inset-cs, oy + ih - inset-cs);
+
+        // Punto central decorativo
+        gc.setFill(Color.color(1, 1, 1, 0.55));
+        gc.fillOval(ox + iw/2 - 3, oy + ih/2 - 3, 6, 6);
+
+        canvas.setMouseTransparent(true);
+        if (spanC > 1) GridPane.setColumnSpan(canvas, spanC);
+        if (spanR > 1) GridPane.setRowSpan(canvas, spanR);
+        boardGrid.add(canvas, col, row);
+        assamView.toFront();
     }
 
-    private void colocarImagenAlfombraSpan(int col, int row, boolean horizontal, int player, boolean dosCeldas) {
-        if (carpetImages[player - 1] == null) return;
-        ImageView iv = new ImageView(carpetImages[player - 1]);
-        iv.setMouseTransparent(true); iv.setPreserveRatio(false);
-        if (!dosCeldas) {
-            iv.setFitWidth(CELL); iv.setFitHeight(CELL);
-            GridPane.setColumnSpan(iv, 1); GridPane.setRowSpan(iv, 1);
-        } else if (horizontal) {
-            iv.setFitWidth(CELL * 2); iv.setFitHeight(CELL);
-            GridPane.setColumnSpan(iv, 2); GridPane.setRowSpan(iv, 1);
-        } else {
-            iv.setFitWidth(CELL); iv.setFitHeight(CELL * 2);
-            GridPane.setColumnSpan(iv, 1); GridPane.setRowSpan(iv, 2);
-        }
-        boardGrid.add(iv, col, row);
-        assamView.toFront();
+    // Mantenemos el método viejo con nombre original por si hay otra llamada residual,
+    // pero redirige al nuevo
+    private void colocarImagenAlfombra(int col, int row, boolean horizontal, int player) {
+        colocarAlfombraCanvas(col, row, horizontal, player, true);
+    }
+
+    private void colocarImagenAlfombraSpan(int col, int row, boolean horizontal,
+                                            int player, boolean dosCeldas) {
+        colocarAlfombraCanvas(col, row, horizontal, player, dosCeldas);
     }
 
     // ── Movimiento Assam ──────────────────────────────────────────────────────
@@ -785,7 +981,6 @@ public class GameController {
 
         boolean yoGane = !modoMultijugador || (win == miIndice);
 
-        // ── Estilo resultado: ganaste = dorado brillante, perdiste = plateado apagado
         if(resultadoLabel != null){
             if(yoGane){
                 resultadoLabel.setText("✦  ¡HAS GANADO!  ✦");
@@ -810,7 +1005,6 @@ public class GameController {
                 "-fx-effect:dropshadow(gaussian,rgba(240,208,96,0.5),8,0.3,0,0);");
         }
 
-        // Tabla de puntuaciones
         StringBuilder sb = new StringBuilder();
         for(int i=0;i<numPlayers;i++){
             sb.append(playerNames[i])
