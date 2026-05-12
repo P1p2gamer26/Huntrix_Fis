@@ -1,22 +1,31 @@
-package com.marrakech.game.infrastructure.persistence;
+package com.marrakech.game.repositorio;
 
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.*;
 
-public class JugadorRepository {
+/** Acceso a datos de la tabla Jugador. Implementa {@link IJugadorRepositorio}. */
+public class JugadorRepositorio implements IJugadorRepositorio {
 
-    private final EstadisticasRepository estadisticasRepo = new EstadisticasRepository();
+    private final EstadisticasRepositorio estadisticasRepo;
 
-    // ── Inicialización ────────────────────────────────────────────────────────
+    public JugadorRepositorio(EstadisticasRepositorio estadisticasRepo) {
+        this.estadisticasRepo = estadisticasRepo;
+    }
 
+    // ── Creación ──────────────────────────────────────────────────────────────
+
+    @Override
     public void crearJugador(String nombre, String correo, String password) {
         agregarColumnasExtra();
-        String sql = "INSERT INTO Jugador (nombre_usuario, correo, password, fecha_registro, estado) " +
-                     "VALUES (?, ?, ?, CURRENT_TIMESTAMP, 'ACTIVO')";
+        String sql = "INSERT INTO Jugador (nombre_usuario, correo, password, " +
+                     "fecha_registro, estado) VALUES (?, ?, ?, CURRENT_TIMESTAMP, 'ACTIVO')";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(sql,
+                                         PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, nombre);
             stmt.setString(2, correo);
             stmt.setString(3, password);
@@ -26,8 +35,9 @@ public class JugadorRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // ── Validaciones de existencia ────────────────────────────────────────────
+    // ── Validaciones de existencia ─────────────────────────────────────────────
 
+    @Override
     public boolean correoExiste(String correo) {
         String sql = "SELECT id_jugador FROM Jugador WHERE correo = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -38,6 +48,7 @@ public class JugadorRepository {
         return false;
     }
 
+    @Override
     public boolean nombreExiste(String nombre) {
         String sql = "SELECT id_jugador FROM Jugador WHERE nombre_usuario = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -48,14 +59,13 @@ public class JugadorRepository {
         return false;
     }
 
-    // ── Login / Logout con sesión única ───────────────────────────────────────
+    // ── Login / Logout ────────────────────────────────────────────────────────
 
     /**
-     * Intenta hacer login. Retorna:
-     *   null         → credenciales incorrectas
-     *   "SESION_ACTIVA" → ya hay una sesión abierta en otro lado
-     *   nombre_usuario → login exitoso
+     * Intenta autenticar al jugador.
+     * @return null=credenciales incorrectas, "SESION_ACTIVA"=ya hay sesión, nombre=éxito
      */
+    @Override
     public String loginJugador(String apodo, String password) {
         agregarColumnasExtra();
         String sql = "SELECT nombre_usuario, sesion_activa FROM Jugador " +
@@ -65,19 +75,16 @@ public class JugadorRepository {
             stmt.setString(1, apodo);
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
-            if (!rs.next()) return null; // credenciales incorrectas
-
-            boolean sesionActiva = rs.getBoolean("sesion_activa");
-            if (sesionActiva) return "SESION_ACTIVA";
-
+            if (!rs.next()) return null;
+            if (rs.getBoolean("sesion_activa")) return "SESION_ACTIVA";
             String nombre = rs.getString("nombre_usuario");
-            // Marcar sesión como activa
             marcarSesion(nombre, true);
             return nombre;
         } catch (Exception e) { e.printStackTrace(); }
         return null;
     }
 
+    @Override
     public void cerrarSesion(String nombreUsuario) {
         if (nombreUsuario == null) return;
         marcarSesion(nombreUsuario, false);
@@ -93,8 +100,9 @@ public class JugadorRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // ── Datos del perfil ──────────────────────────────────────────────────────
+    // ── Datos del perfil ───────────────────────────────────────────────────────
 
+    @Override
     public int obtenerIdJugador(String nombre) {
         String sql = "SELECT id_jugador FROM Jugador WHERE nombre_usuario = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -106,6 +114,7 @@ public class JugadorRepository {
         return -1;
     }
 
+    @Override
     public String getCorreo(String nombreUsuario) {
         String sql = "SELECT correo FROM Jugador WHERE nombre_usuario = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -117,6 +126,7 @@ public class JugadorRepository {
         return "";
     }
 
+    @Override
     public String getFechaRegistro(String nombreUsuario) {
         String sql = "SELECT fecha_registro FROM Jugador WHERE nombre_usuario = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -131,9 +141,10 @@ public class JugadorRepository {
         return "—";
     }
 
-    // ── Foto de perfil ────────────────────────────────────────────────────────
+    // ── Foto de perfil ─────────────────────────────────────────────────────────
 
-    public boolean guardarFoto(String nombreUsuario, java.io.File archivoImagen) {
+    @Override
+    public boolean guardarFoto(String nombreUsuario, File archivoImagen) {
         agregarColumnasExtra();
         String sql = "UPDATE Jugador SET foto = ? WHERE nombre_usuario = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -146,6 +157,7 @@ public class JugadorRepository {
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
+    @Override
     public byte[] getFoto(String nombreUsuario) {
         agregarColumnasExtra();
         String sql = "SELECT foto FROM Jugador WHERE nombre_usuario = ?";
@@ -161,7 +173,7 @@ public class JugadorRepository {
         return null;
     }
 
-    // ── Columnas extra (idempotente) ──────────────────────────────────────────
+    // ── Columnas extra (idempotente) ───────────────────────────────────────────
 
     private void agregarColumnasExtra() {
         try (Connection conn = DatabaseConnection.getConnection();

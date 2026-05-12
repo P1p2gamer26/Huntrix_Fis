@@ -26,6 +26,7 @@ import javafx.scene.text.Text;
 public class MenuView extends StackPane {
 
     private Button btnJugar;
+    private Button btnJugarLocal;
     private Button btnReglas;
     private Button btnConfiguracion;
     private HBox   tarjetaUsuario;
@@ -71,13 +72,14 @@ public class MenuView extends StackPane {
         subtitulo.setFont(Font.font("Georgia", 12));
         subtitulo.setFill(Color.web("#9E7A3A"));
 
-        btnJugar         = crearBoton("JUGAR");
+        btnJugar         = crearBoton("JUGAR EN LÍNEA");
+        btnJugarLocal    = crearBoton("JUGAR LOCAL");
         btnReglas        = crearBoton("REGLAS");
         btnConfiguracion = crearBoton("CONFIGURACIÓN");
 
         VBox botones = new VBox(14);
         botones.setAlignment(Pos.CENTER);
-        botones.getChildren().addAll(btnJugar, btnReglas, btnConfiguracion);
+        botones.getChildren().addAll(btnJugar, btnJugarLocal, btnReglas, btnConfiguracion);
 
         contenido.getChildren().addAll(titulo, botones, subtitulo);
         getChildren().add(contenido);
@@ -139,6 +141,7 @@ public class MenuView extends StackPane {
     }
 
     public Button getBtnJugar()         { return btnJugar; }
+    public Button getBtnJugarLocal()    { return btnJugarLocal; }
     public Button getBtnReglas()        { return btnReglas; }
     public Button getBtnConfiguracion() { return btnConfiguracion; }
     public HBox   getTarjetaUsuario()   { return tarjetaUsuario; }

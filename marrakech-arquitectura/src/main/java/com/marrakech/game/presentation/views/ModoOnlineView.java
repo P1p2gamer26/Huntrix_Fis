@@ -2,8 +2,8 @@ package com.marrakech.game.presentation.views;
 
 import java.util.List;
 
-import com.marrakech.game.infrastructure.PartidaRepository;
-import com.marrakech.game.infrastructure.PartidaRepository.RankingEntry;
+import com.marrakech.game.repositorio.PartidaRepositorio.RankingEntry;
+import com.marrakech.game.servicios.PartidaServicio;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -30,8 +30,10 @@ public class ModoOnlineView extends StackPane {
 
     private Button btnCrear;
     private Button btnUnirse;
+    private final PartidaServicio partidaSvc;
 
-    public ModoOnlineView() {
+    public ModoOnlineView(PartidaServicio partidaSvc) {
+        this.partidaSvc = partidaSvc;
         configurarFondo();
         configurarContenido();
     }
@@ -77,7 +79,7 @@ public class ModoOnlineView extends StackPane {
         listaRanking.setMaxWidth(580);
         listaRanking.setPadding(new Insets(0, 20, 0, 20));
 
-        List<RankingEntry> rankingData = PartidaRepository.obtenerRanking();
+        List<RankingEntry> rankingData = partidaSvc.obtenerRanking();
 
         if (rankingData.isEmpty()) {
             Text vacio = new Text("Aún no hay victorias registradas.");

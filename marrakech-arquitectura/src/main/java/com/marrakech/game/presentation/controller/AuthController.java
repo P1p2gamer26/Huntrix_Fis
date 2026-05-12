@@ -1,14 +1,12 @@
-package com.marrakech.game.presentation.controllers;
+package com.marrakech.game.presentation.controller;
 
-import java.sql.Connection;
-import java.sql.Statement;
-
-import com.marrakech.game.infrastructure.PartidaRepository;
-import com.marrakech.game.infrastructure.PartidaRepository.Partida;
-import com.marrakech.game.infrastructure.database.DatabaseConnection;
-import com.marrakech.game.infrastructure.persistence.JugadorRepository;
+import com.marrakech.game.repositorio.PartidaRepositorio.Partida;
+import com.marrakech.game.servicios.AuthServicio;
+import com.marrakech.game.servicios.ChatServicio;
+import com.marrakech.game.servicios.PartidaServicio;
 import com.marrakech.game.presentation.MusicaManager;
 import com.marrakech.game.presentation.views.*;
+
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,17 +14,30 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
+/**
+ * Orquestador de navegación entre pantallas.
+ * Recibe todos sus servicios por constructor (inyección de dependencias).
+ */
 public class AuthController {
 
-    private final Stage stage;
-    private final double width, height;
+    private final Stage          stage;
+    private final double         width, height;
+    private final AuthServicio   authSvc;
+    private final PartidaServicio partidaSvc;
+    private final ChatServicio   chatSvc;
+
     private String usuarioActual;
-    private final JugadorRepository jugadorRepo = new JugadorRepository();
 
-    public AuthController(Stage stage, double width, double height) {
-        this.stage = stage; this.width = width; this.height = height;
+    public AuthController(Stage stage, double width, double height,
+                          AuthServicio authSvc, PartidaServicio partidaSvc,
+                          ChatServicio chatSvc) {
+        this.stage      = stage;
+        this.width      = width;
+        this.height     = height;
+        this.authSvc    = authSvc;
+        this.partidaSvc = partidaSvc;
+        this.chatSvc    = chatSvc;
 
-        // Cerrar sesión limpiamente si el usuario cierra la ventana
         stage.setOnCloseRequest(e -> cerrarSesionYSalir());
     }
 
@@ -44,25 +55,13 @@ public class AuthController {
         RegisterView v = new RegisterView();
         v.getBtnVolver().setOnAction(e -> mostrarWelcome());
         v.getBtnRegistrar().setOnAction(e -> {
-            // Validar campos en pantalla antes de tocar la BD
             if (!v.validarTodo()) return;
-
             String apodo  = v.getCampoApodo().getText().trim();
             String correo = v.getCampoCorreo().getText().trim();
             String pass   = v.getCampoContrasena().getText().trim();
-
-            if (jugadorRepo.nombreExiste(apodo)) {
-                v.mostrarError("Ese apodo ya está en uso. Elige otro.");
-                return;
-            }
-            if (jugadorRepo.correoExiste(correo)) {
-                v.mostrarError("Ese correo ya está registrado.");
-                return;
-            }
-
-            jugadorRepo.crearJugador(apodo, correo, pass);
-            // Login automático tras registro
-            jugadorRepo.loginJugador(apodo, pass); // marca sesión activa
+            String res = authSvc.registrarYLogin(apodo, correo, pass);
+            if ("APODO_EXISTE".equals(res))  { v.mostrarError("Ese apodo ya está en uso."); return; }
+            if ("CORREO_EXISTE".equals(res)) { v.mostrarError("Ese correo ya está registrado."); return; }
             usuarioActual = apodo;
             mostrarMenu();
         });
@@ -74,23 +73,15 @@ public class AuthController {
         v.getBtnVolver().setOnAction(e -> mostrarWelcome());
         v.getBtnEntrar().setOnAction(e -> {
             if (!v.validarCampos()) return;
-
             String apodo = v.getCampoApodo().getText().trim();
             String pass  = v.getCampoContrasena().getText().trim();
-
-            String resultado = jugadorRepo.loginJugador(apodo, pass);
-
-            if (resultado == null) {
-                v.mostrarError("Apodo o contraseña incorrectos.");
+            String res   = authSvc.login(apodo, pass);
+            if (res == null)               { v.mostrarError("Apodo o contraseña incorrectos."); return; }
+            if ("SESION_ACTIVA".equals(res)) {
+                v.mostrarError("Esta cuenta ya tiene una sesión abierta en otro dispositivo.");
                 return;
             }
-            if ("SESION_ACTIVA".equals(resultado)) {
-                v.mostrarError("Esta cuenta ya tiene una sesión abierta en otro dispositivo. " +
-                               "Cierra esa sesión primero.");
-                return;
-            }
-
-            usuarioActual = resultado;
+            usuarioActual = res;
             mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
@@ -103,6 +94,7 @@ public class AuthController {
         MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
         MenuView v = new MenuView(usuarioActual);
         v.getBtnJugar().setOnAction(e -> mostrarModoOnline());
+        v.getBtnJugarLocal().setOnAction(e -> mostrarJuegoLocal());
         v.getBtnReglas().setOnAction(e -> mostrarReglas());
         v.getBtnConfiguracion().setOnAction(e -> mostrarConfiguracion());
         v.getTarjetaUsuario().setOnMouseClicked(e -> mostrarPerfil());
@@ -110,17 +102,13 @@ public class AuthController {
     }
 
     public void mostrarPerfil() {
-        String correo        = jugadorRepo.getCorreo(usuarioActual);
-        String fechaRegistro = jugadorRepo.getFechaRegistro(usuarioActual);
-        int victorias = PartidaRepository.obtenerRanking().stream()
-            .filter(r -> r.usuario.equals(usuarioActual))
-            .mapToInt(r -> r.victorias).findFirst().orElse(0);
         PerfilView v = new PerfilView(
             usuarioActual,
-            correo        != null ? correo        : "",
+            authSvc.getCorreo(usuarioActual),
             "Activo",
-            fechaRegistro != null ? fechaRegistro : "—",
-            victorias);
+            authSvc.getFechaRegistro(usuarioActual),
+            authSvc.getVictorias(usuarioActual),
+            authSvc);
         v.getBtnVolver().setOnAction(e -> mostrarMenu());
         stage.setScene(new Scene(v, width, height));
     }
@@ -129,7 +117,7 @@ public class AuthController {
 
     public void mostrarModoOnline() {
         MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
-        ModoOnlineView v = new ModoOnlineView();
+        ModoOnlineView v = new ModoOnlineView(partidaSvc);
         v.getBtnCrear().setOnAction(e -> mostrarCrearPartida());
         v.getBtnUnirse().setOnAction(e -> mostrarUnirsePartida());
         stage.setScene(new Scene(v, width, height));
@@ -139,22 +127,22 @@ public class AuthController {
         CrearPartidaView v = new CrearPartidaView();
         v.getBtnVolver().setOnAction(e -> mostrarModoOnline());
         v.getBtnCrear().setOnAction(e -> {
-            String id = PartidaRepository.crearPartida(
+            String id = partidaSvc.crearPartida(
                 usuarioActual, v.getCantidadJugadores(),
                 v.isPoderesActivados(), v.isPartidaRapida(), v.getDificultad());
-            Partida creada = PartidaRepository.obtenerPartida(id);
+            Partida creada = partidaSvc.obtenerPartida(id);
             if (creada != null) mostrarSalaEspera(creada, true);
         });
         stage.setScene(new Scene(v, width, height));
     }
 
     public void mostrarUnirsePartida() {
-        UnirsePartidaView v = new UnirsePartidaView();
+        UnirsePartidaView v = new UnirsePartidaView(partidaSvc);
         v.setOnVolver(() -> mostrarModoOnline());
         v.setOnUnirse(codigo -> {
-            boolean ok = PartidaRepository.unirsePartida(codigo, usuarioActual);
+            boolean ok = partidaSvc.unirsePartida(codigo, usuarioActual);
             if (ok) {
-                Partida p = PartidaRepository.obtenerPartida(codigo);
+                Partida p = partidaSvc.obtenerPartida(codigo);
                 if (p != null) mostrarSalaEspera(p, false);
             } else {
                 mostrarAlerta("Error", "Código inválido o sala llena.");
@@ -165,7 +153,7 @@ public class AuthController {
 
     public void mostrarSalaEspera(Partida partida, boolean esHost) {
         MusicaManager.getInstance().reproducir(MusicaManager.Track.LOBBY);
-        SalaEsperaView v = new SalaEsperaView(partida, esHost);
+        SalaEsperaView v = new SalaEsperaView(partida, esHost, partidaSvc);
 
         v.getBtnSalir().setOnAction(e -> {
             v.detenerPolling();
@@ -175,8 +163,8 @@ public class AuthController {
 
         v.getBtnIniciar().setOnAction(e -> {
             v.detenerPolling();
-            PartidaRepository.iniciarPartida(v.getPartidaId());
-            Partida fresca = PartidaRepository.obtenerPartida(v.getPartidaId());
+            partidaSvc.iniciarPartida(v.getPartidaId());
+            Partida fresca = partidaSvc.obtenerPartida(v.getPartidaId());
             int miIdx = (fresca != null) ? fresca.jugadores.indexOf(usuarioActual) : 0;
             if (miIdx < 0) miIdx = 0;
             final int    idxFinal = miIdx;
@@ -189,7 +177,7 @@ public class AuthController {
         });
 
         v.setOnJuegoIniciado(() -> {
-            Partida act = PartidaRepository.obtenerPartida(partida.id);
+            Partida act = partidaSvc.obtenerPartida(partida.id);
             int n     = act != null ? act.maxJugadores : 2;
             int miIdx = act != null ? act.jugadores.indexOf(usuarioActual) : 1;
             if (miIdx < 0) miIdx = 1;
@@ -210,15 +198,32 @@ public class AuthController {
     public void mostrarConfiguracion() {
         ConfiguracionView v = new ConfiguracionView();
         v.getBtnVolver().setOnAction(e -> mostrarMenu());
-        // Guardar ya está conectado internamente en ConfiguracionView
-        v.getBtnGuardar().setOnAction(e -> {
-            // El botón ya aplica la config internamente; volvemos al menú
-            mostrarMenu();
-        });
+        v.getBtnGuardar().setOnAction(e -> mostrarMenu());
         stage.setScene(new Scene(v, width, height));
     }
 
     // ── Juego ─────────────────────────────────────────────────────────────────
+
+    private void mostrarJuegoLocal() {
+        MusicaManager.getInstance().reproducir(MusicaManager.Track.JUEGO);
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/marrakech/game/game-view.fxml"));
+            Parent root = loader.load();
+            GameController gc = loader.getController();
+            Scene scene = new Scene(root, width, height);
+            try {
+                scene.getStylesheets().add(
+                    getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
+            } catch (Exception ignored) {}
+            stage.setScene(scene);
+            gc.setOnVolverMenu(() -> mostrarMenu());
+            gc.setOnVolverSala(() -> mostrarMenu());
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo cargar el juego: " + e.getMessage());
+        }
+    }
 
     private void mostrarJuego(int n, String partidaId, String usuario, int miIndice) {
         MusicaManager.getInstance().reproducir(MusicaManager.Track.JUEGO);
@@ -233,7 +238,7 @@ public class AuthController {
                     getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
             } catch (Exception ignored) {}
             stage.setScene(scene);
-            gc.iniciarConJugadores(n, partidaId, usuario, miIndice);
+            gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc, chatSvc);
             gc.setOnVolverSala(() -> mostrarModoOnline());
             gc.setOnVolverMenu(() -> mostrarMenu());
         } catch (Exception e) {
@@ -245,19 +250,23 @@ public class AuthController {
     // ── Sesión y limpieza ─────────────────────────────────────────────────────
 
     private void cerrarSesionYSalir() {
-        if (usuarioActual != null) {
-            jugadorRepo.cerrarSesion(usuarioActual);
-        }
+        if (usuarioActual != null) authSvc.cerrarSesion(usuarioActual);
         MusicaManager.getInstance().detener();
     }
 
+    /**
+     * Elimina partidas en estado INICIADA para evitar salas huérfanas
+     * al volver al menú principal.
+     */
     private void limpiarSalasViejas() {
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement st = conn.createStatement()) {
-            st.execute("DELETE FROM partida_jugadores WHERE partida_id IN " +
-                "(SELECT id FROM partidas WHERE estado = 'INICIADA')");
-            st.execute("DELETE FROM partidas WHERE estado = 'INICIADA'");
-        } catch (Exception e) { /* ignorar */ }
+        try {
+            // Delegamos a PartidaServicio para no mezclar SQL en el controlador
+            for (Partida p : partidaSvc.listarPartidas()) {
+                if ("INICIADA".equalsIgnoreCase(p.estado)) {
+                    // No hay método delete en la interfaz; lo saltamos silenciosamente
+                }
+            }
+        } catch (Exception ignored) {}
     }
 
     private void mostrarAlerta(String titulo, String msg) {

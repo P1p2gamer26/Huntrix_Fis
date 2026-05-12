@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.marrakech.game.presentation.controllers.GameController"
+           fx:controller="com.marrakech.game.presentation.controller.GameController"
            stylesheets="@styles.css" styleClass="root-pane">
   <children>
 

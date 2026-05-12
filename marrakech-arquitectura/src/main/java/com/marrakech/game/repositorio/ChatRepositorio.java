@@ -1,31 +1,31 @@
-package com.marrakech.game.infrastructure;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+package com.marrakech.game.repositorio;
 
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
 
-public class ChatRepository {
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
+/** Acceso a datos de mensajes de chat. */
+public class ChatRepositorio implements IChatRepositorio {
+
+    /** Mensaje de chat (solo datos). */
     public static class Mensaje {
-        public final int id;
+        public final int    id;
         public final String usuario;
         public final String texto;
         public final String hora;
 
         public Mensaje(int id, String usuario, String texto, String hora) {
-            this.id = id;
+            this.id      = id;
             this.usuario = usuario;
-            this.texto = texto;
-            this.hora = hora;
+            this.texto   = texto;
+            this.hora    = hora;
         }
     }
 
-    public static void inicializarTabla() {
+    @Override
+    public void inicializarTabla() {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement st = conn.createStatement()) {
             st.execute(
@@ -39,7 +39,8 @@ public class ChatRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public static void enviarMensaje(String partidaId, String usuario, String texto) {
+    @Override
+    public void enviarMensaje(String partidaId, String usuario, String texto) {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO chat_mensajes (partida_id, usuario, texto, hora) " +
@@ -51,7 +52,8 @@ public class ChatRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public static List<Mensaje> obtenerMensajes(String partidaId, int desdeId) {
+    @Override
+    public List<Mensaje> obtenerMensajes(String partidaId, int desdeId) {
         List<Mensaje> lista = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
@@ -65,13 +67,13 @@ public class ChatRepository {
                     rs.getInt("id"),
                     rs.getString("usuario"),
                     rs.getString("texto"),
-                    rs.getString("hora")
-            )   );
-        } catch (Exception e) { /* tabla aún no existe */ }
+                    rs.getString("hora")));
+        } catch (Exception e) { /* tabla puede no existir aún */ }
         return lista;
     }
 
-    public static int obtenerUltimoId(String partidaId) {
+    @Override
+    public int obtenerUltimoId(String partidaId) {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
                 "SELECT MAX(id) FROM chat_mensajes WHERE partida_id = ?")) {
@@ -81,5 +83,4 @@ public class ChatRepository {
         } catch (Exception e) { /* ignorar */ }
         return 0;
     }
-
 }
