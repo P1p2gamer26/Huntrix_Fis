@@ -6,8 +6,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 import java.util.Random;
@@ -43,26 +41,14 @@ public class GameRenderEngine {
 
     // ── Dado ──────────────────────────────────────────────────────────────────
 
-    /** Dibuja el dado en estado inicial (signo '?'). */
+    /** Dibuja el dado en estado inicial. */
     public void dibujarDadoInicial() {
         if (diceCanvas == null) return;
+        dibujarCaraDado(Color.rgb(195, 130, 60), Color.rgb(140, 80, 20));
         GraphicsContext gc = diceCanvas.getGraphicsContext2D();
-        double w = diceCanvas.getWidth(), h = diceCanvas.getHeight(), m = 8;
-
-        gc.clearRect(0, 0, w, h);
-        gc.setFill(Color.rgb(0, 0, 0, 0.35));
-        gc.fillRoundRect(m + 3, m + 3, w - m * 2, h - m * 2, 18, 18);
-        gc.setFill(Color.rgb(185, 120, 55));
-        gc.fillRoundRect(m, m, w - m * 2, h - m * 2, 16, 16);
-        gc.setStroke(Color.rgb(140, 80, 20));
-        gc.setLineWidth(2);
-        gc.strokeRoundRect(m, m, w - m * 2, h - m * 2, 16, 16);
-        dibujarVetaMadera(gc, w, h, m);
-
-        gc.setFill(Color.rgb(240, 200, 100, 0.6));
-        gc.setFont(Font.font(28));
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.fillText("?", w / 2, h / 2 + 10);
+        double w = diceCanvas.getWidth(), h = diceCanvas.getHeight();
+        gc.setFill(Color.rgb(200, 160, 80, 0.5));
+        gc.fillOval(w / 2 - 8, h / 2 - 8, 16, 16);
     }
 
     /** Anima el dado (efecto de giro) y termina mostrando el resultado real. */
@@ -74,7 +60,7 @@ public class GameRenderEngine {
         for (int i = 0; i < totalFrames; i++) {
             anim.getKeyFrames().add(new KeyFrame(
                 Duration.millis(50 + i * 28L),
-                e -> dibujarDadoCanvas(rng.nextInt(4) + 1, true)));
+                e -> dibujarDadoCanvas(rng.nextInt(6) + 1, true)));
         }
         anim.getKeyFrames().add(new KeyFrame(
             Duration.millis(50 + totalFrames * 28L),
@@ -82,39 +68,53 @@ public class GameRenderEngine {
         anim.play();
     }
 
-    private void dibujarDadoCanvas(int valor, boolean animando) {
+    private static final double[][] POSICIONES_DADO = {
+        {55, 55},                                              // 1: centro
+        {35, 35}, {75, 75},                                   // 2: diagonal
+        {35, 35}, {55, 55}, {75, 75},                         // 3: diagonal + centro
+        {35, 35}, {75, 35}, {35, 75}, {75, 75},              // 4: 4 esquinas
+        {35, 35}, {75, 35}, {55, 55}, {35, 75}, {75, 75},    // 5: 4 esquinas + centro
+        {35, 35}, {55, 35}, {75, 35}, {35, 75}, {55, 75}, {75, 75} // 6: 2 columnas
+    };
+    private static final int[] INDICES_DADO = {0, 1, 3, 6, 10, 15};
+
+    private void dibujarCaraDado(Color fondo, Color borde) {
         if (diceCanvas == null) return;
         GraphicsContext gc = diceCanvas.getGraphicsContext2D();
         double w = diceCanvas.getWidth(), h = diceCanvas.getHeight(), m = 8;
-
         gc.clearRect(0, 0, w, h);
         gc.setFill(Color.rgb(0, 0, 0, 0.4));
         gc.fillRoundRect(m + 3, m + 3, w - m * 2, h - m * 2, 18, 18);
-        gc.setFill(animando ? Color.rgb(220, 155, 75) : Color.rgb(205, 140, 70));
+        gc.setFill(fondo);
         gc.fillRoundRect(m, m, w - m * 2, h - m * 2, 16, 16);
-        gc.setStroke(animando ? Color.rgb(255, 220, 100, 0.9) : Color.rgb(160, 90, 20));
-        gc.setLineWidth(animando ? 2.5 : 2);
+        gc.setStroke(borde);
+        gc.setLineWidth(2);
         gc.strokeRoundRect(m, m, w - m * 2, h - m * 2, 16, 16);
         dibujarVetaMadera(gc, w, h, m);
-
-        gc.setFont(Font.font(animando ? 20 : 22));
-        gc.setTextAlign(TextAlignment.CENTER);
-        dibujarChancletas(gc, valor, w, h);
     }
 
-    /** Distribuye las chancletas como en un dado real (posiciones clásicas). */
-    private void dibujarChancletas(GraphicsContext gc, int valor, double w, double h) {
-        double cx = w / 2, cy = h / 2, off = 20;
-        double[][] pos;
-        switch (valor) {
-            case 1: pos = new double[][]{{cx, cy}}; break;
-            case 2: pos = new double[][]{{cx - off, cy - off}, {cx + off, cy + off}}; break;
-            case 3: pos = new double[][]{{cx - off, cy - off}, {cx, cy}, {cx + off, cy + off}}; break;
-            case 4: pos = new double[][]{{cx-off,cy-off},{cx+off,cy-off},{cx-off,cy+off},{cx+off,cy+off}}; break;
-            default: pos = new double[][]{{cx, cy}};
+    private void dibujarPips(GraphicsContext gc, int valor, double pr) {
+        int idx = INDICES_DADO[Math.min(valor - 1, 5)];
+        int fin = Math.min(valor, 6);
+        gc.setFill(Color.rgb(40, 14, 3));
+        for (int i = idx; i < idx + fin; i++) {
+            double[] p = POSICIONES_DADO[i];
+            gc.fillOval(p[0] - pr, p[1] - pr, pr * 2, pr * 2);
         }
-        gc.setFill(Color.rgb(30, 10, 0, 0.85));
-        for (double[] p : pos) gc.fillText("🥿", p[0], p[1] + 8);
+        gc.setFill(Color.rgb(245, 215, 170));
+        for (int i = idx; i < idx + fin; i++) {
+            double[] p = POSICIONES_DADO[i];
+            gc.fillOval(p[0] - pr + 1.5, p[1] - pr + 1.5, pr * 2 - 3, pr * 2 - 3);
+        }
+    }
+
+    private void dibujarDadoCanvas(int valor, boolean animando) {
+        dibujarCaraDado(
+            animando ? Color.rgb(230, 165, 80) : Color.rgb(210, 148, 72),
+            animando ? Color.rgb(255, 220, 100, 0.9) : Color.rgb(160, 90, 20));
+        if (diceCanvas == null) return;
+        GraphicsContext gc = diceCanvas.getGraphicsContext2D();
+        dibujarPips(gc, valor, animando ? 5.5 : 7);
     }
 
     private void dibujarVetaMadera(GraphicsContext gc, double w, double h, double m) {

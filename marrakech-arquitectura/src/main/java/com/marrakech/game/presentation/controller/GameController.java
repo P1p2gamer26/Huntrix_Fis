@@ -225,9 +225,11 @@ public class GameController {
 
     @FXML protected void onRollDiceClick() {
         if (!esMiTurno() || currentPhase != PHASE_MOVE) return;
-        int pasos = new Random().nextInt(4) + 1;
+        int pasos = new Random().nextInt(6) + 1;
         rollDiceBtn.setDisable(true);
 
+        diceResultLabel.setText(String.valueOf(pasos));
+        diceValueLabel.setText(String.valueOf(pasos));
         renderEngine.animarDado(pasos, () -> animarMovimientoAssam(pasos, () -> {
             assamView.toFront();
             int dueno = tileOwner[assamX][assamY];
