@@ -1,4 +1,4 @@
-package com.marrakech.game.presentation.controller;
+package com.marrakech.game.servicios;
 
 /**
  * Calcula el movimiento de Assam sobre el tablero 7x7, incluyendo los rebotes

@@ -1,4 +1,4 @@
-package com.marrakech.game.presentation.controller;
+package com.marrakech.game.presentation.render;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

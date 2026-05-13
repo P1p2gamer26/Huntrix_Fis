@@ -29,6 +29,7 @@ public class MenuView extends StackPane {
     private Button btnJugarLocal;
     private Button btnReglas;
     private Button btnConfiguracion;
+    private Button btnCerrarSesion;
     private HBox   tarjetaUsuario;
     private final String usuario;
 
@@ -83,6 +84,22 @@ public class MenuView extends StackPane {
 
         contenido.getChildren().addAll(titulo, botones, subtitulo);
         getChildren().add(contenido);
+
+        btnCerrarSesion = crearBotonCerrarSesion();
+        StackPane.setAlignment(btnCerrarSesion, Pos.BOTTOM_LEFT);
+        StackPane.setMargin(btnCerrarSesion, new Insets(0, 0, 22, 22));
+        getChildren().add(btnCerrarSesion);
+    }
+
+    private Button crearBotonCerrarSesion() {
+        Button btn = new Button("CERRAR SESIÓN");
+        btn.setMaxWidth(Double.MAX_VALUE);
+        btn.setPrefHeight(36);
+        btn.setFont(Font.font("Arial", FontWeight.BOLD, 11));
+        String n = "-fx-background-color:transparent;-fx-text-fill:#885533;-fx-border-color:#5C3A10;-fx-border-width:1.5;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
+        String h = "-fx-background-color:rgba(100,40,20,0.2);-fx-text-fill:#AA6655;-fx-border-color:#885533;-fx-border-width:1.5;-fx-border-radius:3;-fx-background-radius:3;-fx-cursor:hand;";
+        btn.setStyle(n); btn.setOnMouseEntered(e->btn.setStyle(h)); btn.setOnMouseExited(e->btn.setStyle(n));
+        return btn;
     }
 
     private void configurarTarjetaUsuario() {
@@ -144,5 +161,6 @@ public class MenuView extends StackPane {
     public Button getBtnJugarLocal()    { return btnJugarLocal; }
     public Button getBtnReglas()        { return btnReglas; }
     public Button getBtnConfiguracion() { return btnConfiguracion; }
+    public Button getBtnCerrarSesion()  { return btnCerrarSesion; }
     public HBox   getTarjetaUsuario()   { return tarjetaUsuario; }
 }

@@ -1,4 +1,4 @@
-package com.marrakech.game.domain.valdata;
+package com.marrakech.game.entitie.valdata;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,8 +19,8 @@ class NombreTest {
     
     @Test
     void testNombreCompleto() {
-        Nombre nombre = new Nombre("Juan Pérez García");
-        assertEquals("Juan Pérez García", nombre.value());
+        Nombre nombre = new Nombre("Juan Pï¿½rez Garcï¿½a");
+        assertEquals("Juan Pï¿½rez Garcï¿½a", nombre.value());
     }
     
     @Test

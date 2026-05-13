@@ -3,8 +3,8 @@ package com.marrakech.game.presentation.controller;
 import com.marrakech.game.repositorio.PartidaRepositorio.Partida;
 import com.marrakech.game.servicios.AuthServicio;
 import com.marrakech.game.servicios.ChatServicio;
+import com.marrakech.game.servicios.MusicaServicio;
 import com.marrakech.game.servicios.PartidaServicio;
-import com.marrakech.game.presentation.MusicaManager;
 import com.marrakech.game.presentation.views.*;
 
 import javafx.application.Platform;
@@ -12,12 +12,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
-/**
- * Orquestador de navegación entre pantallas.
- * Recibe todos sus servicios por constructor (inyección de dependencias).
- */
 public class AuthController {
 
     private final Stage          stage;
@@ -25,29 +22,37 @@ public class AuthController {
     private final AuthServicio   authSvc;
     private final PartidaServicio partidaSvc;
     private final ChatServicio   chatSvc;
+    private final MusicaServicio musicaSvc;
 
     private String usuarioActual;
 
     public AuthController(Stage stage, double width, double height,
                           AuthServicio authSvc, PartidaServicio partidaSvc,
-                          ChatServicio chatSvc) {
+                          ChatServicio chatSvc, MusicaServicio musicaSvc) {
         this.stage      = stage;
         this.width      = width;
         this.height     = height;
         this.authSvc    = authSvc;
         this.partidaSvc = partidaSvc;
         this.chatSvc    = chatSvc;
+        this.musicaSvc  = musicaSvc;
 
         stage.setOnCloseRequest(e -> cerrarSesionYSalir());
     }
 
-    // ── Pantallas de acceso ───────────────────────────────────────────────────
-
     public void mostrarWelcome() {
-        MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
+        musicaSvc.reproducir(MusicaServicio.Track.MENU);
         WelcomeView v = new WelcomeView();
         v.getBtnCrearCuenta().setOnAction(e -> mostrarRegister());
         v.getBtnYaTengoCuenta().setOnAction(e -> mostrarLogin());
+        v.getBtnSalir().setOnAction(e -> {
+            Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+            a.setTitle("Salir");
+            a.setHeaderText("¿Seguro que quieres salir?");
+            a.setContentText("Se cerrará la aplicación.");
+            if (a.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK)
+                Platform.exit();
+        });
         stage.setScene(new Scene(v, width, height));
     }
 
@@ -87,17 +92,25 @@ public class AuthController {
         stage.setScene(new Scene(v, width, height));
     }
 
-    // ── Menú principal ────────────────────────────────────────────────────────
-
     public void mostrarMenu() {
-        limpiarSalasViejas();
-        MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
+        musicaSvc.reproducir(MusicaServicio.Track.MENU);
         MenuView v = new MenuView(usuarioActual);
         v.getBtnJugar().setOnAction(e -> mostrarModoOnline());
         v.getBtnJugarLocal().setOnAction(e -> mostrarJuegoLocal());
         v.getBtnReglas().setOnAction(e -> mostrarReglas());
         v.getBtnConfiguracion().setOnAction(e -> mostrarConfiguracion());
         v.getTarjetaUsuario().setOnMouseClicked(e -> mostrarPerfil());
+        v.getBtnCerrarSesion().setOnAction(e -> {
+            Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+            a.setTitle("Cerrar sesión");
+            a.setHeaderText("¿Seguro que quieres cerrar sesión?");
+            a.setContentText("Volverás a la pantalla de acceso.");
+            if (a.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                authSvc.cerrarSesion(usuarioActual);
+                usuarioActual = null;
+                mostrarWelcome();
+            }
+        });
         stage.setScene(new Scene(v, width, height));
     }
 
@@ -113,13 +126,12 @@ public class AuthController {
         stage.setScene(new Scene(v, width, height));
     }
 
-    // ── Modo online ───────────────────────────────────────────────────────────
-
     public void mostrarModoOnline() {
-        MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
+        musicaSvc.reproducir(MusicaServicio.Track.MENU);
         ModoOnlineView v = new ModoOnlineView(partidaSvc);
         v.getBtnCrear().setOnAction(e -> mostrarCrearPartida());
         v.getBtnUnirse().setOnAction(e -> mostrarUnirsePartida());
+        v.getBtnVolver().setOnAction(e -> mostrarMenu());
         stage.setScene(new Scene(v, width, height));
     }
 
@@ -152,12 +164,12 @@ public class AuthController {
     }
 
     public void mostrarSalaEspera(Partida partida, boolean esHost) {
-        MusicaManager.getInstance().reproducir(MusicaManager.Track.LOBBY);
+        musicaSvc.reproducir(MusicaServicio.Track.LOBBY);
         SalaEsperaView v = new SalaEsperaView(partida, esHost, partidaSvc);
 
         v.getBtnSalir().setOnAction(e -> {
             v.detenerPolling();
-            MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
+            musicaSvc.reproducir(MusicaServicio.Track.MENU);
             mostrarModoOnline();
         });
 
@@ -187,8 +199,6 @@ public class AuthController {
         stage.setScene(new Scene(v, width, height));
     }
 
-    // ── Configuración y reglas ────────────────────────────────────────────────
-
     public void mostrarReglas() {
         ReglasView v = new ReglasView();
         v.getBtnVolver().setOnAction(e -> mostrarMenu());
@@ -202,10 +212,8 @@ public class AuthController {
         stage.setScene(new Scene(v, width, height));
     }
 
-    // ── Juego ─────────────────────────────────────────────────────────────────
-
     private void mostrarJuegoLocal() {
-        MusicaManager.getInstance().reproducir(MusicaManager.Track.JUEGO);
+        musicaSvc.reproducir(MusicaServicio.Track.JUEGO);
         try {
             FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/marrakech/game/game-view.fxml"));
@@ -217,6 +225,7 @@ public class AuthController {
                     getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
             } catch (Exception ignored) {}
             stage.setScene(scene);
+            gc.setServicios(musicaSvc, chatSvc);
             gc.setOnVolverMenu(() -> mostrarMenu());
             gc.setOnVolverSala(() -> mostrarMenu());
         } catch (Exception e) {
@@ -226,7 +235,7 @@ public class AuthController {
     }
 
     private void mostrarJuego(int n, String partidaId, String usuario, int miIndice) {
-        MusicaManager.getInstance().reproducir(MusicaManager.Track.JUEGO);
+        musicaSvc.reproducir(MusicaServicio.Track.JUEGO);
         try {
             FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/marrakech/game/game-view.fxml"));
@@ -238,7 +247,8 @@ public class AuthController {
                     getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
             } catch (Exception ignored) {}
             stage.setScene(scene);
-            gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc, chatSvc);
+            gc.setServicios(musicaSvc, chatSvc);
+            gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc);
             gc.setOnVolverSala(() -> mostrarModoOnline());
             gc.setOnVolverMenu(() -> mostrarMenu());
         } catch (Exception e) {
@@ -247,26 +257,9 @@ public class AuthController {
         }
     }
 
-    // ── Sesión y limpieza ─────────────────────────────────────────────────────
-
     private void cerrarSesionYSalir() {
         if (usuarioActual != null) authSvc.cerrarSesion(usuarioActual);
-        MusicaManager.getInstance().detener();
-    }
-
-    /**
-     * Elimina partidas en estado INICIADA para evitar salas huérfanas
-     * al volver al menú principal.
-     */
-    private void limpiarSalasViejas() {
-        try {
-            // Delegamos a PartidaServicio para no mezclar SQL en el controlador
-            for (Partida p : partidaSvc.listarPartidas()) {
-                if ("INICIADA".equalsIgnoreCase(p.estado)) {
-                    // No hay método delete en la interfaz; lo saltamos silenciosamente
-                }
-            }
-        } catch (Exception ignored) {}
+        musicaSvc.detener();
     }
 
     private void mostrarAlerta(String titulo, String msg) {

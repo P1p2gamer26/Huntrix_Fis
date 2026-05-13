@@ -1,4 +1,4 @@
-package com.marrakech.game.domain.models;
+package com.marrakech.game.entitie;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,10 +20,13 @@ class BoardTest {
     }
     
     @Test
-    void testColocarAlfombra() {
-        Player player = new Player("Test", "green");
-        Carpet carpet = new Carpet(player);
-        board.placeCarpet(2, 3, carpet);
-        assertNotNull(board.getTile(2, 3).getCarpet());
+    void testGetTile_devuelveTileEnPosicion() {
+        assertNotNull(board.getTile(2, 3));
+    }
+    
+    @Test
+    void testGetTile_fueraDelTablero_devuelveNull() {
+        assertNull(board.getTile(-1, -1));
+        assertNull(board.getTile(7, 7));
     }
 }

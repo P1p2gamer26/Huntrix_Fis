@@ -76,8 +76,8 @@ public class JugadorRepositorio implements IJugadorRepositorio {
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) return null;
-            if (rs.getBoolean("sesion_activa")) return "SESION_ACTIVA";
             String nombre = rs.getString("nombre_usuario");
+            if (rs.getBoolean("sesion_activa")) marcarSesion(nombre, false);
             marcarSesion(nombre, true);
             return nombre;
         } catch (Exception e) { e.printStackTrace(); }

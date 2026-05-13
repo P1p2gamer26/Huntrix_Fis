@@ -1,4 +1,4 @@
-package com.marrakech.game.presentation.controller;
+package com.marrakech.game.servicios;
 
 /**
  * Reglas de validación y reparación de alfombras sobre el tablero 7x7.

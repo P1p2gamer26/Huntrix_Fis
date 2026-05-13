@@ -1,4 +1,4 @@
-package com.marrakech.game.domain.models;
+package com.marrakech.game.entitie;
 
 public class Carpet {
     private final Player owner;

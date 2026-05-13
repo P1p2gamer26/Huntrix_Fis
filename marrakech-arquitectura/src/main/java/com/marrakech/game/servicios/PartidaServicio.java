@@ -50,4 +50,12 @@ public class PartidaServicio {
     public void registrarVictoria(String usuario) {
         partidaRepo.registrarVictoria(usuario);
     }
+
+    public void limpiarSalasViejas() {
+        for (Partida p : partidaRepo.listarPartidas()) {
+            if ("INICIADA".equalsIgnoreCase(p.estado)) {
+                // cleanup delegado al repositorio cuando se implemente delete
+            }
+        }
+    }
 }

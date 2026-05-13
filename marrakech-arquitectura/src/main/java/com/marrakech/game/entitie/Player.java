@@ -1,4 +1,4 @@
-package com.marrakech.game.domain.models;
+package com.marrakech.game.entitie;
 
 /**
  * Representa a un jugador (entidad de solo datos).

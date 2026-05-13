@@ -30,6 +30,7 @@ public class ModoOnlineView extends StackPane {
 
     private Button btnCrear;
     private Button btnUnirse;
+    private Button btnVolver;
     private final PartidaServicio partidaSvc;
 
     public ModoOnlineView(PartidaServicio partidaSvc) {
@@ -64,6 +65,11 @@ public class ModoOnlineView extends StackPane {
         DropShadow s = new DropShadow();
         s.setColor(Color.web("#7A4500")); s.setRadius(12); s.setOffsetX(3); s.setOffsetY(4);
         titulo.setEffect(s);
+
+        btnVolver = crearBotonVolver();
+        StackPane.setAlignment(btnVolver, Pos.TOP_LEFT);
+        StackPane.setMargin(btnVolver, new Insets(16, 0, 0, 16));
+        getChildren().add(btnVolver);
 
         HBox botones = new HBox(20);
         botones.setAlignment(Pos.CENTER);
@@ -112,6 +118,15 @@ public class ModoOnlineView extends StackPane {
         getChildren().add(contenido);
     }
 
+    private Button crearBotonVolver() {
+        Button btn = new Button("←  VOLVER");
+        btn.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        String n = "-fx-background-color:transparent;-fx-text-fill:#D4A017;-fx-border-color:#8B6914;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;-fx-padding:8 16;";
+        String h = "-fx-background-color:rgba(201,146,42,0.18);-fx-text-fill:#F0D060;-fx-border-color:#D4A017;-fx-border-width:1.5;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;-fx-padding:8 16;";
+        btn.setStyle(n); btn.setOnMouseEntered(e->btn.setStyle(h)); btn.setOnMouseExited(e->btn.setStyle(n));
+        return btn;
+    }
+
     private Button crearBotonRelleno(String texto) {
         Button btn = new Button(texto);
         btn.setPrefWidth(180); btn.setPrefHeight(44);
@@ -134,4 +149,5 @@ public class ModoOnlineView extends StackPane {
 
     public Button getBtnCrear()  { return btnCrear; }
     public Button getBtnUnirse() { return btnUnirse; }
+    public Button getBtnVolver() { return btnVolver; }
 }

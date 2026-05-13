@@ -1,4 +1,4 @@
-package com.marrakech.game.domain.models;
+package com.marrakech.game.entitie;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;

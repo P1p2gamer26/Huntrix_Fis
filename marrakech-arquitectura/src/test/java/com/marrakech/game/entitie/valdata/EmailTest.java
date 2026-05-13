@@ -1,4 +1,4 @@
-package com.marrakech.game.domain.valdata;
+package com.marrakech.game.entitie.valdata;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;

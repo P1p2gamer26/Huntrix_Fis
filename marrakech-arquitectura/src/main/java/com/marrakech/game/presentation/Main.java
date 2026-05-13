@@ -8,11 +8,6 @@ import com.marrakech.game.presentation.controller.AuthController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-/**
- * Punto de entrada de la aplicación.
- * Aquí se construye el árbol completo de dependencias:
- *   repositorios → servicios → controladores.
- */
 public class Main extends Application {
 
     @Override
@@ -27,15 +22,16 @@ public class Main extends Application {
         IChatRepositorio        chatRepo         = new ChatRepositorio();
 
         // ── 2. Servicios ──────────────────────────────────────────────────────
+        MusicaServicio  musicaSvc  = new MusicaServicio();
         AuthServicio    authSvc    = new AuthServicio(jugadorRepo, partidaRepo);
         PartidaServicio partidaSvc = new PartidaServicio(partidaRepo);
         ChatServicio    chatSvc    = new ChatServicio(chatRepo);
 
-        // ── 3. Controlador principal (recibe servicios por constructor) ────────
+        // ── 3. Controlador principal ───────────────────────────────────────────
         AuthController auth = new AuthController(stage, 1100, 700,
-                                                 authSvc, partidaSvc, chatSvc);
+                                                 authSvc, partidaSvc, chatSvc, musicaSvc);
 
-        MusicaManager.getInstance().reproducir(MusicaManager.Track.MENU);
+        musicaSvc.reproducir(MusicaServicio.Track.MENU);
         auth.mostrarWelcome();
         stage.show();
     }

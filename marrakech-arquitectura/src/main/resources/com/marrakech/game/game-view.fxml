@@ -43,6 +43,9 @@
         <!-- Panel J1, J2 y DADO GRANDE (izquierda) -->
         <VBox alignment="TOP_CENTER" spacing="10.0" prefWidth="150.0">
           <children>
+            <Button mnemonicParsing="false" onAction="#volverMenu" text="✕  Salir"
+                    style="-fx-background-color:rgba(100,40,20,0.25);-fx-text-fill:#AA7755;-fx-border-color:#5C3A10;-fx-border-width:1;-fx-border-radius:4;-fx-background-radius:4;-fx-cursor:hand;-fx-font-size:11px;-fx-font-weight:bold;-fx-padding:4 10;"
+                    maxWidth="9999.0"/>
             <VBox fx:id="panelJ1" alignment="CENTER" spacing="6.0" styleClass="panel">
               <children>
                 <Label text="J1" style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#e74c3c;"/>

@@ -1,4 +1,4 @@
-package com.marrakech.game.domain.valdata;
+package com.marrakech.game.entitie.valdata;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,8 +13,8 @@ class PasswordTest {
     
     @Test
     void testPasswordLarga() {
-        Password password = new Password("contraseñaSegura123");
-        assertEquals("contraseñaSegura123", password.value());
+        Password password = new Password("contraseï¿½aSegura123");
+        assertEquals("contraseï¿½aSegura123", password.value());
     }
     
     @Test
