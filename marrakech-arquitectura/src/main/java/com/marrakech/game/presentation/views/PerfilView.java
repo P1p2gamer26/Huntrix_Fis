@@ -1,6 +1,6 @@
 package com.marrakech.game.presentation.views;
 
-import com.marrakech.game.servicios.AuthServicio;
+import com.marrakech.game.service.AuthServicio;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;

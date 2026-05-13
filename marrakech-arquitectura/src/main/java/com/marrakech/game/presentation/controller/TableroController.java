@@ -1,7 +1,7 @@
 package com.marrakech.game.presentation.controller;
 
-import com.marrakech.game.servicios.CarpetValidador;
-import com.marrakech.game.servicios.JuegoServicio;
+import com.marrakech.game.service.CarpetValidador;
+import com.marrakech.game.service.JuegoServicio;
 import com.marrakech.game.presentation.render.GameRenderEngine;
 
 import javafx.scene.image.ImageView;

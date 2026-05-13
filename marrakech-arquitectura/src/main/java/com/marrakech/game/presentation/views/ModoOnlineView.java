@@ -2,8 +2,8 @@ package com.marrakech.game.presentation.views;
 
 import java.util.List;
 
-import com.marrakech.game.repositorio.PartidaRepositorio.RankingEntry;
-import com.marrakech.game.servicios.PartidaServicio;
+import com.marrakech.game.repository.PartidaRepositorio.RankingEntry;
+import com.marrakech.game.service.PartidaServicio;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

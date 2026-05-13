@@ -2,12 +2,12 @@ package com.marrakech.game.presentation.controller;
 
 import java.util.Random;
 
-import com.marrakech.game.servicios.ChatServicio;
-import com.marrakech.game.servicios.EstadoJuegoServicio;
-import com.marrakech.game.servicios.EstadoJuegoServicio.EstadoDB;
-import com.marrakech.game.servicios.JuegoServicio;
-import com.marrakech.game.servicios.MusicaServicio;
-import com.marrakech.game.servicios.PartidaServicio;
+import com.marrakech.game.service.ChatServicio;
+import com.marrakech.game.service.EstadoJuegoServicio;
+import com.marrakech.game.service.EstadoJuegoServicio.EstadoDB;
+import com.marrakech.game.service.JuegoServicio;
+import com.marrakech.game.service.MusicaServicio;
+import com.marrakech.game.service.PartidaServicio;
 import com.marrakech.game.presentation.render.GameRenderEngine;
 
 import javafx.application.Platform;

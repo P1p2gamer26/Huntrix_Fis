@@ -1,8 +1,8 @@
 package com.marrakech.game.presentation.controller;
 
-import com.marrakech.game.servicios.EstadoJuegoServicio;
-import com.marrakech.game.servicios.JuegoServicio;
-import com.marrakech.game.servicios.PartidaServicio;
+import com.marrakech.game.service.EstadoJuegoServicio;
+import com.marrakech.game.service.JuegoServicio;
+import com.marrakech.game.service.PartidaServicio;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -44,7 +44,7 @@ public class FinJuegoController {
                          boolean modoMultijugador, int miIndice, String usuarioActual,
                          PartidaServicio partidaSvc,
                          EstadoJuegoServicio estadoSvc,
-                         com.marrakech.game.servicios.ChatServicio chatSvc) {
+                         com.marrakech.game.service.ChatServicio chatSvc) {
         if (estadoSvc != null) estadoSvc.detenerPolling();
         if (chatSvc != null) chatSvc.detenerPolling();
 

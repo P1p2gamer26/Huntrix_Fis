@@ -1,8 +1,9 @@
 package com.marrakech.game.presentation;
 
 import com.marrakech.game.infrastructure.database.DatabaseConnection;
-import com.marrakech.game.repositorio.*;
-import com.marrakech.game.servicios.*;
+import com.marrakech.game.repository.*;
+import com.marrakech.game.service.*;
+import com.marrakech.game.infrastructure.audio.MusicaManager;
 import com.marrakech.game.presentation.controller.AuthController;
 
 import javafx.application.Application;

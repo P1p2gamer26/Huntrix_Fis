@@ -1,7 +1,7 @@
 package com.marrakech.game.presentation.views;
 
-import com.marrakech.game.repositorio.PartidaRepositorio.Partida;
-import com.marrakech.game.servicios.PartidaServicio;
+import com.marrakech.game.repository.PartidaRepositorio.Partida;
+import com.marrakech.game.service.PartidaServicio;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;

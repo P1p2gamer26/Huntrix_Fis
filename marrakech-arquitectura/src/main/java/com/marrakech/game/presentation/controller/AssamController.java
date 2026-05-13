@@ -1,6 +1,6 @@
 package com.marrakech.game.presentation.controller;
 
-import com.marrakech.game.servicios.AssamNavigator;
+import com.marrakech.game.service.AssamNavigator;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

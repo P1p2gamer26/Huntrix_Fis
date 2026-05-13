@@ -1,7 +1,7 @@
 package com.marrakech.game.presentation.controller;
 
-import com.marrakech.game.repositorio.ChatRepositorio.Mensaje;
-import com.marrakech.game.servicios.ChatServicio;
+import com.marrakech.game.repository.ChatRepositorio.Mensaje;
+import com.marrakech.game.service.ChatServicio;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;

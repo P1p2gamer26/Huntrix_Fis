@@ -1,10 +1,10 @@
 package com.marrakech.game.presentation.controller;
 
-import com.marrakech.game.repositorio.PartidaRepositorio.Partida;
-import com.marrakech.game.servicios.AuthServicio;
-import com.marrakech.game.servicios.ChatServicio;
-import com.marrakech.game.servicios.MusicaServicio;
-import com.marrakech.game.servicios.PartidaServicio;
+import com.marrakech.game.repository.PartidaRepositorio.Partida;
+import com.marrakech.game.service.AuthServicio;
+import com.marrakech.game.service.ChatServicio;
+import com.marrakech.game.service.MusicaServicio;
+import com.marrakech.game.service.PartidaServicio;
 import com.marrakech.game.presentation.views.*;
 
 import javafx.application.Platform;

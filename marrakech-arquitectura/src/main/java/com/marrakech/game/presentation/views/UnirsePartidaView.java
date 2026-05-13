@@ -3,8 +3,8 @@ package com.marrakech.game.presentation.views;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.marrakech.game.repositorio.PartidaRepositorio.Partida;
-import com.marrakech.game.servicios.PartidaServicio;
+import com.marrakech.game.repository.PartidaRepositorio.Partida;
+import com.marrakech.game.service.PartidaServicio;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
