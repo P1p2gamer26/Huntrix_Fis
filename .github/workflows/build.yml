@@ -28,13 +28,13 @@ jobs:
           name: jacoco-report
           path: marrakech-arquitectura/target/site/jacoco/
 
-      - name: Add coverage to PR
-        id: jacoco
-        uses: madrapps/jacoco-report@v1.7.1
-        with:
-          paths: ${{ github.workspace }}/marrakech-arquitectura/target/site/jacoco/jacoco.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 0
-          min-coverage-changed-files: 0
-          title: Coverage Report
-          update-comment: true
+      - name: Publish coverage summary
+        run: |
+          XML=marrakech-arquitectura/target/site/jacoco/jacoco.xml
+          C=$(xmllint --xpath 'number(//report/counter[@type="LINE"]/@covered)' "$XML")
+          M=$(xmllint --xpath 'number(//report/counter[@type="LINE"]/@missed)' "$XML")
+          PCT=$(echo "scale=2; $C * 100 / ($C + $M)" | bc)
+          echo "## Coverage: ${PCT}%" >> $GITHUB_STEP_SUMMARY
+          echo "| Lines Covered | Lines Missed | Total |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| $(printf "%.0f" $C) | $(printf "%.0f" $M) | $(printf "%.0f" $(echo "$C + $M" | bc)) |" >> $GITHUB_STEP_SUMMARY
