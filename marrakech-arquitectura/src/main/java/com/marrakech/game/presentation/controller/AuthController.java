@@ -71,6 +71,7 @@ public class AuthController {
             String res = authSvc.registrarYLogin(apodo, correo, pass);
             if ("APODO_EXISTE".equals(res))  { v.mostrarError("Ese apodo ya está en uso."); return; }
             if ("CORREO_EXISTE".equals(res)) { v.mostrarError("Ese correo ya está registrado."); return; }
+            if ("ERROR_BD".equals(res))      { v.mostrarError("Error al guardar los datos. Intenta de nuevo."); return; }
             usuarioActual = apodo;
             mostrarMenu();
         });

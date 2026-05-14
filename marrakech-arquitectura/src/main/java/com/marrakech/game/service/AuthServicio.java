@@ -26,7 +26,7 @@ public class AuthServicio {
     public String registrarYLogin(String apodo, String correo, String password) {
         if (jugadorRepo.nombreExiste(apodo))  return "APODO_EXISTE";
         if (jugadorRepo.correoExiste(correo)) return "CORREO_EXISTE";
-        jugadorRepo.crearJugador(apodo, correo, password);
+        if (!jugadorRepo.crearJugador(apodo, correo, password)) return "ERROR_BD";
         jugadorRepo.loginJugador(apodo, password);
         return apodo;
     }

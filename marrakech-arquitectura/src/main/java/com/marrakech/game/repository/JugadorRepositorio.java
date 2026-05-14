@@ -20,8 +20,7 @@ public class JugadorRepositorio implements IJugadorRepositorio {
     // ── Creación ──────────────────────────────────────────────────────────────
 
     @Override
-    public void crearJugador(String nombre, String correo, String password) {
-        agregarColumnasExtra();
+    public boolean crearJugador(String nombre, String correo, String password) {
         String sql = "INSERT INTO Jugador (nombre_usuario, correo, password, " +
                      "fecha_registro, estado) VALUES (?, ?, ?, CURRENT_TIMESTAMP, 'ACTIVO')";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -33,7 +32,11 @@ public class JugadorRepositorio implements IJugadorRepositorio {
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) estadisticasRepo.inicializarEstadisticas(keys.getInt(1));
-        } catch (Exception e) { e.printStackTrace(); }
+            return true;
+        } catch (Exception e) {
+            System.err.println("[JugadorRepositorio] Error creando jugador: " + e.getMessage());
+            return false;
+        }
     }
 
     // ── Validaciones de existencia ─────────────────────────────────────────────
@@ -184,10 +187,8 @@ public class JugadorRepositorio implements IJugadorRepositorio {
                 "nombre_usuario VARCHAR(50) UNIQUE NOT NULL, " +
                 "correo VARCHAR(100) UNIQUE NOT NULL, " +
                 "password VARCHAR(255) NOT NULL, " +
-                "fecha_registro TIMESTAMP NOT NULL, " +
-                "estado VARCHAR(15), " +
-                "foto BLOB, " +
-                "sesion_activa BOOLEAN DEFAULT FALSE)");
+                "estado VARCHAR(15))");
+            st.execute("ALTER TABLE Jugador ADD COLUMN IF NOT EXISTS fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
             st.execute("ALTER TABLE Jugador ADD COLUMN IF NOT EXISTS foto BLOB");
             st.execute("ALTER TABLE Jugador ADD COLUMN IF NOT EXISTS sesion_activa BOOLEAN DEFAULT FALSE");
         } catch (Exception e) {

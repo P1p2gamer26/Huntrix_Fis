@@ -94,12 +94,25 @@ class AuthServicioTest {
     void registrar_exitoso_retornaNombreJugador() {
         when(jugadorRepo.nombreExiste("Ana")).thenReturn(false);
         when(jugadorRepo.correoExiste("ana@test.com")).thenReturn(false);
+        when(jugadorRepo.crearJugador("Ana", "ana@test.com", "seg123")).thenReturn(true);
         when(jugadorRepo.loginJugador("Ana", "seg123")).thenReturn("Ana");
 
         String resultado = authSvc.registrarYLogin("Ana", "ana@test.com", "seg123");
 
         assertEquals("Ana", resultado);
         verify(jugadorRepo).crearJugador("Ana", "ana@test.com", "seg123");
+    }
+
+    @Test
+    void registrar_errorBD_retornaErrorBD() {
+        when(jugadorRepo.nombreExiste("Ana")).thenReturn(false);
+        when(jugadorRepo.correoExiste("ana@test.com")).thenReturn(false);
+        when(jugadorRepo.crearJugador("Ana", "ana@test.com", "seg123")).thenReturn(false);
+
+        String resultado = authSvc.registrarYLogin("Ana", "ana@test.com", "seg123");
+
+        assertEquals("ERROR_BD", resultado);
+        verify(jugadorRepo, never()).loginJugador(any(), any());
     }
 
     @Test
