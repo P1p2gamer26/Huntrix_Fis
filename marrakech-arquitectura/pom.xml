@@ -118,6 +118,12 @@
                         <id>report</id>
                         <phase>verify</phase>
                         <goals><goal>report</goal></goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/presentation/**</exclude>
+                                <exclude>**/infrastructure/**</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

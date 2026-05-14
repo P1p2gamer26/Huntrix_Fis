@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ develop, main ]
 
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,18 +23,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
 
       - name: Build and test
         run: mvn -B verify -f marrakech-arquitectura/pom.xml
 
-      - name: Upload JaCoCo report
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: marrakech-arquitectura/target/site/jacoco/
-
-      - name: Publish test results
-        uses: dorny/test-reporter@v2
+      - name: JUnit Test Report
+        uses: dorny/test-reporter@v1
         if: always()
         with:
           name: JUnit Tests
@@ -37,19 +37,45 @@ jobs:
           reporter: java-junit
           fail-on-error: true
 
+      - name: Code Coverage Report
+        uses: madrapps/jacoco-report@v1.6.1
+        if: always()
+        with:
+          paths: marrakech-arquitectura/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Code Coverage
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
+
+      - name: Upload JaCoCo report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jacoco-report
+          path: marrakech-arquitectura/target/site/jacoco/
+
       - name: Coverage summary
+        if: always()
         run: |
           python3 -c "
           import xml.etree.ElementTree as ET
-          tree = ET.parse('marrakech-arquitectura/target/site/jacoco/jacoco.xml')
-          root = tree.getroot()
-          for c in root.findall('.//counter'):
-              if c.get('type') == 'LINE':
-                  cov = int(c.get('covered'))
-                  mis = int(c.get('missed'))
-                  pct = cov * 100 / (cov + mis)
-                  print(f'## Coverage: {pct:.2f}%')
-                  print(f'| Lines Covered | Lines Missed | Total |')
-                  print(f'|---|---|---|')
-                  print(f'| {cov} | {mis} | {cov + mis} |')
-          " >> $GITHUB_STEP_SUMMARY
+          try:
+              tree = ET.parse('marrakech-arquitectura/target/site/jacoco/jacoco.xml')
+              root = tree.getroot()
+              lines = (0, 0)
+              branches = (0, 0)
+              for c in root.findall('.//counter'):
+                  t = c.get('type')
+                  cov, mis = int(c.get('covered')), int(c.get('missed'))
+                  if t == 'LINE': lines = (cov, mis)
+                  elif t == 'BRANCH': branches = (cov, mis)
+              lp = lines[0]*100/(lines[0]+lines[1]) if lines[0]+lines[1] else 0
+              bp = branches[0]*100/(branches[0]+branches[1]) if branches[0]+branches[1] else 0
+              print('## Coverage Summary')
+              print('| Type | Covered | Missed | Total | % |')
+              print('|------|---------|--------|-------|---|')
+              print(f'| Lines | {lines[0]} | {lines[1]} | {lines[0]+lines[1]} | **{lp:.1f}%** |')
+              print(f'| Branches | {branches[0]} | {branches[1]} | {branches[0]+branches[1]} | **{bp:.1f}%** |')
+          except Exception as e:
+              print(f'Coverage report not available: {e}')
+          " >> \$GITHUB_STEP_SUMMARY
