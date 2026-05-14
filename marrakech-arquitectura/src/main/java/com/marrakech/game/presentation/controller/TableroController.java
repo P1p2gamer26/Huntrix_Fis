@@ -77,11 +77,9 @@ public class TableroController {
                 highlightTile(res.x1, res.y1);
                 break;
             case ALFOMBRA_COLOCADA:
-                redibujar(null);
                 if (onCarpetPlaced != null) onCarpetPlaced.run();
                 break;
             case JUEGO_TERMINADO:
-                redibujar(null);
                 if (onGameEnded != null) onGameEnded.run();
                 break;
             default:

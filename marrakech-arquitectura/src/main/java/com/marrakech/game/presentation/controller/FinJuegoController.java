@@ -19,6 +19,11 @@ public class FinJuegoController {
     private final Label finalScores;
     private final Button btnVolverSala;
     private final Button btnVolverMenu;
+    private final GestionJuegoServicio juegoSvc;
+    private final ChatServicio chatSvc;
+
+    private PartidaServicio   partidaSvc;
+    private EstadoJuegoServicio estadoSvc;
 
     private final String[] playerColors = {"#e74c3c","#3498db","#2ecc71","#f39c12"};
     private final String[] playerNames = {"J1 (ROJO)","J2 (AZUL)","J3 (VERDE)","J4 (AMARILLO)"};
@@ -28,7 +33,8 @@ public class FinJuegoController {
 
     public FinJuegoController(StackPane endScreen, HBox gameScreen,
                                Label resultadoLabel, Label winnerLabel, Label finalScores,
-                               Button btnVolverSala, Button btnVolverMenu) {
+                               Button btnVolverSala, Button btnVolverMenu,
+                               GestionJuegoServicio juegoSvc, ChatServicio chatSvc) {
         this.endScreen = endScreen;
         this.gameScreen = gameScreen;
         this.resultadoLabel = resultadoLabel;
@@ -36,16 +42,19 @@ public class FinJuegoController {
         this.finalScores = finalScores;
         this.btnVolverSala = btnVolverSala;
         this.btnVolverMenu = btnVolverMenu;
+        this.juegoSvc = juegoSvc;
+        this.chatSvc = chatSvc;
+    }
+
+    public void setServicios(PartidaServicio partidaSvc, EstadoJuegoServicio estadoSvc) {
+        this.partidaSvc = partidaSvc;
+        this.estadoSvc = estadoSvc;
     }
 
     public void setOnVolverSala(Runnable r) { this.onVolverSala = r; }
     public void setOnVolverMenu(Runnable r) { this.onVolverMenu = r; }
 
-    public void mostrar(GestionJuegoServicio juegoSvc,
-                         boolean modoMultijugador, int miIndice, String usuarioActual,
-                         PartidaServicio partidaSvc,
-                         EstadoJuegoServicio estadoSvc,
-                         ChatServicio chatSvc) {
+    public void mostrar(boolean modoMultijugador, int miIndice, String usuarioActual) {
         if (estadoSvc != null) estadoSvc.detenerPolling();
         if (chatSvc != null) chatSvc.detenerPolling();
 

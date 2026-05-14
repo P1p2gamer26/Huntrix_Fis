@@ -5,11 +5,26 @@ import com.marrakech.game.infrastructure.database.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 /** Gestiona la tabla de estadísticas por jugador. */
 public class EstadisticasRepositorio {
 
     public void inicializarEstadisticas(int idJugador) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement st = conn.createStatement()) {
+            st.execute("CREATE TABLE IF NOT EXISTS Estadisticas (" +
+                "id_estadistica INT AUTO_INCREMENT PRIMARY KEY, " +
+                "partidas_jugadas INT DEFAULT 0, " +
+                "partidas_ganadas INT DEFAULT 0, " +
+                "partidas_perdidas INT DEFAULT 0, " +
+                "total_monedas INT DEFAULT 0, " +
+                "ultima_actualizacion TIMESTAMP, " +
+                "id_jugador INT UNIQUE, " +
+                "FOREIGN KEY (id_jugador) REFERENCES Jugador (id_jugador))");
+        } catch (Exception e) {
+            System.err.println("[EstadisticasRepositorio] Error creando tabla Estadisticas: " + e.getMessage());
+        }
         String sql = "INSERT INTO Estadisticas " +
                      "(id_jugador, partidas_jugadas, partidas_ganadas, partidas_perdidas, " +
                      "total_monedas, ultima_actualizacion) " +

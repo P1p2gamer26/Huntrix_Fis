@@ -4,7 +4,8 @@ import java.io.File;
 
 /** Contrato de persistencia para jugadores. */
 public interface IJugadorRepositorio {
-    void crearJugador(String nombre, String correo, String password);
+    /** Retorna true si el jugador fue creado, false si hubo un error de BD. */
+    boolean crearJugador(String nombre, String correo, String password);
     boolean correoExiste(String correo);
     boolean nombreExiste(String nombre);
     /** Retorna null (credenciales malas), "SESION_ACTIVA" o el nombre del jugador. */

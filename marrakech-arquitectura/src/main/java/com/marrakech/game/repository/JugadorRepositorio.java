@@ -14,6 +14,7 @@ public class JugadorRepositorio implements IJugadorRepositorio {
 
     public JugadorRepositorio(EstadisticasRepositorio estadisticasRepo) {
         this.estadisticasRepo = estadisticasRepo;
+        agregarColumnasExtra();
     }
 
     // ── Creación ──────────────────────────────────────────────────────────────
@@ -173,13 +174,24 @@ public class JugadorRepositorio implements IJugadorRepositorio {
         return null;
     }
 
-    // ── Columnas extra (idempotente) ───────────────────────────────────────────
+    // ── Inicialización de tabla (idempotente) ──────────────────────────────────
 
     private void agregarColumnasExtra() {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement st = conn.createStatement()) {
+            st.execute("CREATE TABLE IF NOT EXISTS Jugador (" +
+                "id_jugador INT AUTO_INCREMENT PRIMARY KEY, " +
+                "nombre_usuario VARCHAR(50) UNIQUE NOT NULL, " +
+                "correo VARCHAR(100) UNIQUE NOT NULL, " +
+                "password VARCHAR(255) NOT NULL, " +
+                "fecha_registro TIMESTAMP NOT NULL, " +
+                "estado VARCHAR(15), " +
+                "foto BLOB, " +
+                "sesion_activa BOOLEAN DEFAULT FALSE)");
             st.execute("ALTER TABLE Jugador ADD COLUMN IF NOT EXISTS foto BLOB");
             st.execute("ALTER TABLE Jugador ADD COLUMN IF NOT EXISTS sesion_activa BOOLEAN DEFAULT FALSE");
-        } catch (Exception e) { /* columnas ya existen */ }
+        } catch (Exception e) {
+            System.err.println("[JugadorRepositorio] Error en tabla Jugador: " + e.getMessage());
+        }
     }
 }

@@ -115,15 +115,22 @@ public class GameController {
         GameRenderEngine renderEngine = new GameRenderEngine(boardGrid, diceCanvas);
 
         tableroCtrl = new TableroController(boardGrid, renderEngine, juegoSvc);
+
+        tableroCtrl.inicializar();
+        tableroCtrl.limpiarHighlights();
+
         assamCtrl = new AssamController(assamSvc, boardGrid);
         chatCtrl = new ChatController(chatBox, chatInput, chatScroll, chatPanel, usuarioActual);
         finJuegoCtrl = new FinJuegoController(endScreen, gameScreen,
-            resultadoLabel, winnerLabel, finalScores, btnVolverSala, btnVolverMenu);
+            resultadoLabel, winnerLabel, finalScores, btnVolverSala, btnVolverMenu,
+            juegoSvc, chatSvc);
+
+        if (partidaSvc != null || estadoSvc != null)
+            finJuegoCtrl.setServicios(partidaSvc, estadoSvc);
 
         tableroCtrl.setOnCarpetPlaced(() -> pasarTurno());
         tableroCtrl.setOnGameEnded(() -> finJuegoCtrl.mostrar(
-            juegoSvc, modoMultijugador, miIndice, usuarioActual,
-            partidaSvc, estadoSvc, chatSvc));
+            modoMultijugador, miIndice, usuarioActual));
 
         finJuegoCtrl.setOnVolverSala(onVolverSala);
         finJuegoCtrl.setOnVolverMenu(onVolverMenu);
@@ -134,7 +141,6 @@ public class GameController {
         panelJ3.setVisible(n >= 3); panelJ3.setManaged(n >= 3);
         panelJ4.setVisible(n >= 4); panelJ4.setManaged(n >= 4);
 
-        tableroCtrl.inicializar();
         assamCtrl.getView().toFront();
 
         int firstPlayer = (!modoMultijugador || miIndice == 0)
@@ -246,8 +252,7 @@ public class GameController {
         assamCtrl.getView().toFront();
         actualizarUI(); actualizarControles(); actualizarStatus();
         if (juegoSvc.juegoTerminado() && !endScreen.isVisible())
-            finJuegoCtrl.mostrar(juegoSvc, modoMultijugador, miIndice, usuarioActual,
-                partidaSvc, estadoSvc, chatSvc);
+            finJuegoCtrl.mostrar(modoMultijugador, miIndice, usuarioActual);
     }
 
     @FXML private void volverSala() {
