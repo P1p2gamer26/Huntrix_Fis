@@ -118,6 +118,11 @@
                         <id>report</id>
                         <phase>verify</phase>
                         <goals><goal>report</goal></goals>
+                        <configuration>
+                            <includes>
+                                <include>**/service/**</include>
+                            </includes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
