@@ -1,7 +1,8 @@
 package com.marrakech.game.presentation.controller;
 
-import com.marrakech.game.service.CarpetValidador;
-import com.marrakech.game.service.JuegoServicio;
+import com.marrakech.game.service.GestionJuegoServicio;
+import com.marrakech.game.service.GestionJuegoServicio.ResultadoClick;
+import com.marrakech.game.service.GestionJuegoServicio.ResultadoTipo;
 import com.marrakech.game.presentation.render.GameRenderEngine;
 
 import javafx.scene.image.ImageView;
@@ -14,22 +15,19 @@ public class TableroController {
 
     private final GridPane boardGrid;
     private final StackPane[][] tiles = new StackPane[7][7];
-    private final int[][] tileOwner = new int[7][7];
-    private final int[][] carpetOrientation = new int[7][7];
     private final GameRenderEngine renderEngine;
+    private final GestionJuegoServicio juegoSvc;
 
-    private int firstCarpetX = -1, firstCarpetY = -1;
-    private int currentPhase;
-    private int currentPlayerIdx;
     private int assamX, assamY;
-    private int[] rugsGlobal;
 
     private Runnable onCarpetPlaced;
     private Runnable onGameEnded;
 
-    public TableroController(GridPane boardGrid, GameRenderEngine renderEngine) {
+    public TableroController(GridPane boardGrid, GameRenderEngine renderEngine,
+                              GestionJuegoServicio juegoSvc) {
         this.boardGrid = boardGrid;
         this.renderEngine = renderEngine;
+        this.juegoSvc = juegoSvc;
     }
 
     public void setOnCarpetPlaced(Runnable r) { this.onCarpetPlaced = r; }
@@ -37,19 +35,16 @@ public class TableroController {
 
     public void actualizarContexto(int phase, int playerIdx,
                                     int ax, int ay, int[] rugs) {
-        this.currentPhase = phase;
-        this.currentPlayerIdx = playerIdx;
+        juegoSvc.setCurrentPhase(phase);
+        juegoSvc.setCurrentPlayerIdx(playerIdx);
         this.assamX = ax;
         this.assamY = ay;
-        this.rugsGlobal = rugs;
     }
 
     public void inicializar() {
         boardGrid.getChildren().clear();
         for (int row = 0; row < 7; row++)
             for (int col = 0; col < 7; col++) {
-                tileOwner[col][row] = 0;
-                carpetOrientation[col][row] = 0;
                 StackPane tile = new StackPane();
                 tile.setPrefSize(CELL, CELL);
                 tile.getStyleClass().add("tile");
@@ -67,89 +62,56 @@ public class TableroController {
     }
 
     public void redibujar(ImageView assamView) {
-        renderEngine.redibujarTableroCompleto(tileOwner, carpetOrientation, assamView);
+        renderEngine.redibujarTableroCompleto(
+            juegoSvc.getTileOwner(), juegoSvc.getCarpetOrientation(), assamView);
     }
 
     public void highlightTile(int x, int y) {
         tiles[x][y].setStyle("-fx-background-color: rgba(255,255,255,0.25);");
     }
 
-    public int procesarClick(int x, int y) {
-        if (currentPhase == 1) {
-            boolean adj = JuegoServicio.esAdyacenteA(x, y, assamX, assamY);
-            boolean noAssam = JuegoServicio.noEsAssam(x, y, assamX, assamY);
-            if (adj && noAssam && CarpetValidador.tiene2daOpcionValida(x, y, assamX, assamY)) {
-                firstCarpetX = x; firstCarpetY = y;
-                highlightTile(x, y);
-                currentPhase = 2;
-                return 2;
-            }
-            return adj && noAssam ? -1 : 0;
-        }
-
-        if (currentPhase == 2 && firstCarpetX >= 0) {
-            boolean adj = JuegoServicio.esAlfombraAdyacente(firstCarpetX, firstCarpetY, x, y);
-            boolean noAssam = JuegoServicio.noEsAssam(x, y, assamX, assamY);
-            boolean dentro = CarpetValidador.esCarpetValida(firstCarpetX, firstCarpetY, x, y);
-
-            if (adj && noAssam && dentro) {
-                tiles[firstCarpetX][firstCarpetY].setStyle("");
-                int player = currentPlayerIdx + 1;
-                boolean horiz = (y == firstCarpetY);
-
-                CarpetValidador.repararAlfombraAfectada(firstCarpetX, firstCarpetY, carpetOrientation);
-                CarpetValidador.repararAlfombraAfectada(x, y, carpetOrientation);
-                tileOwner[firstCarpetX][firstCarpetY] = player;
-                tileOwner[x][y] = player;
-
-                int topCol = Math.min(firstCarpetX, x);
-                int topRow = Math.min(firstCarpetY, y);
-                int botCol = Math.max(firstCarpetX, x);
-                int botRow = Math.max(firstCarpetY, y);
-                carpetOrientation[firstCarpetX][firstCarpetY] = 0;
-                carpetOrientation[x][y] = 0;
-                carpetOrientation[topCol][topRow] = horiz ? 2 : 1;
-                carpetOrientation[botCol][botRow] = -1;
-
-                rugsGlobal[currentPlayerIdx]--;
-                firstCarpetX = -1; firstCarpetY = -1;
-
-                if (JuegoServicio.juegoTerminado(rugsGlobal)) {
-                    if (onGameEnded != null) onGameEnded.run();
-                } else {
-                    if (onCarpetPlaced != null) onCarpetPlaced.run();
-                }
-                return 3;
-            }
-            return -1;
-        }
-
-        return 0;
-    }
-
     private void handleTileClick(int x, int y) {
-        procesarClick(x, y);
+        ResultadoClick res = juegoSvc.procesarClick(x, y, assamX, assamY);
+        switch (res.tipo) {
+            case ESPERA_SEGUNDA:
+                highlightTile(res.x1, res.y1);
+                break;
+            case ALFOMBRA_COLOCADA:
+                redibujar(null);
+                if (onCarpetPlaced != null) onCarpetPlaced.run();
+                break;
+            case JUEGO_TERMINADO:
+                redibujar(null);
+                if (onGameEnded != null) onGameEnded.run();
+                break;
+            default:
+                break;
+        }
     }
 
-    public int[][] getTileOwner() { return tileOwner; }
-    public int[][] getCarpetOrientation() { return carpetOrientation; }
-    public int getFirstCarpetX() { return firstCarpetX; }
-    public int getFirstCarpetY() { return firstCarpetY; }
+    public int[][] getTileOwner() { return juegoSvc.getTileOwner(); }
+    public int[][] getCarpetOrientation() { return juegoSvc.getCarpetOrientation(); }
+    public int getFirstCarpetX() { return juegoSvc.getFirstCarpetX(); }
+    public int getFirstCarpetY() { return juegoSvc.getFirstCarpetY(); }
 
-    public void setFirstCarpetX(int x) { this.firstCarpetX = x; }
-    public void setFirstCarpetY(int y) { this.firstCarpetY = y; }
-    public void setCurrentPlayerIdx(int idx) { this.currentPlayerIdx = idx; }
+    public void setFirstCarpetX(int x) { /* no-op, state in service */ }
+    public void setFirstCarpetY(int y) { /* no-op, state in service */ }
+    public void setCurrentPlayerIdx(int idx) { juegoSvc.setCurrentPlayerIdx(idx); }
     public void setAssamPos(int x, int y) { this.assamX = x; this.assamY = y; }
 
     public void setTileOwner(int[][] owner) {
+        int[][] to = juegoSvc.getTileOwner();
         for (int r = 0; r < 7; r++)
             for (int c = 0; c < 7; c++)
-                tileOwner[c][r] = owner[c][r];
+                to[c][r] = owner[c][r];
     }
+
     public void setCarpetOrientation(int[][] orient) {
+        int[][] co = juegoSvc.getCarpetOrientation();
         for (int r = 0; r < 7; r++)
             for (int c = 0; c < 7; c++)
-                carpetOrientation[c][r] = orient[c][r];
+                co[c][r] = orient[c][r];
     }
+
     public StackPane[][] getTiles() { return tiles; }
 }

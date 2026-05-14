@@ -17,10 +17,11 @@ public class Main extends Application {
         stage.setMaximized(true);
 
         // ── 1. Repositorios ───────────────────────────────────────────────────
-        EstadisticasRepositorio estadisticasRepo = new EstadisticasRepositorio();
-        IJugadorRepositorio     jugadorRepo      = new JugadorRepositorio(estadisticasRepo);
-        IPartidaRepositorio     partidaRepo      = new PartidaRepositorio();
-        IChatRepositorio        chatRepo         = new ChatRepositorio();
+        EstadisticasRepositorio  estadisticasRepo = new EstadisticasRepositorio();
+        IJugadorRepositorio      jugadorRepo      = new JugadorRepositorio(estadisticasRepo);
+        IPartidaRepositorio      partidaRepo      = new PartidaRepositorio();
+        IChatRepositorio         chatRepo         = new ChatRepositorio();
+        IEstadoJuegoRepositorio  estadoRepo       = new EstadoJuegoRepositorio();
 
         // ── 2. Servicios ──────────────────────────────────────────────────────
         MusicaServicio  musicaSvc  = new MusicaServicio();
@@ -30,7 +31,8 @@ public class Main extends Application {
 
         // ── 3. Controlador principal ───────────────────────────────────────────
         AuthController auth = new AuthController(stage, 1100, 700,
-                                                 authSvc, partidaSvc, chatSvc, musicaSvc);
+                                                 authSvc, partidaSvc, chatSvc, musicaSvc,
+                                                 estadoRepo);
 
         musicaSvc.reproducir(MusicaServicio.Track.MENU);
         auth.mostrarWelcome();

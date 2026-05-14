@@ -2,10 +2,12 @@ package com.marrakech.game.presentation.controller;
 
 import java.util.Random;
 
+import com.marrakech.game.repository.IEstadoJuegoRepositorio;
+import com.marrakech.game.service.AssamServicio;
 import com.marrakech.game.service.ChatServicio;
 import com.marrakech.game.service.EstadoJuegoServicio;
 import com.marrakech.game.service.EstadoJuegoServicio.EstadoDB;
-import com.marrakech.game.service.JuegoServicio;
+import com.marrakech.game.service.GestionJuegoServicio;
 import com.marrakech.game.service.MusicaServicio;
 import com.marrakech.game.service.PartidaServicio;
 import com.marrakech.game.presentation.render.GameRenderEngine;
@@ -43,22 +45,20 @@ public class GameController {
     public void setOnVolverSala(Runnable r) { this.onVolverSala = r; }
     public void setOnVolverMenu(Runnable r) { this.onVolverMenu = r; }
 
-    private int currentPhase = 0;
     private static final int PHASE_MOVE = 0;
-
-    private int numPlayers = 2;
-    private int currentPlayerIdx = 0;
-    private int[] money, rugs;
 
     private String  partidaId;
     private String  usuarioActual;
     private int     miIndice = 0;
     private boolean modoMultijugador = false;
 
-    private EstadoJuegoServicio estadoSvc;
-    private ChatServicio        chatSvc;
-    private PartidaServicio     partidaSvc;
-    private MusicaServicio      musicaSvc;
+    private GestionJuegoServicio juegoSvc;
+    private AssamServicio        assamSvc;
+    private EstadoJuegoServicio  estadoSvc;
+    private ChatServicio         chatSvc;
+    private PartidaServicio      partidaSvc;
+    private MusicaServicio       musicaSvc;
+    private IEstadoJuegoRepositorio estadoRepo;
 
     private TableroController tableroCtrl;
     private AssamController   assamCtrl;
@@ -72,6 +72,10 @@ public class GameController {
         this.chatSvc   = chatSvc;
     }
 
+    public void setEstadoRepositorio(IEstadoJuegoRepositorio estadoRepo) {
+        this.estadoRepo = estadoRepo;
+    }
+
     public void iniciarConJugadores(int n, String partidaId, String usuario,
                                     int miIndice, PartidaServicio partidaSvc) {
         this.partidaId        = partidaId;
@@ -80,12 +84,12 @@ public class GameController {
         this.modoMultijugador = true;
         this.partidaSvc       = partidaSvc;
 
-        this.estadoSvc = new EstadoJuegoServicio(partidaId);
+        this.estadoSvc = new EstadoJuegoServicio(estadoRepo, partidaId);
 
         startGame(n);
 
         if (miIndice == 0) estadoSvc.guardarEstadoSincrono(
-            assamCtrl.getX(), assamCtrl.getY(), assamCtrl.getDir(), serializarEstado());
+            assamSvc.getX(), assamSvc.getY(), assamSvc.getDir(), serializarEstado());
         estadoSvc.iniciarPolling(() -> aplicarEstadoDesdeDB());
 
         chatSvc.inicializar(partidaId, usuario);
@@ -103,21 +107,22 @@ public class GameController {
     @FXML private void startWith4() { iniciarConJugadores(4); }
 
     private void startGame(int n) {
-        numPlayers = n;
-        money = new int[n]; rugs = new int[n];
-        for (int i = 0; i < n; i++) { money[i] = 30; rugs[i] = 15; }
+        juegoSvc = new GestionJuegoServicio();
+        juegoSvc.iniciarJuego(n);
+
+        assamSvc = new AssamServicio();
 
         GameRenderEngine renderEngine = new GameRenderEngine(boardGrid, diceCanvas);
 
-        tableroCtrl = new TableroController(boardGrid, renderEngine);
-        chatCtrl    = new ChatController(chatBox, chatInput, chatScroll, chatPanel, usuarioActual);
+        tableroCtrl = new TableroController(boardGrid, renderEngine, juegoSvc);
+        assamCtrl = new AssamController(assamSvc, boardGrid);
+        chatCtrl = new ChatController(chatBox, chatInput, chatScroll, chatPanel, usuarioActual);
         finJuegoCtrl = new FinJuegoController(endScreen, gameScreen,
             resultadoLabel, winnerLabel, finalScores, btnVolverSala, btnVolverMenu);
 
         tableroCtrl.setOnCarpetPlaced(() -> pasarTurno());
         tableroCtrl.setOnGameEnded(() -> finJuegoCtrl.mostrar(
-            numPlayers, money, tableroCtrl.getTileOwner(),
-            modoMultijugador, miIndice, usuarioActual,
+            juegoSvc, modoMultijugador, miIndice, usuarioActual,
             partidaSvc, estadoSvc, chatSvc));
 
         finJuegoCtrl.setOnVolverSala(onVolverSala);
@@ -130,14 +135,14 @@ public class GameController {
         panelJ4.setVisible(n >= 4); panelJ4.setManaged(n >= 4);
 
         tableroCtrl.inicializar();
-        assamCtrl = new AssamController(boardGrid);
         assamCtrl.getView().toFront();
 
-        currentPlayerIdx = (!modoMultijugador || miIndice == 0)
-            ? new Random().nextInt(numPlayers) : 0;
-        currentPhase = PHASE_MOVE;
-        tableroCtrl.actualizarContexto(currentPhase, currentPlayerIdx,
-            assamCtrl.getX(), assamCtrl.getY(), rugs);
+        int firstPlayer = (!modoMultijugador || miIndice == 0)
+            ? new Random().nextInt(n) : 0;
+        juegoSvc.setCurrentPlayerIdx(firstPlayer);
+        juegoSvc.setCurrentPhase(0);
+        tableroCtrl.actualizarContexto(0, firstPlayer,
+            assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
 
         startScreen.setVisible(false);
         endScreen.setVisible(false);
@@ -158,22 +163,22 @@ public class GameController {
     }
 
     @FXML protected void rotateLeft() {
-        if (!JuegoServicio.esMiTurno(modoMultijugador, currentPlayerIdx, miIndice)
-            || currentPhase != PHASE_MOVE) return;
+        if (!juegoSvc.esMiTurno(modoMultijugador, miIndice)
+            || juegoSvc.getCurrentPhase() != PHASE_MOVE) return;
         assamCtrl.rotarIzquierda();
         guardarEstado();
     }
 
     @FXML protected void rotateRight() {
-        if (!JuegoServicio.esMiTurno(modoMultijugador, currentPlayerIdx, miIndice)
-            || currentPhase != PHASE_MOVE) return;
+        if (!juegoSvc.esMiTurno(modoMultijugador, miIndice)
+            || juegoSvc.getCurrentPhase() != PHASE_MOVE) return;
         assamCtrl.rotarDerecha();
         guardarEstado();
     }
 
     @FXML protected void onRollDiceClick() {
-        if (!JuegoServicio.esMiTurno(modoMultijugador, currentPlayerIdx, miIndice)
-            || currentPhase != PHASE_MOVE) return;
+        if (!juegoSvc.esMiTurno(modoMultijugador, miIndice)
+            || juegoSvc.getCurrentPhase() != PHASE_MOVE) return;
         int pasos = new Random().nextInt(6) + 1;
         rollDiceBtn.setDisable(true);
 
@@ -184,20 +189,20 @@ public class GameController {
         renderEngine.animarDado(pasos, () -> {
             assamCtrl.animarMovimiento(pasos, () -> {
                 assamCtrl.getView().toFront();
-                int ax = assamCtrl.getX(), ay = assamCtrl.getY();
-                int pago = JuegoServicio.aplicarPago(ax, ay, currentPlayerIdx,
-                                                      tableroCtrl.getTileOwner(), money);
+                int ax = assamSvc.getX(), ay = assamSvc.getY();
+                int pago = juegoSvc.aplicarPago(ax, ay);
                 if (pago > 0) {
-                    int dueno = tableroCtrl.getTileOwner()[ax][ay];
+                    int dueno = juegoSvc.getTileOwner()[ax][ay];
                     statusLabel.setText("Dado: " + pasos + " — Pagas " + pago
                         + " Dh a " + playerName(dueno - 1) + ". Coloca tu alfombra.");
                 } else {
                     statusLabel.setText("Dado: " + pasos + " — Haz click en una casilla adyacente.");
                 }
-                currentPhase = JuegoServicio.fasePostDado(rugs[currentPlayerIdx]);
-                tableroCtrl.actualizarContexto(currentPhase, currentPlayerIdx,
-                    assamCtrl.getX(), assamCtrl.getY(), rugs);
-                if (rugs[currentPlayerIdx] == 0) { pasarTurno(); return; }
+                int newPhase = juegoSvc.fasePostDado();
+                juegoSvc.setCurrentPhase(newPhase);
+                tableroCtrl.actualizarContexto(newPhase, juegoSvc.getCurrentPlayerIdx(),
+                    assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
+                if (juegoSvc.getRugs()[juegoSvc.getCurrentPlayerIdx()] == 0) { pasarTurno(); return; }
                 actualizarUI(); actualizarControles();
                 guardarEstado();
             });
@@ -205,11 +210,10 @@ public class GameController {
     }
 
     private void pasarTurno() {
-        currentPlayerIdx = JuegoServicio.siguienteTurno(currentPlayerIdx, numPlayers);
-        currentPhase = PHASE_MOVE;
+        juegoSvc.pasarTurno();
         tableroCtrl.redibujar(assamCtrl.getView());
-        tableroCtrl.actualizarContexto(currentPhase, currentPlayerIdx,
-            assamCtrl.getX(), assamCtrl.getY(), rugs);
+        tableroCtrl.actualizarContexto(juegoSvc.getCurrentPhase(), juegoSvc.getCurrentPlayerIdx(),
+            assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
         tableroCtrl.limpiarHighlights();
         actualizarUI(); actualizarControles(); actualizarStatus();
         guardarEstado();
@@ -221,62 +225,29 @@ public class GameController {
         EstadoDB est = EstadoJuegoServicio.parsearEstado(raw);
         if (est == null || est.turno <= estadoSvc.getUltimoTurnoVisto()) return;
 
-        assamCtrl.setPosition(est.ax, est.ay);
-        assamCtrl.setDir(est.adir);
+        assamSvc.setPosition(est.ax, est.ay);
+        assamSvc.setDir(est.adir);
         assamCtrl.actualizarPosicionEnGrid();
 
-        String[] secciones = est.tableroJson.split(";");
-        if (secciones.length < 7) return;
-
-        String[] ms = secciones[0].split(",");
-        String[] rs = secciones[1].split(",");
-        for (int i = 0; i < numPlayers && i < ms.length; i++) {
-            money[i] = Integer.parseInt(ms[i]);
-            rugs[i]  = Integer.parseInt(rs[i]);
-        }
-
-        int[][] owner = new int[7][7];
-        String[] filas = secciones[2].split("/");
-        for (int row = 0; row < 7 && row < filas.length; row++) {
-            String[] celdas = filas[row].split(",");
-            for (int col = 0; col < 7 && col < celdas.length; col++)
-                owner[col][row] = Integer.parseInt(celdas[col]);
-        }
-        tableroCtrl.setTileOwner(owner);
-
-        currentPlayerIdx = Integer.parseInt(secciones[3]);
-        currentPhase     = Integer.parseInt(secciones[4]);
-        tableroCtrl.setFirstCarpetX(Integer.parseInt(secciones[5]));
-        tableroCtrl.setFirstCarpetY(Integer.parseInt(secciones[6]));
-
-        if (secciones.length > 7) {
-            int[][] orient = new int[7][7];
-            String[] ofilas = secciones[7].split("/");
-            for (int row = 0; row < 7 && row < ofilas.length; row++) {
-                String[] oceldas = ofilas[row].split(",");
-                for (int col = 0; col < 7 && col < oceldas.length; col++)
-                    orient[col][row] = Integer.parseInt(oceldas[col]);
-            }
-            tableroCtrl.setCarpetOrientation(orient);
-        }
+        juegoSvc.aplicarEstado(raw);
 
         estadoSvc.setUltimoTurnoVisto(est.turno);
         estadoSvc.setEstadoVersion(est.turno);
 
-        tableroCtrl.actualizarContexto(currentPhase, currentPlayerIdx,
-            assamCtrl.getX(), assamCtrl.getY(), rugs);
+        tableroCtrl.actualizarContexto(juegoSvc.getCurrentPhase(), juegoSvc.getCurrentPlayerIdx(),
+            assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
         tableroCtrl.redibujar(assamCtrl.getView());
         tableroCtrl.limpiarHighlights();
 
-        if (currentPhase == 2 && tableroCtrl.getFirstCarpetX() >= 0
-            && JuegoServicio.esMiTurno(modoMultijugador, currentPlayerIdx, miIndice))
-            tableroCtrl.highlightTile(tableroCtrl.getFirstCarpetX(), tableroCtrl.getFirstCarpetY());
+        if (juegoSvc.getCurrentPhase() == 2 && juegoSvc.getFirstCarpetX() >= 0
+            && juegoSvc.esMiTurno(modoMultijugador, miIndice))
+            tableroCtrl.highlightTile(juegoSvc.getFirstCarpetX(), juegoSvc.getFirstCarpetY());
 
         assamCtrl.getView().toFront();
         actualizarUI(); actualizarControles(); actualizarStatus();
-        if (JuegoServicio.juegoTerminado(rugs) && !endScreen.isVisible())
-            finJuegoCtrl.mostrar(numPlayers, money, tableroCtrl.getTileOwner(),
-                modoMultijugador, miIndice, usuarioActual, partidaSvc, estadoSvc, chatSvc);
+        if (juegoSvc.juegoTerminado() && !endScreen.isVisible())
+            finJuegoCtrl.mostrar(juegoSvc, modoMultijugador, miIndice, usuarioActual,
+                partidaSvc, estadoSvc, chatSvc);
     }
 
     @FXML private void volverSala() {
@@ -303,17 +274,17 @@ public class GameController {
 
     private void actualizarControles() {
         rollDiceBtn.setDisable(
-            !JuegoServicio.esMiTurno(modoMultijugador, currentPlayerIdx, miIndice)
-            || currentPhase != PHASE_MOVE);
+            !juegoSvc.esMiTurno(modoMultijugador, miIndice)
+            || juegoSvc.getCurrentPhase() != PHASE_MOVE);
     }
 
     private void actualizarStatus() {
-        if (!JuegoServicio.esMiTurno(modoMultijugador, currentPlayerIdx, miIndice)) {
+        if (!juegoSvc.esMiTurno(modoMultijugador, miIndice)) {
             String sufijo = modoMultijugador ? " (Tú eres " + playerName(miIndice) + ")" : "";
-            statusLabel.setText("Turno de " + playerName(currentPlayerIdx) + ". Esperando..." + sufijo);
+            statusLabel.setText("Turno de " + playerName(juegoSvc.getCurrentPlayerIdx()) + ". Esperando..." + sufijo);
             return;
         }
-        switch (currentPhase) {
+        switch (juegoSvc.getCurrentPhase()) {
             case 0: statusLabel.setText("Tu turno. Rota a Assam y lanza el dado."); break;
             case 1: statusLabel.setText("Haz click en una casilla adyacente a Assam."); break;
             case 2: statusLabel.setText("1ra mitad lista. Haz click en la casilla contigua."); break;
@@ -325,15 +296,19 @@ public class GameController {
         Label[] ml = {moneyJ1, moneyJ2, moneyJ3, moneyJ4};
         VBox[]  pl = {panelJ1, panelJ2, panelJ3, panelJ4};
         String[] colors = {"#e74c3c","#3498db","#2ecc71","#f39c12"};
-        for (int i = 0; i < numPlayers; i++) {
-            if (rl[i] != null) rl[i].setText(String.valueOf(rugs[i]));
-            if (ml[i] != null) ml[i].setText(money[i] + " Dh");
-            if (pl[i] != null) pl[i].setStyle(i == currentPlayerIdx
+        int[] moneyArr = juegoSvc.getMoney();
+        int[] rugsArr = juegoSvc.getRugs();
+        int cpIdx = juegoSvc.getCurrentPlayerIdx();
+        int np = juegoSvc.getNumPlayers();
+        for (int i = 0; i < np; i++) {
+            if (rl[i] != null) rl[i].setText(String.valueOf(rugsArr[i]));
+            if (ml[i] != null) ml[i].setText(moneyArr[i] + " Dh");
+            if (pl[i] != null) pl[i].setStyle(i == cpIdx
                 ? "-fx-border-color:" + colors[i] + ";-fx-border-width:3px;-fx-border-radius:10px;"
                 : "-fx-border-color:" + hexToRgba(colors[i], 0.35) + ";-fx-border-width:1.5px;-fx-border-radius:10px;");
         }
-        turnLabel.setText(JuegoServicio.esMiTurno(modoMultijugador, currentPlayerIdx, miIndice)
-            ? "TU TURNO" : "TURNO: " + playerName(currentPlayerIdx));
+        turnLabel.setText(juegoSvc.esMiTurno(modoMultijugador, miIndice)
+            ? "TU TURNO" : "TURNO: " + playerName(cpIdx));
     }
 
     private String playerName(int idx) {
@@ -349,11 +324,7 @@ public class GameController {
     }
 
     private String serializarEstado() {
-        return EstadoJuegoServicio.serializarEstado(
-            numPlayers, money, rugs, tableroCtrl.getTileOwner(),
-            currentPlayerIdx, currentPhase,
-            tableroCtrl.getFirstCarpetX(), tableroCtrl.getFirstCarpetY(),
-            tableroCtrl.getCarpetOrientation());
+        return juegoSvc.serializarEstado(assamSvc.getX(), assamSvc.getY(), assamSvc.getDir());
     }
 
     @FXML private void onSendChat() {
@@ -362,7 +333,7 @@ public class GameController {
 
     private void guardarEstado() {
         if (estadoSvc != null)
-            estadoSvc.guardarEstado(assamCtrl.getX(), assamCtrl.getY(),
-                assamCtrl.getDir(), serializarEstado());
+            estadoSvc.guardarEstado(assamSvc.getX(), assamSvc.getY(),
+                assamSvc.getDir(), serializarEstado());
     }
 }

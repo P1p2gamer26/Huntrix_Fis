@@ -1,5 +1,6 @@
 package com.marrakech.game.presentation.controller;
 
+import com.marrakech.game.repository.IEstadoJuegoRepositorio;
 import com.marrakech.game.repository.PartidaRepositorio.Partida;
 import com.marrakech.game.service.AuthServicio;
 import com.marrakech.game.service.ChatServicio;
@@ -21,21 +22,24 @@ public class AuthController {
     private final double         width, height;
     private final AuthServicio   authSvc;
     private final PartidaServicio partidaSvc;
-    private final ChatServicio   chatSvc;
-    private final MusicaServicio musicaSvc;
+    private final ChatServicio    chatSvc;
+    private final MusicaServicio  musicaSvc;
+    private final IEstadoJuegoRepositorio estadoRepo;
 
     private String usuarioActual;
 
     public AuthController(Stage stage, double width, double height,
                           AuthServicio authSvc, PartidaServicio partidaSvc,
-                          ChatServicio chatSvc, MusicaServicio musicaSvc) {
-        this.stage      = stage;
-        this.width      = width;
-        this.height     = height;
-        this.authSvc    = authSvc;
-        this.partidaSvc = partidaSvc;
-        this.chatSvc    = chatSvc;
-        this.musicaSvc  = musicaSvc;
+                          ChatServicio chatSvc, MusicaServicio musicaSvc,
+                          IEstadoJuegoRepositorio estadoRepo) {
+        this.stage       = stage;
+        this.width       = width;
+        this.height      = height;
+        this.authSvc     = authSvc;
+        this.partidaSvc  = partidaSvc;
+        this.chatSvc     = chatSvc;
+        this.musicaSvc   = musicaSvc;
+        this.estadoRepo  = estadoRepo;
 
         stage.setOnCloseRequest(e -> cerrarSesionYSalir());
     }
@@ -226,6 +230,7 @@ public class AuthController {
             } catch (Exception ignored) {}
             stage.setScene(scene);
             gc.setServicios(musicaSvc, chatSvc);
+            gc.setEstadoRepositorio(estadoRepo);
             gc.setOnVolverMenu(() -> mostrarMenu());
             gc.setOnVolverSala(() -> mostrarMenu());
         } catch (Exception e) {
@@ -248,6 +253,7 @@ public class AuthController {
             } catch (Exception ignored) {}
             stage.setScene(scene);
             gc.setServicios(musicaSvc, chatSvc);
+            gc.setEstadoRepositorio(estadoRepo);
             gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc);
             gc.setOnVolverSala(() -> mostrarModoOnline());
             gc.setOnVolverMenu(() -> mostrarMenu());

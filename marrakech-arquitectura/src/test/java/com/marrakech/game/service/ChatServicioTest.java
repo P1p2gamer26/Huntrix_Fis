@@ -104,8 +104,20 @@ class ChatServicioTest {
     }
 
     @Test
-    void getChatRepo_retornaElRepositorioInyectado() {
-        assertSame(chatRepo, svc.getChatRepo());
+    void obtenerUltimoIdMensaje_delegaAlRepositorio() {
+        svc.inicializar("MRK-7", "user");
+        when(chatRepo.obtenerUltimoId("MRK-7")).thenReturn(42);
+        assertEquals(42, svc.obtenerUltimoIdMensaje());
+        verify(chatRepo, times(2)).obtenerUltimoId("MRK-7");
+    }
+
+    @Test
+    void obtenerMensajesDesde_delegaAlRepositorio() {
+        svc.inicializar("MRK-8", "user");
+        List<Mensaje> msgs = List.of(new Mensaje(10, "a", "texto", "12:00"));
+        when(chatRepo.obtenerMensajes("MRK-8", 5)).thenReturn(msgs);
+        assertEquals(1, svc.obtenerMensajesDesde(5).size());
+        verify(chatRepo).obtenerMensajes("MRK-8", 5);
     }
 
     @Test

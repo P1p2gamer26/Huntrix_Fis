@@ -1,17 +1,21 @@
 package com.marrakech.game.service;
 
+import com.marrakech.game.repository.IEstadoJuegoRepositorio;
 import com.marrakech.game.service.EstadoJuegoServicio.EstadoDB;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class EstadoJuegoServicioTest {
 
+    private IEstadoJuegoRepositorio estadoRepo;
     private EstadoJuegoServicio svc;
 
     @BeforeEach
     void setUp() {
-        svc = new EstadoJuegoServicio("MRK-TEST");
+        estadoRepo = mock(IEstadoJuegoRepositorio.class);
+        svc = new EstadoJuegoServicio(estadoRepo, "MRK-TEST");
     }
 
     // ── SERIALIZAR: cantidad de jugadores ──────────────────────────────────
@@ -269,20 +273,20 @@ class EstadoJuegoServicioTest {
 
     @Test
     void cargarUltimoEstado_partidaIdNull_retornaNull() {
-        EstadoJuegoServicio svcSinBD = new EstadoJuegoServicio(null);
+        EstadoJuegoServicio svcSinBD = new EstadoJuegoServicio(estadoRepo, null);
         assertNull(svcSinBD.cargarUltimoEstado());
     }
 
     @Test
     void guardarEstado_partidaIdNull_noIncrementaVersion() {
-        EstadoJuegoServicio s = new EstadoJuegoServicio(null);
+        EstadoJuegoServicio s = new EstadoJuegoServicio(estadoRepo, null);
         s.guardarEstado(0, 0, 0, "test");
         assertEquals(0, s.getEstadoVersion());
     }
 
     @Test
     void guardarEstadoSincrono_partidaIdNull_noIncrementaVersion() {
-        EstadoJuegoServicio s = new EstadoJuegoServicio(null);
+        EstadoJuegoServicio s = new EstadoJuegoServicio(estadoRepo, null);
         s.guardarEstadoSincrono(0, 0, 0, "test");
         assertEquals(0, s.getEstadoVersion());
     }

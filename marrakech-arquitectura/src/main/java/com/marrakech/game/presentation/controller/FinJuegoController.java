@@ -1,7 +1,8 @@
 package com.marrakech.game.presentation.controller;
 
+import com.marrakech.game.service.ChatServicio;
 import com.marrakech.game.service.EstadoJuegoServicio;
-import com.marrakech.game.service.JuegoServicio;
+import com.marrakech.game.service.GestionJuegoServicio;
 import com.marrakech.game.service.PartidaServicio;
 
 import javafx.scene.control.Button;
@@ -40,15 +41,19 @@ public class FinJuegoController {
     public void setOnVolverSala(Runnable r) { this.onVolverSala = r; }
     public void setOnVolverMenu(Runnable r) { this.onVolverMenu = r; }
 
-    public void mostrar(int numPlayers, int[] money, int[][] tileOwner,
+    public void mostrar(GestionJuegoServicio juegoSvc,
                          boolean modoMultijugador, int miIndice, String usuarioActual,
                          PartidaServicio partidaSvc,
                          EstadoJuegoServicio estadoSvc,
-                         com.marrakech.game.service.ChatServicio chatSvc) {
+                         ChatServicio chatSvc) {
         if (estadoSvc != null) estadoSvc.detenerPolling();
         if (chatSvc != null) chatSvc.detenerPolling();
 
-        int win = JuegoServicio.calcularGanador(numPlayers, money, tileOwner);
+        int numPlayers = juegoSvc.getNumPlayers();
+        int[] money = juegoSvc.getMoney();
+        int[][] tileOwner = juegoSvc.getTileOwner();
+
+        int win = juegoSvc.calcularGanador();
 
         if (modoMultijugador && partidaSvc != null) partidaSvc.registrarVictoria(usuarioActual);
 
@@ -66,7 +71,7 @@ public class FinJuegoController {
         if (finalScores != null) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < numPlayers; i++) {
-                int enTablero = JuegoServicio.contarAlfombrasEnTablero(i, tileOwner);
+                int enTablero = juegoSvc.contarAlfombrasEnTablero(i);
                 sb.append(playerNames[i]).append(":  ").append(money[i]).append(" Dh")
                   .append("   |   Alfombras en tablero: ").append(enTablero);
                 if (i < numPlayers - 1) sb.append("\n");
