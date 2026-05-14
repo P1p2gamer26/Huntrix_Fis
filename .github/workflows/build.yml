@@ -28,15 +28,6 @@ jobs:
       - name: Build and test
         run: mvn -B verify -f marrakech-arquitectura/pom.xml
 
-      - name: JUnit Test Report
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: JUnit Tests
-          path: marrakech-arquitectura/target/surefire-reports/*.xml
-          reporter: java-junit
-          fail-on-error: true
-
       - name: Code Coverage Report
         uses: madrapps/jacoco-report@v1.6.1
         if: always()
@@ -46,6 +37,15 @@ jobs:
           title: Code Coverage
           min-coverage-overall: 0
           min-coverage-changed-files: 0
+
+      - name: JUnit Test Report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: JUnit Tests
+          path: marrakech-arquitectura/target/surefire-reports/*.xml
+          reporter: java-junit
+          fail-on-error: true
 
       - name: Upload JaCoCo report
         uses: actions/upload-artifact@v4
