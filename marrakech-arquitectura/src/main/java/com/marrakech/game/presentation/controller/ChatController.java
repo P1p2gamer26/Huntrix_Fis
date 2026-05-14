@@ -12,6 +12,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class ChatController {
 
     private final VBox chatBox;
@@ -53,8 +56,7 @@ public class ChatController {
 
     public void cargarNuevos() {
         if (chatSvc == null) return;
-        java.util.List<Mensaje> nuevos = chatSvc.getChatRepo()
-            .obtenerMensajes(partidaId, chatSvc.getUltimoMensajeId());
+        java.util.List<Mensaje> nuevos = chatSvc.obtenerMensajesDesde(chatSvc.getUltimoMensajeId());
         for (Mensaje m : nuevos) {
             if (!m.usuario.equals(usuarioActual)) agregarBurbuja(m);
             chatSvc.setUltimoMensajeId(m.id);
@@ -70,8 +72,8 @@ public class ChatController {
         chatSvc.enviar(texto);
 
         new Thread(() -> {
-            int nuevoId = chatSvc.getChatRepo().obtenerUltimoId(partidaId);
-            String hora = new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date());
+            int nuevoId = chatSvc.obtenerUltimoIdMensaje();
+            String hora = new SimpleDateFormat("HH:mm").format(new Date());
             Mensaje m = new Mensaje(nuevoId, usuarioActual, texto, hora);
             Platform.runLater(() -> {
                 chatSvc.setUltimoMensajeId(nuevoId);

@@ -1,6 +1,6 @@
 package com.marrakech.game.presentation.controller;
 
-import com.marrakech.game.service.AssamNavigator;
+import com.marrakech.game.service.AssamServicio;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -11,13 +11,13 @@ import javafx.util.Duration;
 
 public class AssamController {
 
+    private final AssamServicio assamSvc;
     private final ImageView assamView;
     private final GridPane boardGrid;
     private final Image[] assamImages = new Image[4];
 
-    private int assamX = 3, assamY = 3, assamDir = 0;
-
-    public AssamController(GridPane boardGrid) {
+    public AssamController(AssamServicio assamSvc, GridPane boardGrid) {
+        this.assamSvc = assamSvc;
         this.boardGrid = boardGrid;
         this.assamView = crearImageView();
     }
@@ -41,22 +41,22 @@ public class AssamController {
         ImageView iv = new ImageView(imgInicial);
         iv.setFitWidth(50); iv.setFitHeight(58);
         iv.setMouseTransparent(true);
-        boardGrid.add(iv, assamX, assamY);
+        boardGrid.add(iv, assamSvc.getX(), assamSvc.getY());
         return iv;
     }
 
     public void rotarIzquierda() {
-        assamDir = (assamDir + 3) % 4;
-        setImage(assamDir);
+        assamSvc.rotarIzquierda();
+        setImage(assamSvc.getDir());
     }
 
     public void rotarDerecha() {
-        assamDir = (assamDir + 1) % 4;
-        setImage(assamDir);
+        assamSvc.rotarDerecha();
+        setImage(assamSvc.getDir());
     }
 
-    public void setDir(int dir) { this.assamDir = dir; }
-    public void setPosition(int x, int y) { this.assamX = x; this.assamY = y; }
+    public void setDir(int dir) { assamSvc.setDir(dir); }
+    public void setPosition(int x, int y) { assamSvc.setPosition(x, y); }
 
     public void setImage(int dir) {
         if (assamImages[dir] != null) {
@@ -68,15 +68,16 @@ public class AssamController {
     }
 
     public void animarMovimiento(int pasos, Runnable onFinished) {
-        int[][] path = AssamNavigator.computePath(pasos, assamX, assamY, assamDir);
+        int[][] path = assamSvc.computePath(pasos);
         Timeline anim = new Timeline();
         for (int p = 1; p <= pasos; p++) {
             final int px = path[p][0], py = path[p][1], pd = path[p][2];
             anim.getKeyFrames().add(new KeyFrame(Duration.millis(p * 280L), e -> {
-                assamX = px; assamY = py; assamDir = pd;
-                GridPane.setColumnIndex(assamView, assamX);
-                GridPane.setRowIndex(assamView, assamY);
-                setImage(assamDir);
+                assamSvc.setPosition(px, py);
+                assamSvc.setDir(pd);
+                GridPane.setColumnIndex(assamView, assamSvc.getX());
+                GridPane.setRowIndex(assamView, assamSvc.getY());
+                setImage(assamSvc.getDir());
                 assamView.toFront();
             }));
         }
@@ -85,14 +86,15 @@ public class AssamController {
     }
 
     public void actualizarPosicionEnGrid() {
-        GridPane.setColumnIndex(assamView, assamX);
-        GridPane.setRowIndex(assamView, assamY);
-        setImage(assamDir);
+        GridPane.setColumnIndex(assamView, assamSvc.getX());
+        GridPane.setRowIndex(assamView, assamSvc.getY());
+        setImage(assamSvc.getDir());
         assamView.toFront();
     }
 
     public ImageView getView() { return assamView; }
-    public int getX() { return assamX; }
-    public int getY() { return assamY; }
-    public int getDir() { return assamDir; }
+    public int getX() { return assamSvc.getX(); }
+    public int getY() { return assamSvc.getY(); }
+    public int getDir() { return assamSvc.getDir(); }
+    public AssamServicio getAssamSvc() { return assamSvc; }
 }

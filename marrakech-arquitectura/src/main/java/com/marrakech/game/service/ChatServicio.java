@@ -69,9 +69,16 @@ public class ChatServicio {
         if (chatTimeline != null) { chatTimeline.stop(); chatTimeline = null; }
     }
 
+    public List<Mensaje> obtenerMensajesDesde(int ultimoId) {
+        return chatRepo.obtenerMensajes(partidaId, ultimoId);
+    }
+
+    public int obtenerUltimoIdMensaje() {
+        return chatRepo.obtenerUltimoId(partidaId);
+    }
+
     // ── Getters ───────────────────────────────────────────────────────────────
 
-    public IChatRepositorio getChatRepo()      { return chatRepo; }
     public String getPartidaId()               { return partidaId; }
     public String getUsuarioActual()           { return usuarioActual; }
     public int    getUltimoMensajeId()         { return ultimoMensajeId; }
