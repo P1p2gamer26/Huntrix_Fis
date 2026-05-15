@@ -1,0 +1,294 @@
+[33mcommit 5de4cd500fa1439792a6f276b9c975f9d22eefa1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfix[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/fix[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mfixes[m[33m)[m
+Author: Julian felipe Africano <africanojulian@gmail.com>
+Date:   Tue Apr 7 11:25:45 2026 -0500
+
+    TODO ha sido unido
+    
+    * ahora organice todo teniendo en cuenta el diagrama de paquetes
+    
+    * se aplico logica de dinero, logica de movimiento, se agregaron las alfombras como imagenes pero aun podemos hacer que queden mas bonitas
+    
+    * Creacion pantallas inicio de sesion y crear sesion, falta decoracion y mas pantallas
+    
+    * se agrego a las pantallas de inicio y registrar los botones, tipografia, imagenes :D, esta listo para conectar a base de datos
+    
+    * Pantallas nuevas: menu principal, configuracion y reglas :D
+    
+    * se agregan pantallas de unirse y crear, incluye ranking mensual, falta funcionamiento
+    
+    * ya se pueden abrir varias terminales para lanzar varios juegos, se agrego boton de refrescar para ver las nuevas partidas creadasy se dejan las bases para la base de datos en h2
+    
+    * Se crearon las clases movimiento y ranking para la base de datos
+    
+    * Se creo un archivo "database.sl" donde se agregaron las tablas SQL para la persistencia del juego
+    
+    * Se creo un metodo para inicializar la base de datos y que las tablas se puedan crear
+    
+    * Se llama al método en el main creado anteriormente en la clase DatabaseConnection para inicializar las tablas al iniciar la partida.
+    
+    * Se creó JugadorRepository y PartidaRepository para el registro de usuarios y la recuperacion de partidas cuando ocurra alguna salida en medio de esta.
+    
+    * Se creó EstadoPartidaRepository para guardar por cada turno que se haga el tablero completo junto con todas sus características principales para restaurarlo en caso de que se salga de la partida.
+    
+    * Se creó ParticipacionRepository para guardar el estado de las características de cada jugador en una partida.
+    
+    * Se creó EstadisticasRepository para guardar los datos de los jugadores en el ranking y ver los resultados finales.
+    
+    * Guardando cambios de conexion antes de traer screens
+    
+    * funciona el log in
+    
+    * okey, funciona el log in pero ehhh pa jugar los dos al tiempo esta medio chistoso
+    
+    * cree pantalla perfil con los datos :D
+    
+    * se agrego la funcion para cargar imagenes en la foto de perfil
+    
+    * Corrección tipo de dato
+    
+    * Corrección DB
+    
+    * intento de ruleset
+    
+    * Guardando cambios de DB antes del merge
+    
+    * Fix: CREATE TABLE IF NOT EXISTS para evitar error al relanzar la app
+    
+    * Perfect state: cleaned up develop by adding comprehensive .gitignore and removing build artifacts
+    
+    ---------
+    
+    Co-authored-by: Juliana Aguirre <terceroapilar78@gmail.com>
+    Co-authored-by: Danc690 <danielcamiloced@gmail.com>
+
+[33mcommit cc90ed763f942033ec51d39a26278540f6e83d0e[m
+Author: Julian felipe Africano <africanojulian@gmail.com>
+Date:   Tue Apr 7 11:22:04 2026 -0500
+
+    Develop (#13)
+    
+    * ahora organice todo teniendo en cuenta el diagrama de paquetes
+    
+    * se aplico logica de dinero, logica de movimiento, se agregaron las alfombras como imagenes pero aun podemos hacer que queden mas bonitas
+    
+    * Creacion pantallas inicio de sesion y crear sesion, falta decoracion y mas pantallas
+    
+    * se agrego a las pantallas de inicio y registrar los botones, tipografia, imagenes :D, esta listo para conectar a base de datos
+    
+    * Pantallas nuevas: menu principal, configuracion y reglas :D
+    
+    * se agregan pantallas de unirse y crear, incluye ranking mensual, falta funcionamiento
+    
+    * ya se pueden abrir varias terminales para lanzar varios juegos, se agrego boton de refrescar para ver las nuevas partidas creadasy se dejan las bases para la base de datos en h2
+    
+    * Se crearon las clases movimiento y ranking para la base de datos
+    
+    * Se creo un archivo "database.sl" donde se agregaron las tablas SQL para la persistencia del juego
+    
+    * Se creo un metodo para inicializar la base de datos y que las tablas se puedan crear
+    
+    * Se llama al método en el main creado anteriormente en la clase DatabaseConnection para inicializar las tablas al iniciar la partida.
+    
+    * Se creó JugadorRepository y PartidaRepository para el registro de usuarios y la recuperacion de partidas cuando ocurra alguna salida en medio de esta.
+    
+    * Se creó EstadoPartidaRepository para guardar por cada turno que se haga el tablero completo junto con todas sus características principales para restaurarlo en caso de que se salga de la partida.
+    
+    * Se creó ParticipacionRepository para guardar el estado de las características de cada jugador en una partida.
+    
+    * Se creó EstadisticasRepository para guardar los datos de los jugadores en el ranking y ver los resultados finales.
+    
+    * Guardando cambios de conexion antes de traer screens
+    
+    * funciona el log in
+    
+    * okey, funciona el log in pero ehhh pa jugar los dos al tiempo esta medio chistoso
+    
+    * cree pantalla perfil con los datos :D
+    
+    * se agrego la funcion para cargar imagenes en la foto de perfil
+    
+    * Corrección tipo de dato
+    
+    * Corrección DB
+    
+    * intento de ruleset
+    
+    * Guardando cambios de DB antes del merge
+    
+    * Fix: CREATE TABLE IF NOT EXISTS para evitar error al relanzar la app
+    
+    * Perfect state: cleaned up develop by adding comprehensive .gitignore and removing build artifacts
+    
+    ---------
+    
+    Co-authored-by: Juliana Aguirre <terceroapilar78@gmail.com>
+    Co-authored-by: Danc690 <danielcamiloced@gmail.com>
+
+[33mcommit ba263a015224e4a2177322d83aa7ab4b90bae78e[m
+Author: Julian felipe Africano <africanojulian@gmail.com>
+Date:   Tue Apr 7 10:44:33 2026 -0500
+
+    Develop (#12)
+    
+    * ahora organice todo teniendo en cuenta el diagrama de paquetes
+    
+    * se aplico logica de dinero, logica de movimiento, se agregaron las alfombras como imagenes pero aun podemos hacer que queden mas bonitas
+    
+    * Creacion pantallas inicio de sesion y crear sesion, falta decoracion y mas pantallas
+    
+    * se agrego a las pantallas de inicio y registrar los botones, tipografia, imagenes :D, esta listo para conectar a base de datos
+    
+    * Pantallas nuevas: menu principal, configuracion y reglas :D
+    
+    * se agregan pantallas de unirse y crear, incluye ranking mensual, falta funcionamiento
+    
+    * ya se pueden abrir varias terminales para lanzar varios juegos, se agrego boton de refrescar para ver las nuevas partidas creadasy se dejan las bases para la base de datos en h2
+    
+    * Se crearon las clases movimiento y ranking para la base de datos
+    
+    * Se creo un archivo "database.sl" donde se agregaron las tablas SQL para la persistencia del juego
+    
+    * Se creo un metodo para inicializar la base de datos y que las tablas se puedan crear
+    
+    * Se llama al método en el main creado anteriormente en la clase DatabaseConnection para inicializar las tablas al iniciar la partida.
+    
+    * Se creó JugadorRepository y PartidaRepository para el registro de usuarios y la recuperacion de partidas cuando ocurra alguna salida en medio de esta.
+    
+    * Se creó EstadoPartidaRepository para guardar por cada turno que se haga el tablero completo junto con todas sus características principales para restaurarlo en caso de que se salga de la partida.
+    
+    * Se creó ParticipacionRepository para guardar el estado de las características de cada jugador en una partida.
+    
+    * Se creó EstadisticasRepository para guardar los datos de los jugadores en el ranking y ver los resultados finales.
+    
+    * Guardando cambios de conexion antes de traer screens
+    
+    * funciona el log in
+    
+    * okey, funciona el log in pero ehhh pa jugar los dos al tiempo esta medio chistoso
+    
+    * cree pantalla perfil con los datos :D
+    
+    * se agrego la funcion para cargar imagenes en la foto de perfil
+    
+    * Corrección tipo de dato
+    
+    * Corrección DB
+    
+    * intento de ruleset
+    
+    * Guardando cambios de DB antes del merge
+    
+    ---------
+    
+    Co-authored-by: Juliana Aguirre <terceroapilar78@gmail.com>
+    Co-authored-by: Danc690 <danielcamiloced@gmail.com>
+
+[33mcommit 82ab982043580dca10cdd25f2e2dac4fb8eb7836[m
+Author: P1p2gamer26 <africanojulian@gmail.com>
+Date:   Mon Apr 6 09:31:48 2026 -0500
+
+    intentando probar ruleset
+
+[33mcommit 62f58cc7eacb475513ec5c250c68132b206ffd38[m
+Author: P1p2gamer26 <africanojulian@gmail.com>
+Date:   Mon Apr 6 09:30:14 2026 -0500
+
+    intentando probar ruleset
+
+[33mcommit f8a7db91bd71345f485aed5a2ab5647c0a71f855[m
+Author: diego melgarejo <42050886+diegui200@users.noreply.github.com>
+Date:   Sun Apr 5 17:51:58 2026 -0500
+
+    Delete marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/game/wewew
+
+[33mcommit d5c4facadbc9a69b2dd8d70cae702aa94dda5604[m
+Author: diego melgarejo <42050886+diegui200@users.noreply.github.com>
+Date:   Sun Apr 5 17:51:36 2026 -0500
+
+    Add files via upload
+    
+    primera versión del juego
+
+[33mcommit c656968e9908e5ed71dd7ebf2b9a090736c5c9bf[m
+Author: diego melgarejo <42050886+diegui200@users.noreply.github.com>
+Date:   Sun Apr 5 17:50:26 2026 -0500
+
+    Create wewew
+
+[33mcommit 9eef14be41690ed7a34e951d7eb42114ec767ae6[m
+Author: diego melgarejo <42050886+diegui200@users.noreply.github.com>
+Date:   Sun Apr 5 17:49:37 2026 -0500
+
+    Delete marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/game/weeww
+
+[33mcommit f69b34ec5f0a7c5fddf7c6191e040d699c520124[m
+Author: diego melgarejo <42050886+diegui200@users.noreply.github.com>
+Date:   Sun Apr 5 17:49:26 2026 -0500
+
+    Create weeww
+
+[33mcommit e1918d72618367424877c63138dc400fd28c0368[m
+Author: diego melgarejo <42050886+diegui200@users.noreply.github.com>
+Date:   Sun Apr 5 17:48:36 2026 -0500
+
+    Delete marrakech-arquitectura/src/main/java/com/marrakech/game/domain/models/Game
+
+[33mcommit 10c07763f039a41db90522c8f67309f6e5b1c825[m
+Author: diego melgarejo <42050886+diegui200@users.noreply.github.com>
+Date:   Sun Apr 5 17:48:09 2026 -0500
+
+    Create Game
+
+[33mcommit 480561a1c885ee488f50adfbdc0249dbda497593[m
+Author: Danc690 <danielcamiloced@gmail.com>
+Date:   Mon Mar 30 18:56:05 2026 -0500
+
+    Se creó la clase DatabaseConecction para la conexión a la base de datos H2
+
+[33mcommit 983411933ac52d33182016e7b2dc7ab4299a2bdf[m[33m ([m[1;32mmain[m[33m)[m
+Author: Juliana Aguirre <terceroapilar78@gmail.com>
+Date:   Thu Mar 19 12:59:41 2026 -0500
+
+    Actualizo README del proyecto, puede ser modificado durante el desarrollo del proyecto
+
+[33mcommit 0b12c6674d0469c14e9102e38359a398b12426e3[m
+Author: Juliana Aguirre <terceroapilar78@gmail.com>
+Date:   Thu Mar 19 12:16:20 2026 -0500
+
+    pongo algunas imagenes para el tablero del juego, las lafombras, el assam en diferentes posiciones y demas recusos 19/03/2026 -juliana aguirre
+
+[33mcommit bcd71fca6373d02f950b34e77590991443708fae[m
+Merge: 23e5691 8d5ca97
+Author: Julian felipe Africano <africanojulian@gmail.com>
+Date:   Fri Mar 13 10:00:07 2026 -0500
+
+    Merge pull request #1 from P1p2gamer26/develop
+    
+    Migración del juego a nueva arquitectura
+    todo esto es lo que tenemos
+
+[33mcommit 8d5ca9798b8a275035130c2ba8bda3e2111e3ecf[m
+Author: P1p2gamer26 <africanojulian@gmail.com>
+Date:   Fri Mar 13 09:57:39 2026 -0500
+
+    Migración del juego a nueva arquitectura DDD con Maven
+
+[33mcommit 23e5691ae789e1c2376be6b17d9cca7aeee100f7[m
+Author: P1p2gamer26 <africanojulian@gmail.com>
+Date:   Thu Feb 26 21:26:46 2026 -0500
+
+    mi primer commit,Nombres readme
+
+[33mcommit b8c32a7b0629ed4131be8594a5f19b448b36f572[m
+Author: Julian felipe Africano <africanojulian@gmail.com>
+Date:   Thu Feb 26 15:48:16 2026 -0500
+
+    Create .gitignore with standard exclusions
+    
+    Add common file types and directories to .gitignore
+
+[33mcommit b8f9c44b623e425d0cefb0b5dc0f0ffdc32c475f[m
+Author: Julian felipe Africano <africanojulian@gmail.com>
+Date:   Thu Feb 26 15:41:46 2026 -0500
+
+    Initial commit
