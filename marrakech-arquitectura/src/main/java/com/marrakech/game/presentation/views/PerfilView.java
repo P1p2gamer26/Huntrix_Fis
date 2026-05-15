@@ -1,6 +1,6 @@
 package com.marrakech.game.presentation.views;
 
-import com.marrakech.game.infrastructure.persistence.JugadorRepository;
+import com.marrakech.game.service.AuthServicio;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -26,7 +26,7 @@ public class PerfilView extends StackPane {
 
     private Button btnVolver;
     private StackPane avatarContainer;
-    private final JugadorRepository jugadorRepo = new JugadorRepository();
+    private final AuthServicio authServicio;
 
     private final String nombreUsuario;
     private final String correo;
@@ -35,12 +35,13 @@ public class PerfilView extends StackPane {
     private final int    victorias;
 
     public PerfilView(String nombreUsuario, String correo, String estado,
-                      String fechaRegistro, int victorias) {
+                      String fechaRegistro, int victorias, AuthServicio authServicio) {
         this.nombreUsuario = nombreUsuario;
         this.correo        = correo;
         this.estado        = estado;
         this.fechaRegistro = fechaRegistro;
         this.victorias     = victorias;
+        this.authServicio  = authServicio;
         configurarFondo();
         configurarContenido();
     }
@@ -131,7 +132,7 @@ public class PerfilView extends StackPane {
         avatarContainer.getChildren().clear();
         avatarContainer.getChildren().add(circulo);
 
-        byte[] fotoBytes = jugadorRepo.getFoto(nombreUsuario);
+        byte[] fotoBytes = authServicio.getFoto(nombreUsuario);
         if (fotoBytes != null && fotoBytes.length > 0) {
             Image img = new Image(new ByteArrayInputStream(fotoBytes));
             ImageView iv = new ImageView(img);
@@ -158,7 +159,7 @@ public class PerfilView extends StackPane {
         File archivo = fc.showOpenDialog(ventana);
 
         if (archivo != null) {
-            boolean ok = jugadorRepo.guardarFoto(nombreUsuario, archivo);
+            boolean ok = authServicio.guardarFoto(nombreUsuario, archivo);
             if (ok) {
                 Circle circulo = new Circle(48);
                 circulo.setFill(Color.web("#1A0800"));

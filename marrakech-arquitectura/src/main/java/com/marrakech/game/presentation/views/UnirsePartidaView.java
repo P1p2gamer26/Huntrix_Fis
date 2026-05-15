@@ -3,8 +3,8 @@ package com.marrakech.game.presentation.views;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.marrakech.game.infrastructure.PartidaRepository;
-import com.marrakech.game.infrastructure.PartidaRepository.Partida;
+import com.marrakech.game.repository.PartidaRepositorio.Partida;
+import com.marrakech.game.service.PartidaServicio;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,8 +35,10 @@ public class UnirsePartidaView extends StackPane {
     private Consumer<String> onUnirse;
     private Runnable onVolver;
     private VBox contenedorLista;
+    private final PartidaServicio partidaSvc;
 
-    public UnirsePartidaView() {
+    public UnirsePartidaView(PartidaServicio partidaSvc) {
+        this.partidaSvc = partidaSvc;
         configurarFondo();
         configurarContenido();
     }
@@ -142,7 +144,7 @@ public class UnirsePartidaView extends StackPane {
 
     private void actualizarLista() {
         contenedorLista.getChildren().clear();
-        List<Partida> partidas = PartidaRepository.listarPartidas();
+        List<Partida> partidas = partidaSvc.listarPartidas();
 
         if (partidas.isEmpty()) {
             Label vacia = new Label("No hay partidas disponibles. ¡Crea una!");

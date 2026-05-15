@@ -21,6 +21,7 @@ public class WelcomeView extends StackPane {
 
     private Button btnCrearCuenta;
     private Button btnYaTengoCuenta;
+    private Button btnSalir;
 
     public WelcomeView() {
         configurarFondo();
@@ -40,7 +41,6 @@ public class WelcomeView extends StackPane {
         );
         setBackground(new Background(bgImage));
 
-        // Overlay oscuro
         Pane overlay = new Pane();
         overlay.setStyle("-fx-background-color: rgba(0,0,0,0.55);");
         overlay.prefWidthProperty().bind(widthProperty());
@@ -53,7 +53,6 @@ public class WelcomeView extends StackPane {
         contenido.setAlignment(Pos.CENTER);
         contenido.setMaxWidth(380);
 
-        // Título
         Text titulo = new Text("ACCESO");
         titulo.setFont(Font.font("Georgia", FontWeight.BOLD, 64));
         titulo.setFill(Color.web("#D4A017"));
@@ -64,13 +63,43 @@ public class WelcomeView extends StackPane {
         sombra.setOffsetY(4);
         titulo.setEffect(sombra);
 
-        // Botón principal (relleno dorado)
         btnCrearCuenta = crearBotonRelleno("CREAR NUEVA CUENTA");
-
-        // Botón secundario (solo borde)
         btnYaTengoCuenta = crearBotonContorno("YA TENGO CUENTA");
 
-        contenido.getChildren().addAll(titulo, btnCrearCuenta, btnYaTengoCuenta);
+        VBox sep = new VBox(4);
+        sep.setAlignment(Pos.CENTER);
+        Text linea = new Text("──────────────");
+        linea.setFill(Color.web("#5C3A10"));
+        linea.setFont(Font.font(12));
+        sep.getChildren().add(linea);
+
+        btnSalir = crearBotonContorno("SALIR");
+        btnSalir.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-text-fill: #885533;" +
+            "-fx-border-color: #5C3A10;" +
+            "-fx-border-width: 1.5;" +
+            "-fx-border-radius: 3;" +
+            "-fx-background-radius: 3;" +
+            "-fx-cursor: hand;");
+        btnSalir.setOnMouseEntered(e -> btnSalir.setStyle(
+            "-fx-background-color: rgba(100,40,20,0.2);" +
+            "-fx-text-fill: #AA6655;" +
+            "-fx-border-color: #885533;" +
+            "-fx-border-width: 1.5;" +
+            "-fx-border-radius: 3;" +
+            "-fx-background-radius: 3;" +
+            "-fx-cursor: hand;"));
+        btnSalir.setOnMouseExited(e -> btnSalir.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-text-fill: #885533;" +
+            "-fx-border-color: #5C3A10;" +
+            "-fx-border-width: 1.5;" +
+            "-fx-border-radius: 3;" +
+            "-fx-background-radius: 3;" +
+            "-fx-cursor: hand;"));
+
+        contenido.getChildren().addAll(titulo, btnCrearCuenta, btnYaTengoCuenta, sep, btnSalir);
         getChildren().add(contenido);
     }
 
@@ -130,4 +159,5 @@ public class WelcomeView extends StackPane {
 
     public Button getBtnCrearCuenta()    { return btnCrearCuenta; }
     public Button getBtnYaTengoCuenta()  { return btnYaTengoCuenta; }
+    public Button getBtnSalir()          { return btnSalir; }
 }

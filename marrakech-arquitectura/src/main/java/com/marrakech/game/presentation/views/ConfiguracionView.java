@@ -1,6 +1,6 @@
 package com.marrakech.game.presentation.views;
 
-import com.marrakech.game.presentation.MusicaManager;
+import com.marrakech.game.infrastructure.audio.MusicaManager;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

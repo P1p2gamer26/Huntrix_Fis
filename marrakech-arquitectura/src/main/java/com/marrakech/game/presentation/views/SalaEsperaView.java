@@ -1,7 +1,7 @@
 package com.marrakech.game.presentation.views;
 
-import com.marrakech.game.infrastructure.PartidaRepository;
-import com.marrakech.game.infrastructure.PartidaRepository.Partida;
+import com.marrakech.game.repository.PartidaRepositorio.Partida;
+import com.marrakech.game.service.PartidaServicio;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -29,16 +29,19 @@ public class SalaEsperaView extends StackPane {
     private boolean  juegoYaIniciado = false;
     private final String[] colores = {"#e74c3c","#3498db","#2ecc71","#f39c12"};
 
-    public SalaEsperaView(Partida partida, boolean esHost) {
-        this.partida = partida;
-        this.esHost  = esHost;
+    private PartidaServicio partidaSvc;
+
+    public SalaEsperaView(Partida partida, boolean esHost, PartidaServicio partidaSvc) {
+        this.partida    = partida;
+        this.esHost     = esHost;
+        this.partidaSvc = partidaSvc;
         configurarFondo();
         configurarContenido();
         // Arrancar polling después de que AuthController registre los callbacks
         Platform.runLater(this::iniciarPolling);
     }
 
-    public SalaEsperaView(Partida partida) { this(partida, true); }
+    public SalaEsperaView(Partida partida, PartidaServicio svc) { this(partida, true, svc); }
 
     private void configurarFondo() {
         try {
@@ -118,7 +121,7 @@ public class SalaEsperaView extends StackPane {
     private void iniciarPolling() {
         pollingTimeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
             new Thread(() -> {
-                Partida actualizada = PartidaRepository.obtenerPartida(partida.id);
+                Partida actualizada = partidaSvc.obtenerPartida(partida.id);
                 if (actualizada == null) return;
                 this.partida = actualizada;
                 Platform.runLater(() -> {
