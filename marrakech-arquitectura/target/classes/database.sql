@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS Jugador(
     correo VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     fecha_registro TIMESTAMP NOT NULL,
-    estado VARCHAR(15)
+    estado VARCHAR(15),
+    foto BLOB,
+    sesion_activa BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS Estadisticas(
