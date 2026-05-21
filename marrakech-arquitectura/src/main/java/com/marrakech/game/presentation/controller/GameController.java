@@ -68,6 +68,7 @@ public class GameController {
     private AssamController   assamCtrl;
     private ChatController    chatCtrl;
     private FinJuegoController finJuegoCtrl;
+    private PoderesController  poderesCtrl;
 
     public void initialize() {}
 
@@ -129,6 +130,7 @@ public class GameController {
 
         assamCtrl    = new AssamController(assamSvc, boardGrid);
         chatCtrl     = new ChatController(chatBox, chatInput, chatScroll, chatPanel, usuarioActual);
+        poderesCtrl  = new PoderesController(juegoSvc, poderesActivados);
         finJuegoCtrl = new FinJuegoController(endScreen, gameScreen,
             resultadoLabel, winnerLabel, finalScores, btnVolverSala, btnVolverMenu,
             juegoSvc, chatSvc);
@@ -202,25 +204,7 @@ public class GameController {
         if (!juegoSvc.esMiTurno(modoMultijugador, miIndice)
             || juegoSvc.getCurrentPhase() != PHASE_MOVE) return;
 
-        // ── Brújula del Mercader: el jugador elige cuántos pasos (1-6) ────────
-        if (poderesActivados
-                && juegoSvc.tieneReliquia(juegoSvc.getCurrentPlayerIdx(), Reliquia.BRUJULA_MERCADER)) {
-
-            javafx.scene.control.ChoiceDialog<Integer> dialogo =
-                new javafx.scene.control.ChoiceDialog<>(1,
-                    java.util.List.of(1, 2, 3, 4, 5, 6));
-            dialogo.setTitle("🧭 Brújula del Mercader");
-            dialogo.setHeaderText("Elige cuántas casillas mover a Assam");
-            dialogo.setContentText("Pasos:");
-            dialogo.showAndWait().ifPresent(pasos -> {
-                juegoSvc.consumirReliquia(Reliquia.BRUJULA_MERCADER);
-                ejecutarMovimientoAssam(pasos);
-            });
-            return;
-        }
-
-        // ── Dado normal ───────────────────────────────────────────────────────
-        int pasos = new Random().nextInt(6) + 1;
+        int pasos = poderesCtrl.resolverDado();
         ejecutarMovimientoAssam(pasos);
     }
 
@@ -231,56 +215,24 @@ public class GameController {
 
         GameRenderEngine renderEngine = new GameRenderEngine(boardGrid, diceCanvas);
         renderEngine.animarDado(pasos, () -> {
-            // Calcular el path antes de que la animación mueva a Assam
+            // Guardar el path antes de que animarMovimiento actualice la posición de Assam
             int[][] path = assamSvc.computePath(pasos);
 
             assamCtrl.animarMovimiento(pasos, () -> {
                 assamCtrl.getView().toFront();
                 int ax = assamSvc.getX(), ay = assamSvc.getY();
 
-                // ── Recoger reliquias en cada casilla del recorrido ──────────
-                if (poderesActivados) {
-                    Reliquia ultimaRecogida = null;
-                    for (int paso = 1; paso <= pasos; paso++) {
-                        Reliquia r = juegoSvc.intentarRecogerReliquia(path[paso][0], path[paso][1]);
-                        if (r != null) ultimaRecogida = r;
-                    }
-                    if (ultimaRecogida != null) {
-                        statusLabel.setText(ultimaRecogida.emoji + " ¡Recogiste: " + ultimaRecogida.nombre + "!");
-                        redibujarTablero();
-                        actualizarUI();
-                    }
+                // Recoger reliquias en cada casilla del recorrido (solo si poderes activos)
+                Reliquia recogida = poderesCtrl.recogerReliquiasEnRecorrido(path, pasos);
+                if (recogida != null) {
+                    statusLabel.setText(recogida.emoji + " ¡Recogiste: " + recogida.nombre + "!");
+                    redibujarTablero();
+                    actualizarUI();
                 }
 
-                // ── Pago (con posible descuento del Cáliz Dorado) ────────────
-                int pago = juegoSvc.aplicarPago(ax, ay);
-
-                if (pago > 0 && poderesActivados
-                        && juegoSvc.tieneReliquia(juegoSvc.getCurrentPlayerIdx(), Reliquia.CALIZ_DORADO)) {
-                    // Revertir pago completo y aplicar la mitad (sin decimales)
-                    int dueno = juegoSvc.getTileOwner()[ax][ay];
-                    int[] dinero = juegoSvc.getMoney();
-                    dinero[juegoSvc.getCurrentPlayerIdx()] += pago;   // devolver
-                    if (dueno > 0) dinero[dueno - 1] -= pago;          // revertir cobro
-
-                    int pagoMitad = pago / 2;                          // entero, sin redondear
-                    dinero[juegoSvc.getCurrentPlayerIdx()] =
-                        Math.max(0, dinero[juegoSvc.getCurrentPlayerIdx()] - pagoMitad);
-                    if (dueno > 0) dinero[dueno - 1] += pagoMitad;
-
-                    juegoSvc.consumirReliquia(Reliquia.CALIZ_DORADO);
-                    statusLabel.setText("🏆 Cáliz Dorado — pagas solo " + pagoMitad
-                        + " Dh en vez de " + pago + ". Coloca tu alfombra.");
-                } else if (pago > 0) {
-                    int dueno = juegoSvc.getTileOwner()[ax][ay];
-                    statusLabel.setText("Dado: " + pasos + " — Pagas " + pago
-                        + " Dh a " + playerName(dueno - 1) + ". Coloca tu alfombra.");
-                } else {
-                    statusLabel.setText("Dado: " + pasos + " — Haz click en una casilla adyacente.");
-                }
-
-                // ── Alfombra del Sultán: colocar dos alfombras este turno ────
-                // (se gestiona en pasarTurno; aquí solo avanzamos la fase)
+                // Pago, con posible intervención del Cáliz Dorado
+                String msgPago = poderesCtrl.resolverPago(ax, ay, pasos);
+                statusLabel.setText(msgPago);
 
                 int newPhase = juegoSvc.fasePostDado();
                 juegoSvc.setCurrentPhase(newPhase);
@@ -294,26 +246,18 @@ public class GameController {
     }
 
     private void pasarTurno() {
-        // ── Alfombra del Sultán: si el jugador actual la tiene, colocar 2ª alfombra ──
-        if (poderesActivados
-                && juegoSvc.tieneReliquia(juegoSvc.getCurrentPlayerIdx(), Reliquia.ALFOMBRA_SULTAN)
-                && juegoSvc.getCurrentPhase() == 1) {
-            // Aún quedan alfombras por colocar gracias al sultán: consumir y dar fase extra
-            juegoSvc.consumirReliquia(Reliquia.ALFOMBRA_SULTAN);
-            statusLabel.setText("✨ Alfombra del Sultán — ¡coloca una segunda alfombra!");
+        // Alfombra del Sultán: preguntar si la quiere usar
+        if (poderesCtrl.resolverSultan()) {
             tableroCtrl.actualizarContexto(1, juegoSvc.getCurrentPlayerIdx(),
                 assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
             actualizarUI(); actualizarControles();
             guardarEstado();
-            return; // no avanzar turno todavía
+            return;
         }
 
         juegoSvc.pasarTurno();
 
-        // ── Aparición aleatoria de reliquia al inicio del nuevo turno ─────────
-        if (poderesActivados) {
-            juegoSvc.intentarAparecerReliquia();
-        }
+        if (poderesActivados) juegoSvc.intentarAparecerReliquia();
 
         redibujarTablero();
         tableroCtrl.actualizarContexto(juegoSvc.getCurrentPhase(), juegoSvc.getCurrentPlayerIdx(),
