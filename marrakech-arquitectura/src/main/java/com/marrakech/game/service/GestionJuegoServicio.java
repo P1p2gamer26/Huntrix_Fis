@@ -2,7 +2,7 @@ package com.marrakech.game.service;
 
 public class GestionJuegoServicio {
 
-    public enum ResultadoTipo { INVALIDO, SIN_SEGUNDA_OPCION, ESPERA_SEGUNDA, ALFOMBRA_COLOCADA, JUEGO_TERMINADO }
+    public enum ResultadoTipo { INVALIDO, SIN_SEGUNDA_OPCION, ESPERA_SEGUNDA, ALFOMBRA_COLOCADA, JUEGO_TERMINADO, ALFOMBRA_COMPLETA }
 
     public static class ResultadoClick {
         public final ResultadoTipo tipo;
@@ -39,23 +39,26 @@ public class GestionJuegoServicio {
 
     public ResultadoClick procesarClick(int x, int y, int assamX, int assamY) {
         if (currentPhase == 1) {
-            boolean adj = JuegoServicio.esAdyacenteA(x, y, assamX, assamY);
+            boolean enRango = CarpetValidador.estaEnRango3x3(x, y, assamX, assamY);
             boolean noAssam = JuegoServicio.noEsAssam(x, y, assamX, assamY);
-            if (adj && noAssam && CarpetValidador.tiene2daOpcionValida(x, y, assamX, assamY)) {
+            if (enRango && noAssam && CarpetValidador.tiene2daOpcionValida(x, y, assamX, assamY)) {
                 firstCarpetX = x; firstCarpetY = y;
                 currentPhase = 2;
                 return new ResultadoClick(ResultadoTipo.ESPERA_SEGUNDA, x, y);
             }
-            if (adj && noAssam) return new ResultadoClick(ResultadoTipo.SIN_SEGUNDA_OPCION, -1, -1);
+            if (enRango && noAssam) return new ResultadoClick(ResultadoTipo.SIN_SEGUNDA_OPCION, -1, -1);
             return ResultadoClick.invalido();
         }
 
         if (currentPhase == 2 && firstCarpetX >= 0) {
-            boolean adj = JuegoServicio.esAlfombraAdyacente(firstCarpetX, firstCarpetY, x, y);
+            boolean adj     = JuegoServicio.esAlfombraAdyacente(firstCarpetX, firstCarpetY, x, y);
             boolean noAssam = JuegoServicio.noEsAssam(x, y, assamX, assamY);
-            boolean dentro = CarpetValidador.esCarpetValida(firstCarpetX, firstCarpetY, x, y);
+            boolean dentro  = CarpetValidador.esCarpetValida(firstCarpetX, firstCarpetY, x, y);
+            boolean noTapa  = CarpetValidador.noTapaAlfombraCompleta(
+                                firstCarpetX, firstCarpetY, x, y,
+                                currentPlayerIdx, tileOwner, carpetOrientation);
 
-            if (adj && noAssam && dentro) {
+            if (adj && noAssam && dentro && noTapa) {
                 int player = currentPlayerIdx + 1;
                 CarpetValidador.repararAlfombraAfectada(firstCarpetX, firstCarpetY, carpetOrientation);
                 CarpetValidador.repararAlfombraAfectada(x, y, carpetOrientation);
@@ -80,7 +83,11 @@ public class GestionJuegoServicio {
                     terminado ? ResultadoTipo.JUEGO_TERMINADO : ResultadoTipo.ALFOMBRA_COLOCADA,
                     -1, -1);
             }
-            return new ResultadoClick(ResultadoTipo.INVALIDO, -1, -1);
+
+            if (adj && noAssam && dentro && !noTapa)
+                return new ResultadoClick(ResultadoTipo.ALFOMBRA_COMPLETA, -1, -1);
+
+            return ResultadoClick.invalido();
         }
 
         return ResultadoClick.invalido();
@@ -172,7 +179,7 @@ public class GestionJuegoServicio {
         }
     }
 
-    // ── Getters ───────────────────────────────────────────────────────────────
+    // ── Getters / Setters ─────────────────────────────────────────────────────
 
     public int getNumPlayers() { return numPlayers; }
     public int[] getMoney() { return money; }

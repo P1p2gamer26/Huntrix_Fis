@@ -115,12 +115,11 @@ public class GameController {
         GameRenderEngine renderEngine = new GameRenderEngine(boardGrid, diceCanvas);
 
         tableroCtrl = new TableroController(boardGrid, renderEngine, juegoSvc);
-
         tableroCtrl.inicializar();
         tableroCtrl.limpiarHighlights();
 
-        assamCtrl = new AssamController(assamSvc, boardGrid);
-        chatCtrl = new ChatController(chatBox, chatInput, chatScroll, chatPanel, usuarioActual);
+        assamCtrl    = new AssamController(assamSvc, boardGrid);
+        chatCtrl     = new ChatController(chatBox, chatInput, chatScroll, chatPanel, usuarioActual);
         finJuegoCtrl = new FinJuegoController(endScreen, gameScreen,
             resultadoLabel, winnerLabel, finalScores, btnVolverSala, btnVolverMenu,
             juegoSvc, chatSvc);
@@ -131,6 +130,9 @@ public class GameController {
         tableroCtrl.setOnCarpetPlaced(() -> pasarTurno());
         tableroCtrl.setOnGameEnded(() -> finJuegoCtrl.mostrar(
             modoMultijugador, miIndice, usuarioActual));
+        tableroCtrl.setOnAlfombraCompleta(() ->
+            statusLabel.setText("¡No puedes tapar una alfombra completa! Elige otra casilla.")
+        );
 
         finJuegoCtrl.setOnVolverSala(onVolverSala);
         finJuegoCtrl.setOnVolverMenu(onVolverMenu);
@@ -302,9 +304,9 @@ public class GameController {
         VBox[]  pl = {panelJ1, panelJ2, panelJ3, panelJ4};
         String[] colors = {"#e74c3c","#3498db","#2ecc71","#f39c12"};
         int[] moneyArr = juegoSvc.getMoney();
-        int[] rugsArr = juegoSvc.getRugs();
+        int[] rugsArr  = juegoSvc.getRugs();
         int cpIdx = juegoSvc.getCurrentPlayerIdx();
-        int np = juegoSvc.getNumPlayers();
+        int np    = juegoSvc.getNumPlayers();
         for (int i = 0; i < np; i++) {
             if (rl[i] != null) rl[i].setText(String.valueOf(rugsArr[i]));
             if (ml[i] != null) ml[i].setText(moneyArr[i] + " Dh");

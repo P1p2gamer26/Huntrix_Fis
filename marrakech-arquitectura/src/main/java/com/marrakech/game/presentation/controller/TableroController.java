@@ -22,6 +22,7 @@ public class TableroController {
 
     private Runnable onCarpetPlaced;
     private Runnable onGameEnded;
+    private Runnable onAlfombraCompleta;
 
     public TableroController(GridPane boardGrid, GameRenderEngine renderEngine,
                               GestionJuegoServicio juegoSvc) {
@@ -32,6 +33,7 @@ public class TableroController {
 
     public void setOnCarpetPlaced(Runnable r) { this.onCarpetPlaced = r; }
     public void setOnGameEnded(Runnable r) { this.onGameEnded = r; }
+    public void setOnAlfombraCompleta(Runnable r) { this.onAlfombraCompleta = r; }
 
     public void actualizarContexto(int phase, int playerIdx,
                                     int ax, int ay, int[] rugs) {
@@ -81,6 +83,11 @@ public class TableroController {
                 break;
             case JUEGO_TERMINADO:
                 if (onGameEnded != null) onGameEnded.run();
+                break;
+            case ALFOMBRA_COMPLETA:
+                juegoSvc.setCurrentPhase(1);
+                limpiarHighlights();
+                if (onAlfombraCompleta != null) onAlfombraCompleta.run();
                 break;
             default:
                 break;
