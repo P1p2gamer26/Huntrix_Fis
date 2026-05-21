@@ -2,6 +2,126 @@ package com.marrakech.game.service;
 
 public class GestionJuegoServicio {
 
+    // ── Reliquias ─────────────────────────────────────────────────────────────
+
+    /** Identificadores de cada reliquia. */
+    public enum Reliquia {
+        CALIZ_DORADO     ("🏆", "Cáliz Dorado"),
+        BRUJULA_MERCADER ("🧭", "Brújula del Mercader"),
+        ALFOMBRA_SULTAN  ("✨", "Alfombra del Sultán");
+
+        public final String emoji;
+        public final String nombre;
+        Reliquia(String emoji, String nombre) { this.emoji = emoji; this.nombre = nombre; }
+    }
+
+    /** Máximo de veces que puede aparecer cada reliquia en una partida. */
+    private static final int MAX_APARICIONES = 3;
+
+    /** Cuántas veces ha aparecido cada reliquia (índice = ordinal de Reliquia). */
+    private final int[] aparicionesReliquia = new int[Reliquia.values().length];
+
+    /** Posición de cada reliquia en el tablero: [reliquia][0]=col, [1]=row, -1 si no está. */
+    private final int[][] posicionReliquia = new int[Reliquia.values().length][2];
+
+    /** Inventario de reliquias por jugador: inventarioReliquias[jugador][reliquia] = true si la tiene. */
+    private boolean[][] inventarioReliquias;
+
+    private final java.util.Random rng = new java.util.Random();
+
+    private void inicializarReliquias() {
+        for (int i = 0; i < Reliquia.values().length; i++) {
+            aparicionesReliquia[i] = 0;
+            posicionReliquia[i][0] = -1;
+            posicionReliquia[i][1] = -1;
+        }
+        inventarioReliquias = new boolean[numPlayers][Reliquia.values().length];
+    }
+
+    /**
+     * Intenta hacer aparecer una reliquia aleatoria en el tablero.
+     * Se llama al inicio de cada turno si los poderes están activados.
+     * Solo aparece si: no está ya en el tablero, no ha llegado a MAX_APARICIONES,
+     * y la probabilidad aleatoria lo permite (33% por turno).
+     */
+    public void intentarAparecerReliquia() {
+        if (rng.nextInt(3) != 0) return; // 33% de probabilidad por turno
+
+        Reliquia[] todas = Reliquia.values();
+        // Barajar para no favorecer siempre la primera
+        int[] orden = {0, 1, 2};
+        for (int i = 2; i > 0; i--) {
+            int j = rng.nextInt(i + 1);
+            int tmp = orden[i]; orden[i] = orden[j]; orden[j] = tmp;
+        }
+
+        for (int idx : orden) {
+            if (posicionReliquia[idx][0] != -1) continue;      // ya está en tablero
+            if (aparicionesReliquia[idx] >= MAX_APARICIONES) continue; // agotada
+
+            // Buscar casilla libre al azar (máximo 20 intentos)
+            for (int intento = 0; intento < 20; intento++) {
+                int c = rng.nextInt(7), r = rng.nextInt(7);
+                // Verificar que no hay otra reliquia ya en esa casilla
+                boolean ocupada = false;
+                for (int otra = 0; otra < Reliquia.values().length; otra++) {
+                    if (posicionReliquia[otra][0] == c && posicionReliquia[otra][1] == r) {
+                        ocupada = true;
+                        break;
+                    }
+                }
+                if (ocupada) continue;
+                posicionReliquia[idx][0] = c;
+                posicionReliquia[idx][1] = r;
+                aparicionesReliquia[idx]++;
+                return;
+            }
+        }
+    }
+
+    /**
+     * Comprueba si Assam está sobre una reliquia y la recoge si el jugador
+     * no la tiene ya. Devuelve la reliquia recogida o null.
+     */
+    public Reliquia intentarRecogerReliquia(int assamX, int assamY) {
+        Reliquia[] todas = Reliquia.values();
+        for (int idx = 0; idx < todas.length; idx++) {
+            if (posicionReliquia[idx][0] == assamX && posicionReliquia[idx][1] == assamY) {
+                if (!inventarioReliquias[currentPlayerIdx][idx]) {
+                    inventarioReliquias[currentPlayerIdx][idx] = true;
+                    posicionReliquia[idx][0] = -1;
+                    posicionReliquia[idx][1] = -1;
+                    return todas[idx];
+                }
+                // Jugador ya la tiene, la reliquia se queda en el tablero
+            }
+        }
+        return null;
+    }
+
+    /** Devuelve true si el jugador tiene la reliquia indicada. */
+    public boolean tieneReliquia(int jugadorIdx, Reliquia r) {
+        if (inventarioReliquias == null) return false;
+        return inventarioReliquias[jugadorIdx][r.ordinal()];
+    }
+
+    /** Consume (elimina del inventario) una reliquia del jugador actual. */
+    public void consumirReliquia(Reliquia r) {
+        if (inventarioReliquias != null)
+            inventarioReliquias[currentPlayerIdx][r.ordinal()] = false;
+    }
+
+    /** Posición actual de una reliquia en el tablero ({col,row} o {-1,-1} si no está). */
+    public int[] getPosicionReliquia(Reliquia r) { return posicionReliquia[r.ordinal()]; }
+
+    /** Inventario completo de un jugador (array de boolean por ordinal de Reliquia). */
+    public boolean[] getInventarioJugador(int jugadorIdx) {
+        if (inventarioReliquias == null) return new boolean[Reliquia.values().length];
+        return inventarioReliquias[jugadorIdx];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
     public enum ResultadoTipo { INVALIDO, SIN_SEGUNDA_OPCION, ESPERA_SEGUNDA, ALFOMBRA_COLOCADA, JUEGO_TERMINADO, ALFOMBRA_COMPLETA }
 
     public static class ResultadoClick {
@@ -35,6 +155,7 @@ public class GestionJuegoServicio {
         currentPlayerIdx = 0;
         currentPhase = 0;
         firstCarpetX = -1; firstCarpetY = -1;
+        inicializarReliquias();
     }
 
     public ResultadoClick procesarClick(int x, int y, int assamX, int assamY) {

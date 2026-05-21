@@ -3,6 +3,7 @@ package com.marrakech.game.presentation.controller;
 import com.marrakech.game.service.GestionJuegoServicio;
 import com.marrakech.game.service.GestionJuegoServicio.ResultadoClick;
 import com.marrakech.game.service.GestionJuegoServicio.ResultadoTipo;
+import com.marrakech.game.service.GestionJuegoServicio.Reliquia;
 import com.marrakech.game.presentation.render.GameRenderEngine;
 
 import javafx.scene.image.ImageView;
@@ -66,6 +67,25 @@ public class TableroController {
     public void redibujar(ImageView assamView) {
         renderEngine.redibujarTableroCompleto(
             juegoSvc.getTileOwner(), juegoSvc.getCarpetOrientation(), assamView);
+    }
+
+    /** Redibuja el tablero y además pinta los emojis de las reliquias activas. */
+    public void redibujarConReliquias(ImageView assamView) {
+        redibujar(assamView);
+        // Limpiar labels de reliquias anteriores del grid
+        boardGrid.getChildren().removeIf(n ->
+            n instanceof javafx.scene.control.Label
+            && "reliquia-overlay".equals(n.getUserData()));
+
+        for (Reliquia rel : Reliquia.values()) {
+            int[] pos = juegoSvc.getPosicionReliquia(rel);
+            if (pos[0] < 0) continue; // no está en el tablero
+            javafx.scene.control.Label lbl = new javafx.scene.control.Label(rel.emoji);
+            lbl.setUserData("reliquia-overlay");
+            lbl.setStyle("-fx-font-size:22px;");
+            lbl.setMouseTransparent(true);
+            boardGrid.add(lbl, pos[0], pos[1]);
+        }
     }
 
     public void highlightTile(int x, int y) {

@@ -8,6 +8,7 @@ import com.marrakech.game.service.ChatServicio;
 import com.marrakech.game.service.EstadoJuegoServicio;
 import com.marrakech.game.service.EstadoJuegoServicio.EstadoDB;
 import com.marrakech.game.service.GestionJuegoServicio;
+import com.marrakech.game.service.GestionJuegoServicio.Reliquia;
 import com.marrakech.game.service.MusicaServicio;
 import com.marrakech.game.service.PartidaServicio;
 import com.marrakech.game.presentation.render.GameRenderEngine;
@@ -19,12 +20,14 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.control.CheckBox;
 
 public class GameController {
 
     @FXML private VBox      startScreen;
     @FXML private HBox      gameScreen;
     @FXML private StackPane endScreen;
+    @FXML private CheckBox  checkPoderesLocal;
     @FXML private GridPane  boardGrid;
     @FXML private Label     turnLabel, statusLabel, diceResultLabel, diceValueLabel;
     @FXML private Button    rollDiceBtn;
@@ -51,6 +54,7 @@ public class GameController {
     private String  usuarioActual;
     private int     miIndice = 0;
     private boolean modoMultijugador = false;
+    private boolean poderesActivados = false;
 
     private GestionJuegoServicio juegoSvc;
     private AssamServicio        assamSvc;
@@ -102,9 +106,14 @@ public class GameController {
         startGame(n);
     }
 
-    @FXML private void startWith2() { iniciarConJugadores(2); }
-    @FXML private void startWith3() { iniciarConJugadores(3); }
-    @FXML private void startWith4() { iniciarConJugadores(4); }
+    @FXML private void startWith2() { iniciarConJugadoresLocal(2); }
+    @FXML private void startWith3() { iniciarConJugadoresLocal(3); }
+    @FXML private void startWith4() { iniciarConJugadoresLocal(4); }
+
+    private void iniciarConJugadoresLocal(int n) {
+        this.poderesActivados = checkPoderesLocal != null && checkPoderesLocal.isSelected();
+        iniciarConJugadores(n);
+    }
 
     private void startGame(int n) {
         juegoSvc = new GestionJuegoServicio();
@@ -168,6 +177,11 @@ public class GameController {
         statusLabel.setText(modoMultijugador
             ? "Conectando... Eres " + playerName(miIndice) + ". Espera el inicio."
             : "Rota a Assam y lanza el dado.");
+
+        // ══════════════════════════════════════════════════════════════════════
+        // AQUÍ VAN LOS SUPERPODERES
+        // (poderesActivados == true cuando el jugador activó el toggle)
+        // ══════════════════════════════════════════════════════════════════════
     }
 
     @FXML protected void rotateLeft() {
@@ -187,25 +201,87 @@ public class GameController {
     @FXML protected void onRollDiceClick() {
         if (!juegoSvc.esMiTurno(modoMultijugador, miIndice)
             || juegoSvc.getCurrentPhase() != PHASE_MOVE) return;
-        int pasos = new Random().nextInt(6) + 1;
-        rollDiceBtn.setDisable(true);
 
+        // ── Brújula del Mercader: el jugador elige cuántos pasos (1-6) ────────
+        if (poderesActivados
+                && juegoSvc.tieneReliquia(juegoSvc.getCurrentPlayerIdx(), Reliquia.BRUJULA_MERCADER)) {
+
+            javafx.scene.control.ChoiceDialog<Integer> dialogo =
+                new javafx.scene.control.ChoiceDialog<>(1,
+                    java.util.List.of(1, 2, 3, 4, 5, 6));
+            dialogo.setTitle("🧭 Brújula del Mercader");
+            dialogo.setHeaderText("Elige cuántas casillas mover a Assam");
+            dialogo.setContentText("Pasos:");
+            dialogo.showAndWait().ifPresent(pasos -> {
+                juegoSvc.consumirReliquia(Reliquia.BRUJULA_MERCADER);
+                ejecutarMovimientoAssam(pasos);
+            });
+            return;
+        }
+
+        // ── Dado normal ───────────────────────────────────────────────────────
+        int pasos = new Random().nextInt(6) + 1;
+        ejecutarMovimientoAssam(pasos);
+    }
+
+    private void ejecutarMovimientoAssam(int pasos) {
+        rollDiceBtn.setDisable(true);
         diceResultLabel.setText(String.valueOf(pasos));
         diceValueLabel.setText(String.valueOf(pasos));
 
         GameRenderEngine renderEngine = new GameRenderEngine(boardGrid, diceCanvas);
         renderEngine.animarDado(pasos, () -> {
+            // Calcular el path antes de que la animación mueva a Assam
+            int[][] path = assamSvc.computePath(pasos);
+
             assamCtrl.animarMovimiento(pasos, () -> {
                 assamCtrl.getView().toFront();
                 int ax = assamSvc.getX(), ay = assamSvc.getY();
+
+                // ── Recoger reliquias en cada casilla del recorrido ──────────
+                if (poderesActivados) {
+                    Reliquia ultimaRecogida = null;
+                    for (int paso = 1; paso <= pasos; paso++) {
+                        Reliquia r = juegoSvc.intentarRecogerReliquia(path[paso][0], path[paso][1]);
+                        if (r != null) ultimaRecogida = r;
+                    }
+                    if (ultimaRecogida != null) {
+                        statusLabel.setText(ultimaRecogida.emoji + " ¡Recogiste: " + ultimaRecogida.nombre + "!");
+                        redibujarTablero();
+                        actualizarUI();
+                    }
+                }
+
+                // ── Pago (con posible descuento del Cáliz Dorado) ────────────
                 int pago = juegoSvc.aplicarPago(ax, ay);
-                if (pago > 0) {
+
+                if (pago > 0 && poderesActivados
+                        && juegoSvc.tieneReliquia(juegoSvc.getCurrentPlayerIdx(), Reliquia.CALIZ_DORADO)) {
+                    // Revertir pago completo y aplicar la mitad (sin decimales)
+                    int dueno = juegoSvc.getTileOwner()[ax][ay];
+                    int[] dinero = juegoSvc.getMoney();
+                    dinero[juegoSvc.getCurrentPlayerIdx()] += pago;   // devolver
+                    if (dueno > 0) dinero[dueno - 1] -= pago;          // revertir cobro
+
+                    int pagoMitad = pago / 2;                          // entero, sin redondear
+                    dinero[juegoSvc.getCurrentPlayerIdx()] =
+                        Math.max(0, dinero[juegoSvc.getCurrentPlayerIdx()] - pagoMitad);
+                    if (dueno > 0) dinero[dueno - 1] += pagoMitad;
+
+                    juegoSvc.consumirReliquia(Reliquia.CALIZ_DORADO);
+                    statusLabel.setText("🏆 Cáliz Dorado — pagas solo " + pagoMitad
+                        + " Dh en vez de " + pago + ". Coloca tu alfombra.");
+                } else if (pago > 0) {
                     int dueno = juegoSvc.getTileOwner()[ax][ay];
                     statusLabel.setText("Dado: " + pasos + " — Pagas " + pago
                         + " Dh a " + playerName(dueno - 1) + ". Coloca tu alfombra.");
                 } else {
                     statusLabel.setText("Dado: " + pasos + " — Haz click en una casilla adyacente.");
                 }
+
+                // ── Alfombra del Sultán: colocar dos alfombras este turno ────
+                // (se gestiona en pasarTurno; aquí solo avanzamos la fase)
+
                 int newPhase = juegoSvc.fasePostDado();
                 juegoSvc.setCurrentPhase(newPhase);
                 tableroCtrl.actualizarContexto(newPhase, juegoSvc.getCurrentPlayerIdx(),
@@ -218,8 +294,28 @@ public class GameController {
     }
 
     private void pasarTurno() {
+        // ── Alfombra del Sultán: si el jugador actual la tiene, colocar 2ª alfombra ──
+        if (poderesActivados
+                && juegoSvc.tieneReliquia(juegoSvc.getCurrentPlayerIdx(), Reliquia.ALFOMBRA_SULTAN)
+                && juegoSvc.getCurrentPhase() == 1) {
+            // Aún quedan alfombras por colocar gracias al sultán: consumir y dar fase extra
+            juegoSvc.consumirReliquia(Reliquia.ALFOMBRA_SULTAN);
+            statusLabel.setText("✨ Alfombra del Sultán — ¡coloca una segunda alfombra!");
+            tableroCtrl.actualizarContexto(1, juegoSvc.getCurrentPlayerIdx(),
+                assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
+            actualizarUI(); actualizarControles();
+            guardarEstado();
+            return; // no avanzar turno todavía
+        }
+
         juegoSvc.pasarTurno();
-        tableroCtrl.redibujar(assamCtrl.getView());
+
+        // ── Aparición aleatoria de reliquia al inicio del nuevo turno ─────────
+        if (poderesActivados) {
+            juegoSvc.intentarAparecerReliquia();
+        }
+
+        redibujarTablero();
         tableroCtrl.actualizarContexto(juegoSvc.getCurrentPhase(), juegoSvc.getCurrentPlayerIdx(),
             assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
         tableroCtrl.limpiarHighlights();
@@ -244,7 +340,7 @@ public class GameController {
 
         tableroCtrl.actualizarContexto(juegoSvc.getCurrentPhase(), juegoSvc.getCurrentPlayerIdx(),
             assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
-        tableroCtrl.redibujar(assamCtrl.getView());
+        redibujarTablero();
         tableroCtrl.limpiarHighlights();
 
         if (juegoSvc.getCurrentPhase() == 2 && juegoSvc.getFirstCarpetX() >= 0
@@ -313,6 +409,25 @@ public class GameController {
             if (pl[i] != null) pl[i].setStyle(i == cpIdx
                 ? "-fx-border-color:" + colors[i] + ";-fx-border-width:3px;-fx-border-radius:10px;"
                 : "-fx-border-color:" + hexToRgba(colors[i], 0.35) + ";-fx-border-width:1.5px;-fx-border-radius:10px;");
+
+            // ── Inventario de reliquias ───────────────────────────────────────
+            if (poderesActivados && pl[i] != null) {
+                // Eliminar label de reliquias anterior si existe
+                pl[i].getChildren().removeIf(n ->
+                    n instanceof Label && "reliquias-label".equals(n.getUserData()));
+
+                boolean[] inv = juegoSvc.getInventarioJugador(i);
+                StringBuilder sb = new StringBuilder();
+                for (int r = 0; r < Reliquia.values().length; r++)
+                    if (inv[r]) sb.append(Reliquia.values()[r].emoji).append(" ");
+
+                if (sb.length() > 0) {
+                    Label lblRel = new Label(sb.toString().trim());
+                    lblRel.setUserData("reliquias-label");
+                    lblRel.setStyle("-fx-font-size:14px;-fx-text-fill:#D4A017;");
+                    pl[i].getChildren().add(lblRel);
+                }
+            }
         }
         turnLabel.setText(juegoSvc.esMiTurno(modoMultijugador, miIndice)
             ? "TU TURNO" : "TURNO: " + playerName(cpIdx));
@@ -336,6 +451,13 @@ public class GameController {
 
     @FXML private void onSendChat() {
         chatCtrl.enviar();
+    }
+
+    private void redibujarTablero() {
+        if (poderesActivados)
+            tableroCtrl.redibujarConReliquias(assamCtrl.getView());
+        else
+            redibujarTablero();
     }
 
     private void guardarEstado() {
