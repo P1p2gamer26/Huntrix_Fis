@@ -189,7 +189,8 @@ public class AuthController {
             final String pidFinal = v.getPartidaId();
             new Thread(() -> {
                 try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
-                Platform.runLater(() -> mostrarJuego(nFinal, pidFinal, usuarioActual, idxFinal));
+                Platform.runLater(() -> mostrarJuego(nFinal, pidFinal, usuarioActual, idxFinal,
+                    v.isPoderesActivados()));
             }, "host-delay").start();
         });
 
@@ -198,7 +199,7 @@ public class AuthController {
             int n     = act != null ? act.maxJugadores : 2;
             int miIdx = act != null ? act.jugadores.indexOf(usuarioActual) : 1;
             if (miIdx < 0) miIdx = 1;
-            mostrarJuego(n, partida.id, usuarioActual, miIdx);
+            mostrarJuego(n, partida.id, usuarioActual, miIdx, v.isPoderesActivados());
         });
 
         stage.setScene(new Scene(v, width, height));
@@ -240,7 +241,7 @@ public class AuthController {
         }
     }
 
-    private void mostrarJuego(int n, String partidaId, String usuario, int miIndice) {
+    private void mostrarJuego(int n, String partidaId, String usuario, int miIndice, boolean poderes) {
         musicaSvc.reproducir(MusicaServicio.Track.JUEGO);
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -255,7 +256,7 @@ public class AuthController {
             stage.setScene(scene);
             gc.setServicios(musicaSvc, chatSvc);
             gc.setEstadoRepositorio(estadoRepo);
-            gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc);
+            gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc, poderes);
             gc.setOnVolverSala(() -> mostrarModoOnline());
             gc.setOnVolverMenu(() -> mostrarMenu());
         } catch (Exception e) {

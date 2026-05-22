@@ -83,7 +83,8 @@ public class EstadoJuegoServicio {
     public static String serializarEstado(int numPlayers, int[] money, int[] rugs,
                                           int[][] tileOwner, int currentPlayerIdx,
                                           int currentPhase, int firstCarpetX, int firstCarpetY,
-                                          int[][] carpetOrientation) {
+                                          int[][] carpetOrientation,
+                                          int[][] posicionReliquia, boolean[][] inventarioReliquias) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numPlayers; i++)
             sb.append(money[i]).append(i < numPlayers - 1 ? "," : "");
@@ -103,6 +104,19 @@ public class EstadoJuegoServicio {
         for (int row = 0; row < 7; row++) {
             for (int col = 0; col < 7; col++) sb.append(carpetOrientation[col][row]).append(",");
             sb.append("/");
+        }
+        // ── Reliquias: posiciones ─────────────────────────────────────────────
+        sb.append(";");
+        for (int i = 0; i < posicionReliquia.length; i++)
+            sb.append(posicionReliquia[i][0]).append(",").append(posicionReliquia[i][1])
+              .append(i < posicionReliquia.length - 1 ? "/" : "");
+        // ── Reliquias: inventarios por jugador ────────────────────────────────
+        sb.append(";");
+        for (int j = 0; j < numPlayers; j++) {
+            for (int r = 0; r < inventarioReliquias[j].length; r++)
+                sb.append(inventarioReliquias[j][r] ? "1" : "0")
+                  .append(r < inventarioReliquias[j].length - 1 ? "," : "");
+            if (j < numPlayers - 1) sb.append("/");
         }
         return sb.toString();
     }

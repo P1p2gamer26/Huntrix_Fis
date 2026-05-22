@@ -2,6 +2,7 @@ package com.marrakech.game.presentation.controller;
 
 import com.marrakech.game.service.GestionJuegoServicio;
 import com.marrakech.game.service.GestionJuegoServicio.Reliquia;
+import com.marrakech.game.service.JuegoServicio;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -12,8 +13,15 @@ import java.util.Random;
 
 /**
  * Controlador auxiliar de superpoderes (reliquias).
- * Centraliza los diálogos y la lógica de cada reliquia,
- * manteniendo GameController limpio.
+ *
+ * Jerarquía de ejecución al terminar el movimiento de Assam:
+ *   1. resolverDado()          — antes de mover (Brújula)
+ *   2. recogerReliquias()      — durante el recorrido
+ *   3. resolverPostMovimiento() — al aterrizar:
+ *        a) ¿está sobre alfombra ajena? → pago normal
+ *        b) ¿tiene Cáliz?              → preguntar si lo usa → aplicar pago
+ *        c) ¿tiene Sultán?             → preguntar si lo usa
+ *        Devuelve un ResultadoPost con el mensaje y si se activa el sultán.
  */
 public class PoderesController {
 
@@ -22,21 +30,22 @@ public class PoderesController {
     private final Random rng = new Random();
 
     public PoderesController(GestionJuegoServicio juegoSvc, boolean poderesActivados) {
-        this.juegoSvc        = juegoSvc;
+        this.juegoSvc         = juegoSvc;
         this.poderesActivados = poderesActivados;
     }
 
-    // ── Brújula del Mercader ──────────────────────────────────────────────────
+    // ── 1. Brújula del Mercader ───────────────────────────────────────────────
 
     /**
-     * Resuelve cuántos pasos moverá Assam este turno.
-     * Si el jugador tiene la Brújula y acepta usarla, elige entre 1-6.
-     * Si no tiene o rechaza, lanza el dado normal.
-     * Devuelve -1 si el diálogo fue cancelado sin elegir nada.
+     * Resuelve cuántos pasos mover a Assam.
+     * Primero comprueba que el jugador tenga la Brújula en el inventario.
+     * Si la tiene, pregunta; si acepta, muestra el selector 1-6.
+     * Si cancela en cualquier punto, lanza el dado normal sin consumir la reliquia.
      */
     public int resolverDado() {
         if (poderesActivados
-                && juegoSvc.tieneReliquia(juegoSvc.getCurrentPlayerIdx(), Reliquia.BRUJULA_MERCADER)) {
+                && juegoSvc.getInventarioJugador(juegoSvc.getCurrentPlayerIdx())
+                            [Reliquia.BRUJULA_MERCADER.ordinal()]) {
 
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
             confirm.setTitle("🧭 Brújula del Mercader");
@@ -53,24 +62,22 @@ public class PoderesController {
                 dialogo.setHeaderText("Elige cuántas casillas mover a Assam");
                 dialogo.setContentText("Pasos:");
 
-                int elegido = dialogo.showAndWait().orElse(-1);
+                int elegido = dialogo.showAndWait().orElse(0);
                 if (elegido > 0) {
                     juegoSvc.consumirReliquia(Reliquia.BRUJULA_MERCADER);
                     return elegido;
                 }
-                // Si cerró el diálogo sin elegir, dado normal (no se consume la reliquia)
             }
         }
-
-        // Dado normal
         return rng.nextInt(6) + 1;
     }
 
-    // ── Recolección de reliquias en el recorrido ──────────────────────────────
+    // ── 2. Recolección en el recorrido ────────────────────────────────────────
 
     /**
-     * Revisa cada casilla del path de Assam y recoge las reliquias que encuentre.
-     * Devuelve la última reliquia recogida, o null si no se recogió ninguna.
+     * Recorre cada casilla del path y recoge reliquias.
+     * Solo actúa si los poderes están activos.
+     * Devuelve la última reliquia recogida, o null.
      */
     public Reliquia recogerReliquiasEnRecorrido(int[][] path, int pasos) {
         if (!poderesActivados) return null;
@@ -83,90 +90,95 @@ public class PoderesController {
         return ultimaRecogida;
     }
 
-    // ── Cáliz Dorado ─────────────────────────────────────────────────────────
+    // ── 3. Post-movimiento: Cáliz → pago → Sultán ────────────────────────────
 
-    /**
-     * Calcula y aplica el pago por caer en alfombra ajena.
-     * Si el jugador tiene el Cáliz y acepta usarlo, paga la mitad (sin decimales).
-     * Devuelve el mensaje de estado para mostrar en pantalla.
-     */
-    public String resolverPago(int ax, int ay, int pasos) {
-        // Calcular el pago sin aplicarlo todavía
-        int pago = com.marrakech.game.service.JuegoServicio.calcularPago(
-            ax, ay, juegoSvc.getCurrentPlayerIdx(), juegoSvc.getTileOwner());
-
-        if (pago <= 0) {
-            return "Dado: " + pasos + " — Haz click en una casilla adyacente.";
+    /** Resultado del post-movimiento: mensaje a mostrar + si el Sultán fue activado. */
+    public static class ResultadoPost {
+        public final String mensaje;
+        public final boolean sultanActivado;
+        ResultadoPost(String mensaje, boolean sultanActivado) {
+            this.mensaje         = mensaje;
+            this.sultanActivado  = sultanActivado;
         }
-
-        int dueno = juegoSvc.getTileOwner()[ax][ay];
-        String nombreDueno = nombreJugador(dueno - 1);
-
-        if (poderesActivados
-                && juegoSvc.tieneReliquia(juegoSvc.getCurrentPlayerIdx(), Reliquia.CALIZ_DORADO)) {
-
-            int pagoMitad = pago / 2;
-
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("🏆 Cáliz Dorado");
-            confirm.setHeaderText("Debes pagar " + pago + " Dh a " + nombreDueno);
-            confirm.setContentText("¿Usas el Cáliz Dorado para pagar solo " + pagoMitad + " Dh?");
-            confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-
-            boolean usar = confirm.showAndWait()
-                .map(r -> r == ButtonType.YES).orElse(false);
-
-            int pagoFinal = usar ? pagoMitad : pago;
-
-            // Aplicar el pago final directamente sobre el array
-            int[] dinero = juegoSvc.getMoney();
-            dinero[juegoSvc.getCurrentPlayerIdx()] =
-                Math.max(0, dinero[juegoSvc.getCurrentPlayerIdx()] - pagoFinal);
-            if (dueno > 0) dinero[dueno - 1] += pagoFinal;
-
-            if (usar) {
-                juegoSvc.consumirReliquia(Reliquia.CALIZ_DORADO);
-                return "🏆 Cáliz Dorado — pagaste solo " + pagoFinal
-                    + " Dh en vez de " + pago + ". Coloca tu alfombra.";
-            } else {
-                return "Dado: " + pasos + " — Pagaste " + pago
-                    + " Dh a " + nombreDueno + ". Coloca tu alfombra.";
-            }
-        }
-
-        // Sin cáliz: aplicar pago normal
-        juegoSvc.aplicarPago(ax, ay);
-        return "Dado: " + pasos + " — Pagas " + pago
-            + " Dh a " + nombreDueno + ". Coloca tu alfombra.";
     }
 
-    // ── Alfombra del Sultán ───────────────────────────────────────────────────
-
     /**
-     * Pregunta si el jugador quiere usar la Alfombra del Sultán para colocar
-     * una segunda alfombra. Devuelve true si la usa (y la consume),
-     * false si no la tiene, no está en fase de alfombra, o rechaza.
+     * Ejecuta la jerarquía completa al terminar el movimiento de Assam:
+     *   1. Calcula si hay pago (alfombra ajena bajo Assam).
+     *   2. Si hay pago y el jugador tiene el Cáliz, pregunta si lo usa.
+     *   3. Aplica el pago final (con o sin descuento).
+     *   4. Si el jugador tiene la Alfombra del Sultán, pregunta si la usa.
+     *
+     * @param ax    columna final de Assam
+     * @param ay    fila final de Assam
+     * @param pasos número de pasos lanzados (para el mensaje)
      */
-    public boolean resolverSultan() {
-        if (!poderesActivados
-                || !juegoSvc.tieneReliquia(juegoSvc.getCurrentPlayerIdx(), Reliquia.ALFOMBRA_SULTAN)
-                || juegoSvc.getCurrentPhase() != 1) {
-            return false;
+    public ResultadoPost resolverPostMovimiento(int ax, int ay, int pasos) {
+        int jugador = juegoSvc.getCurrentPlayerIdx();
+        boolean[] inv = juegoSvc.getInventarioJugador(jugador);
+
+        // ── Paso 1: calcular pago sin aplicarlo aún ───────────────────────────
+        int pago = JuegoServicio.calcularPago(ax, ay, jugador, juegoSvc.getTileOwner());
+        int dueno = juegoSvc.getTileOwner()[ax][ay];
+        String nombreDueno = nombreJugador(dueno - 1);
+        String mensajePago;
+
+        if (pago > 0) {
+            // ── Paso 2: ¿tiene Cáliz? ─────────────────────────────────────────
+            int pagoFinal = pago;
+            boolean caliz = poderesActivados && inv[Reliquia.CALIZ_DORADO.ordinal()];
+
+            if (caliz) {
+                int pagoMitad = pago / 2;
+
+                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                confirm.setTitle("🏆 Cáliz Dorado");
+                confirm.setHeaderText("Debes pagar " + pago + " Dh a " + nombreDueno);
+                confirm.setContentText("¿Usas el Cáliz Dorado para pagar solo " + pagoMitad + " Dh?");
+                confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+
+                boolean usar = confirm.showAndWait()
+                    .map(r -> r == ButtonType.YES).orElse(false);
+
+                if (usar) {
+                    pagoFinal = pagoMitad;
+                    juegoSvc.consumirReliquia(Reliquia.CALIZ_DORADO);
+                    mensajePago = "🏆 Cáliz Dorado — pagaste solo " + pagoFinal
+                        + " Dh en vez de " + pago + ". Coloca tu alfombra.";
+                } else {
+                    mensajePago = "Dado: " + pasos + " — Pagaste " + pago
+                        + " Dh a " + nombreDueno + ". Coloca tu alfombra.";
+                }
+            } else {
+                mensajePago = "Dado: " + pasos + " — Pagas " + pago
+                    + " Dh a " + nombreDueno + ". Coloca tu alfombra.";
+            }
+
+            // ── Paso 3: aplicar el pago final ────────────────────────────────
+            int[] dinero = juegoSvc.getMoney();
+            dinero[jugador] = Math.max(0, dinero[jugador] - pagoFinal);
+            if (dueno > 0) dinero[dueno - 1] += pagoFinal;
+
+        } else {
+            mensajePago = "Dado: " + pasos + " — Haz click en una casilla adyacente.";
         }
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("✨ Alfombra del Sultán");
-        confirm.setHeaderText("Tienes la Alfombra del Sultán");
-        confirm.setContentText("¿Quieres usarla para colocar una segunda alfombra este turno?");
-        confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        // ── Paso 4: ¿tiene Alfombra del Sultán? ──────────────────────────────
+        boolean sultan = false;
+        if (poderesActivados && inv[Reliquia.ALFOMBRA_SULTAN.ordinal()]) {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("✨ Alfombra del Sultán");
+            confirm.setHeaderText("Tienes la Alfombra del Sultán");
+            confirm.setContentText("¿Quieres usarla para colocar una segunda alfombra este turno?");
+            confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
-        boolean usar = confirm.showAndWait()
-            .map(r -> r == ButtonType.YES).orElse(false);
+            sultan = confirm.showAndWait()
+                .map(r -> r == ButtonType.YES).orElse(false);
 
-        if (usar) {
-            juegoSvc.consumirReliquia(Reliquia.ALFOMBRA_SULTAN);
+            if (sultan) juegoSvc.consumirReliquia(Reliquia.ALFOMBRA_SULTAN);
         }
-        return usar;
+
+        return new ResultadoPost(mensajePago, sultan);
     }
 
     // ── Utilidad ──────────────────────────────────────────────────────────────

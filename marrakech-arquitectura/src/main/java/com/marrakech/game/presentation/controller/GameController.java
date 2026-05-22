@@ -55,6 +55,7 @@ public class GameController {
     private int     miIndice = 0;
     private boolean modoMultijugador = false;
     private boolean poderesActivados = false;
+    private boolean sultanPendiente  = false;
 
     private GestionJuegoServicio juegoSvc;
     private AssamServicio        assamSvc;
@@ -82,12 +83,13 @@ public class GameController {
     }
 
     public void iniciarConJugadores(int n, String partidaId, String usuario,
-                                    int miIndice, PartidaServicio partidaSvc) {
+                                    int miIndice, PartidaServicio partidaSvc, boolean poderes) {
         this.partidaId        = partidaId;
         this.usuarioActual    = usuario;
         this.miIndice         = miIndice;
         this.modoMultijugador = true;
         this.partidaSvc       = partidaSvc;
+        this.poderesActivados = poderes;
 
         this.estadoSvc = new EstadoJuegoServicio(estadoRepo, partidaId);
 
@@ -138,7 +140,21 @@ public class GameController {
         if (partidaSvc != null || estadoSvc != null)
             finJuegoCtrl.setServicios(partidaSvc, estadoSvc);
 
-        tableroCtrl.setOnCarpetPlaced(() -> pasarTurno());
+        tableroCtrl.setOnCarpetPlaced(() -> {
+            if (sultanPendiente) {
+                // Primera alfombra del Sultán colocada — permitir la segunda
+                sultanPendiente = false;
+                statusLabel.setText("✨ Alfombra del Sultán — coloca tu segunda alfombra.");
+                juegoSvc.setCurrentPhase(1);
+                tableroCtrl.actualizarContexto(1, juegoSvc.getCurrentPlayerIdx(),
+                    assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
+                tableroCtrl.limpiarHighlights();
+                actualizarUI(); actualizarControles();
+                guardarEstado();
+            } else {
+                pasarTurno();
+            }
+        });
         tableroCtrl.setOnGameEnded(() -> finJuegoCtrl.mostrar(
             modoMultijugador, miIndice, usuarioActual));
         tableroCtrl.setOnAlfombraCompleta(() ->
@@ -218,7 +234,7 @@ public class GameController {
             // Guardar el path antes de que animarMovimiento actualice la posición de Assam
             int[][] path = assamSvc.computePath(pasos);
 
-            assamCtrl.animarMovimiento(pasos, () -> {
+            assamCtrl.animarMovimiento(pasos, () -> Platform.runLater(() -> {
                 assamCtrl.getView().toFront();
                 int ax = assamSvc.getX(), ay = assamSvc.getY();
 
@@ -230,34 +246,55 @@ public class GameController {
                     actualizarUI();
                 }
 
-                // Pago, con posible intervención del Cáliz Dorado
-                String msgPago = poderesCtrl.resolverPago(ax, ay, pasos);
-                statusLabel.setText(msgPago);
+                // Pago + Cáliz + Sultán en jerarquía correcta
+                PoderesController.ResultadoPost resultado =
+                    poderesCtrl.resolverPostMovimiento(ax, ay, pasos);
+                statusLabel.setText(resultado.mensaje);
+
+                // Verificar si el jugador actual quedó sin monedas
+                int jugadorActual = juegoSvc.getCurrentPlayerIdx();
+                boolean eliminado = juegoSvc.verificarEliminacion(jugadorActual);
+
+                // Comprobar fin de partida (por monedas o por rugs)
+                if (juegoSvc.juegoTerminado()) {
+                    actualizarUI(); guardarEstado();
+                    finJuegoCtrl.mostrar(modoMultijugador, miIndice, usuarioActual);
+                    return;
+                }
+
+                if (eliminado) {
+                    statusLabel.setText("💀 " + playerName(jugadorActual) + " se quedó sin monedas y fue eliminado.");
+                    actualizarUI(); guardarEstado();
+                    pasarTurno();
+                    return;
+                }
 
                 int newPhase = juegoSvc.fasePostDado();
                 juegoSvc.setCurrentPhase(newPhase);
+
+                // Si el Sultán fue activado, quedarse en fase de alfombra
+                if (resultado.sultanActivado) {
+                    sultanPendiente = true;
+                    statusLabel.setText("✨ Alfombra del Sultán — ¡coloca tu primera alfombra!");
+                    tableroCtrl.actualizarContexto(newPhase, juegoSvc.getCurrentPlayerIdx(),
+                        assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
+                    actualizarUI(); actualizarControles();
+                    guardarEstado();
+                    return;
+                }
                 tableroCtrl.actualizarContexto(newPhase, juegoSvc.getCurrentPlayerIdx(),
                     assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
                 if (juegoSvc.getRugs()[juegoSvc.getCurrentPlayerIdx()] == 0) { pasarTurno(); return; }
                 actualizarUI(); actualizarControles();
                 guardarEstado();
-            });
+            }));
         });
     }
 
     private void pasarTurno() {
-        // Alfombra del Sultán: preguntar si la quiere usar
-        if (poderesCtrl.resolverSultan()) {
-            tableroCtrl.actualizarContexto(1, juegoSvc.getCurrentPlayerIdx(),
-                assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
-            actualizarUI(); actualizarControles();
-            guardarEstado();
-            return;
-        }
-
         juegoSvc.pasarTurno();
 
-        if (poderesActivados) juegoSvc.intentarAparecerReliquia();
+        if (poderesActivados) juegoSvc.intentarAparecerReliquia(assamSvc.getX(), assamSvc.getY());
 
         redibujarTablero();
         tableroCtrl.actualizarContexto(juegoSvc.getCurrentPhase(), juegoSvc.getCurrentPlayerIdx(),
@@ -284,7 +321,7 @@ public class GameController {
 
         tableroCtrl.actualizarContexto(juegoSvc.getCurrentPhase(), juegoSvc.getCurrentPlayerIdx(),
             assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
-        redibujarTablero();
+        redibujarTablero(); // usa redibujarConReliquias si poderes activos
         tableroCtrl.limpiarHighlights();
 
         if (juegoSvc.getCurrentPhase() == 2 && juegoSvc.getFirstCarpetX() >= 0
@@ -350,9 +387,18 @@ public class GameController {
         for (int i = 0; i < np; i++) {
             if (rl[i] != null) rl[i].setText(String.valueOf(rugsArr[i]));
             if (ml[i] != null) ml[i].setText(moneyArr[i] + " Dh");
-            if (pl[i] != null) pl[i].setStyle(i == cpIdx
-                ? "-fx-border-color:" + colors[i] + ";-fx-border-width:3px;-fx-border-radius:10px;"
-                : "-fx-border-color:" + hexToRgba(colors[i], 0.35) + ";-fx-border-width:1.5px;-fx-border-radius:10px;");
+
+            boolean estaEliminado = juegoSvc.esEliminado(i);
+            if (pl[i] != null) {
+                if (estaEliminado) {
+                    pl[i].setStyle("-fx-border-color:#555;-fx-border-width:1.5px;"
+                        + "-fx-border-radius:10px;-fx-opacity:0.4;");
+                } else {
+                    pl[i].setStyle(i == cpIdx
+                        ? "-fx-border-color:" + colors[i] + ";-fx-border-width:3px;-fx-border-radius:10px;"
+                        : "-fx-border-color:" + hexToRgba(colors[i], 0.35) + ";-fx-border-width:1.5px;-fx-border-radius:10px;");
+                }
+            }
 
             // ── Inventario de reliquias ───────────────────────────────────────
             if (poderesActivados && pl[i] != null) {
@@ -401,7 +447,7 @@ public class GameController {
         if (poderesActivados)
             tableroCtrl.redibujarConReliquias(assamCtrl.getView());
         else
-            redibujarTablero();
+            tableroCtrl.redibujar(assamCtrl.getView());
     }
 
     private void guardarEstado() {

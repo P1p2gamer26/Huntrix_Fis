@@ -29,6 +29,9 @@ public class GestionJuegoServicio {
 
     private final java.util.Random rng = new java.util.Random();
 
+    /** Jugadores eliminados por quedarse sin monedas (solo aplica en 3-4 jugadores). */
+    private boolean[] eliminado;
+
     private void inicializarReliquias() {
         for (int i = 0; i < Reliquia.values().length; i++) {
             aparicionesReliquia[i] = 0;
@@ -36,6 +39,7 @@ public class GestionJuegoServicio {
             posicionReliquia[i][1] = -1;
         }
         inventarioReliquias = new boolean[numPlayers][Reliquia.values().length];
+        eliminado = new boolean[numPlayers];
     }
 
     /**
@@ -44,11 +48,10 @@ public class GestionJuegoServicio {
      * Solo aparece si: no está ya en el tablero, no ha llegado a MAX_APARICIONES,
      * y la probabilidad aleatoria lo permite (33% por turno).
      */
-    public void intentarAparecerReliquia() {
-        if (rng.nextInt(3) != 0) return; // 33% de probabilidad por turno
+    public void intentarAparecerReliquia(int assamX, int assamY) {
+        if (rng.nextInt(3) != 0) return;
 
         Reliquia[] todas = Reliquia.values();
-        // Barajar para no favorecer siempre la primera
         int[] orden = {0, 1, 2};
         for (int i = 2; i > 0; i--) {
             int j = rng.nextInt(i + 1);
@@ -56,13 +59,16 @@ public class GestionJuegoServicio {
         }
 
         for (int idx : orden) {
-            if (posicionReliquia[idx][0] != -1) continue;      // ya está en tablero
-            if (aparicionesReliquia[idx] >= MAX_APARICIONES) continue; // agotada
+            if (posicionReliquia[idx][0] != -1) continue;
+            if (aparicionesReliquia[idx] >= MAX_APARICIONES) continue;
 
-            // Buscar casilla libre al azar (máximo 20 intentos)
             for (int intento = 0; intento < 20; intento++) {
                 int c = rng.nextInt(7), r = rng.nextInt(7);
-                // Verificar que no hay otra reliquia ya en esa casilla
+
+                // No aparecer sobre Assam
+                if (c == assamX && r == assamY) continue;
+
+                // No aparecer sobre otra reliquia
                 boolean ocupada = false;
                 for (int otra = 0; otra < Reliquia.values().length; otra++) {
                     if (posicionReliquia[otra][0] == c && posicionReliquia[otra][1] == r) {
@@ -71,6 +77,7 @@ public class GestionJuegoServicio {
                     }
                 }
                 if (ocupada) continue;
+
                 posicionReliquia[idx][0] = c;
                 posicionReliquia[idx][1] = r;
                 aparicionesReliquia[idx]++;
@@ -225,12 +232,61 @@ public class GestionJuegoServicio {
     }
 
     public void pasarTurno() {
-        currentPlayerIdx = JuegoServicio.siguienteTurno(currentPlayerIdx, numPlayers);
+        currentPlayerIdx = siguienteTurnoValido(currentPlayerIdx);
         currentPhase = 0;
         firstCarpetX = -1; firstCarpetY = -1;
     }
 
+    /**
+     * Busca el siguiente jugador que no esté eliminado.
+     * Si todos están eliminados menos uno, devuelve ese mismo (el juego termina aparte).
+     */
+    private int siguienteTurnoValido(int desde) {
+        for (int i = 1; i <= numPlayers; i++) {
+            int candidato = (desde + i) % numPlayers;
+            if (!esEliminado(candidato)) return candidato;
+        }
+        return (desde + 1) % numPlayers; // fallback
+    }
+
+    /**
+     * Comprueba si el jugador idx quedó sin monedas y lo elimina si aplica.
+     * En 2 jugadores no se elimina — se termina la partida directamente.
+     * Devuelve true si fue eliminado ahora.
+     */
+    public boolean verificarEliminacion(int jugadorIdx) {
+        if (eliminado == null) eliminado = new boolean[numPlayers];
+        if (eliminado[jugadorIdx]) return false;
+        if (money[jugadorIdx] <= 0) {
+            money[jugadorIdx] = 0;
+            if (numPlayers > 2) {
+                eliminado[jugadorIdx] = true;
+                rugs[jugadorIdx] = 0; // ya no coloca más alfombras
+                return true;
+            }
+            // En 2 jugadores el juego termina, no se elimina
+        }
+        return false;
+    }
+
+    /** Devuelve true si el jugador fue eliminado. */
+    public boolean esEliminado(int jugadorIdx) {
+        return eliminado != null && eliminado[jugadorIdx];
+    }
+
+    /**
+     * En 2 jugadores: termina si alguno llega a 0 monedas O si se agotan rugs.
+     * En 3-4 jugadores: termina si solo queda 1 jugador activo O si se agotan rugs.
+     */
     public boolean juegoTerminado() {
+        if (numPlayers == 2) {
+            if (money[0] <= 0 || money[1] <= 0) return true;
+        } else {
+            int activos = 0;
+            for (int i = 0; i < numPlayers; i++)
+                if (!esEliminado(i)) activos++;
+            if (activos <= 1) return true;
+        }
         return JuegoServicio.juegoTerminado(rugs);
     }
 
@@ -253,7 +309,10 @@ public class GestionJuegoServicio {
     public String serializarEstado(int assamX, int assamY, int assamDir) {
         return EstadoJuegoServicio.serializarEstado(
             numPlayers, money, rugs, tileOwner, currentPlayerIdx, currentPhase,
-            firstCarpetX, firstCarpetY, carpetOrientation);
+            firstCarpetX, firstCarpetY, carpetOrientation,
+            posicionReliquia, inventarioReliquias != null
+                ? inventarioReliquias
+                : new boolean[numPlayers][Reliquia.values().length]);
     }
 
     public void aplicarEstado(String raw) {
@@ -297,6 +356,28 @@ public class GestionJuegoServicio {
             for (int r = 0; r < 7; r++)
                 for (int c = 0; c < 7; c++)
                     carpetOrientation[c][r] = orient[c][r];
+        }
+
+        // ── Reliquias: posiciones ─────────────────────────────────────────────
+        if (secciones.length > 8) {
+            String[] rels = secciones[8].split("/");
+            for (int i = 0; i < rels.length && i < posicionReliquia.length; i++) {
+                String[] coords = rels[i].split(",");
+                if (coords.length >= 2) {
+                    posicionReliquia[i][0] = Integer.parseInt(coords[0]);
+                    posicionReliquia[i][1] = Integer.parseInt(coords[1]);
+                }
+            }
+        }
+
+        // ── Reliquias: inventarios por jugador ────────────────────────────────
+        if (secciones.length > 9 && inventarioReliquias != null) {
+            String[] jugadores = secciones[9].split("/");
+            for (int j = 0; j < jugadores.length && j < numPlayers; j++) {
+                String[] bits = jugadores[j].split(",");
+                for (int r = 0; r < bits.length && r < Reliquia.values().length; r++)
+                    inventarioReliquias[j][r] = "1".equals(bits[r]);
+            }
         }
     }
 

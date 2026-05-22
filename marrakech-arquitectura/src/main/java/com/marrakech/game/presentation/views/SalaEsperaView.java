@@ -233,4 +233,5 @@ public class SalaEsperaView extends StackPane {
     public Button getBtnSalir()     { return btnSalir; }
     public int    getNumJugadores() { return partida.maxJugadores; }
     public String getPartidaId()    { return partida.id; }
+    public boolean isPoderesActivados() { return partida.poderesActivados; }
 }
