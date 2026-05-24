@@ -43,4 +43,10 @@ public class DatabaseConnection {
             System.err.println("[DB] Error inicializando schema: " + e.getMessage());
         }
     }
+
+    public static void initServer() {
+        // Para que los tests que lo llaman no fallen.
+        // En nuestro caso, lo que necesitamos es que la BD esté inicializada.
+        initDatabase();
+    }
 }

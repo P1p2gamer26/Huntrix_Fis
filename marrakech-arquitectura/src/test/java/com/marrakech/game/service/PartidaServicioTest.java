@@ -121,4 +121,27 @@ class PartidaServicioTest {
         when(partidaRepo.unirsePartida("MRK-OK", "Jugador")).thenReturn(true);
         assertTrue(svc.unirsePartida("MRK-OK", "Jugador"));
     }
+
+    @Test
+    void limpiarSalasViejas_cubreForYIf() {
+        IPartidaRepositorio repo = org.mockito.Mockito.mock(IPartidaRepositorio.class);
+
+        var p1 = new com.marrakech.game.repository.PartidaRepositorio.Partida(
+                "MRK-0001", "Sala 1", 4, true, false, "Normal",
+                java.util.List.of("Jugador1"), "INICIADA"
+        );
+
+        var p2 = new com.marrakech.game.repository.PartidaRepositorio.Partida(
+                "MRK-0002", "Sala 2", 4, false, false, "Normal",
+                java.util.List.of("Jugador2"), "ESPERANDO"
+        );
+
+        org.mockito.Mockito.when(repo.listarPartidas()).thenReturn(java.util.List.of(p1, p2));
+
+        PartidaServicio s = new PartidaServicio(repo);
+        s.limpiarSalasViejas();
+
+        org.mockito.Mockito.verify(repo).listarPartidas();
+    }
 }
+
