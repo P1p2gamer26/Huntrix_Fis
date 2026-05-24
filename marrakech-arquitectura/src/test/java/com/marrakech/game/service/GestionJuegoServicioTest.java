@@ -76,4 +76,27 @@ class GestionJuegoServicioTest {
         assertEquals(1, g.getCurrentPlayerIdx());
         assertEquals(2, g.getNumPlayers());
     }
+
+    @Test
+    void cubrir_invalidos_y_getters_firstCarpet() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+
+        // fase 1: click inválido (cubre el return ResultadoClick.invalido() de fase 1)
+        g.setCurrentPhase(1);
+        assertEquals(GestionJuegoServicio.ResultadoTipo.INVALIDO,
+                g.procesarClick(0, 0, 3, 3).tipo);
+
+        // fase 2: generar "espera segunda" y luego segundo click inválido (cubre el return INVALIDO de fase 2)
+        g.setCurrentPhase(1);
+        var r1 = g.procesarClick(3, 4, 3, 3);
+        assertEquals(GestionJuegoServicio.ResultadoTipo.ESPERA_SEGUNDA, r1.tipo);
+
+        var r2 = g.procesarClick(0, 0, 3, 3);
+        assertEquals(GestionJuegoServicio.ResultadoTipo.INVALIDO, r2.tipo);
+
+        // cubrir getters que estaban sin tocar
+        assertEquals(3, g.getFirstCarpetX());
+        assertEquals(4, g.getFirstCarpetY());
+    }
 }

@@ -21,4 +21,13 @@ class AssamServicioTest {
         int[][] path = a.computePath(2);
         assertEquals(3, path.length);
     }
+
+    @Test
+    void gettersXyY_quedanCubiertos() {
+        AssamServicio a = new AssamServicio();
+        a.setPosition(5, 1);
+
+        assertEquals(5, a.getX());
+        assertEquals(1, a.getY());
+    }
 }
