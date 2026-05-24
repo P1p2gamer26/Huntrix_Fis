@@ -21,35 +21,43 @@ public class EstadoJuegoServicio {
     private final IEstadoJuegoRepositorio estadoRepo;
     private final String partidaId;
 
-    private int     estadoVersion;
-    private int     ultimoTurnoVisto;
+    // -1 garantiza que cualquier turno en DB sea detectado como nuevo
+    private volatile int ultimoTurnoVisto = -1;
+    private volatile int estadoVersion    = -1;
     private Timeline pollingTimeline;
 
     public EstadoJuegoServicio(IEstadoJuegoRepositorio estadoRepo, String partidaId) {
         this.estadoRepo = estadoRepo;
-        this.partidaId = partidaId;
+        this.partidaId  = partidaId;
     }
 
     public void guardarEstado(int assamX, int assamY, int assamDir, String tableroJson) {
         if (partidaId == null) return;
-        estadoVersion++;
-        final int turno = estadoVersion;
         final int ax = assamX, ay = assamY, adir = assamDir;
         new Thread(() -> {
+            String raw = estadoRepo.cargarUltimo(partidaId);
+            int ultimoTurno = 0;
+            if (raw != null) {
+                try { ultimoTurno = Integer.parseInt(raw.split("\\|")[0]); } catch (Exception ignored) {}
+            }
+            int turno = ultimoTurno + 1;
             estadoRepo.guardar(partidaId, turno, ax, ay, adir, tableroJson);
-            Platform.runLater(() -> ultimoTurnoVisto = turno);
+            // Actualizar en el mismo hilo para evitar race condition
+            ultimoTurnoVisto = turno;
+            estadoVersion    = turno;
         }, "db-writer").start();
     }
 
     public void guardarEstadoSincrono(int assamX, int assamY, int assamDir, String tableroJson) {
         if (partidaId == null) return;
-        estadoVersion++;
-        final int turno = estadoVersion;
         final int ax = assamX, ay = assamY, adir = assamDir;
         CountDownLatch latch = new CountDownLatch(1);
         new Thread(() -> {
-            estadoRepo.guardar(partidaId, turno, ax, ay, adir, tableroJson);
-            Platform.runLater(() -> ultimoTurnoVisto = turno);
+            // Limpiar estado anterior y empezar siempre desde turno 1
+            estadoRepo.limpiar(partidaId);
+            estadoRepo.guardar(partidaId, 1, ax, ay, adir, tableroJson);
+            ultimoTurnoVisto = 1;
+            estadoVersion    = 1;
             latch.countDown();
         }, "db-init-writer").start();
         try { latch.await(3, TimeUnit.SECONDS); } catch (InterruptedException ignored) {}
@@ -60,15 +68,47 @@ public class EstadoJuegoServicio {
         return estadoRepo.cargarUltimo(partidaId);
     }
 
-    public void iniciarPolling(Runnable onEstadoCambiado) {
-        pollingTimeline = new Timeline(new KeyFrame(Duration.millis(1200), e ->
+    /**
+     * Notifica que el turno actual terminó completamente.
+     * Guarda el estado y lo marca como "listo" para que los otros jugadores lo lean.
+     */
+    public void notificarTurnoListo(int assamX, int assamY, int assamDir, String tableroJson) {
+        if (partidaId == null) return;
+        final int ax = assamX, ay = assamY, adir = assamDir;
+        new Thread(() -> {
+            String raw = estadoRepo.cargarUltimo(partidaId);
+            int ultimoTurno = 0;
+            if (raw != null) {
+                try { ultimoTurno = Integer.parseInt(raw.split("\\|")[0]); } catch (Exception ignored) {}
+            }
+            int turno = ultimoTurno + 1;
+            estadoRepo.guardar(partidaId, turno, ax, ay, adir, tableroJson);
+            // Ahora marcamos como listo — J2 solo leerá a partir de aquí
+            estadoRepo.marcarListo(partidaId);
+            ultimoTurnoVisto = turno;
+            estadoVersion    = turno;
+        }, "db-writer-listo").start();
+    }
+
+    /** Desmarca el listo al empezar el turno propio (para no re-leer el estado anterior). */
+    public void desmarcarListo() {
+        if (partidaId == null) return;
+        new Thread(() -> estadoRepo.desmarcarListo(partidaId), "db-desmarcar").start();
+    }
+
+    public void iniciarPolling(java.util.function.Consumer<String> onEstadoCambiado) {
+        pollingTimeline = new Timeline(new KeyFrame(Duration.millis(500), e ->
             new Thread(() -> {
+                // Solo disparar cuando el otro jugador marcó su turno como listo
+                if (!estadoRepo.estaListo(partidaId)) return;
                 String raw = cargarUltimoEstado();
                 if (raw == null) return;
                 EstadoDB est = parsearEstado(raw);
                 if (est != null && est.turno > ultimoTurnoVisto) {
                     ultimoTurnoVisto = est.turno;
-                    Platform.runLater(onEstadoCambiado);
+                    estadoVersion    = est.turno;
+                    final String rawFinal = raw;
+                    Platform.runLater(() -> onEstadoCambiado.accept(rawFinal));
                 }
             }, "db-poller").start()
         ));
@@ -105,12 +145,10 @@ public class EstadoJuegoServicio {
             for (int col = 0; col < 7; col++) sb.append(carpetOrientation[col][row]).append(",");
             sb.append("/");
         }
-        // ── Reliquias: posiciones ─────────────────────────────────────────────
         sb.append(";");
         for (int i = 0; i < posicionReliquia.length; i++)
             sb.append(posicionReliquia[i][0]).append(",").append(posicionReliquia[i][1])
               .append(i < posicionReliquia.length - 1 ? "/" : "");
-        // ── Reliquias: inventarios por jugador ────────────────────────────────
         sb.append(";");
         for (int j = 0; j < numPlayers; j++) {
             for (int r = 0; r < inventarioReliquias[j].length; r++)

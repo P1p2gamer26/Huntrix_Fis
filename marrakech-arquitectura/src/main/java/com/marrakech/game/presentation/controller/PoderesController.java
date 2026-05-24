@@ -103,15 +103,8 @@ public class PoderesController {
     }
 
     /**
-     * Ejecuta la jerarquía completa al terminar el movimiento de Assam:
-     *   1. Calcula si hay pago (alfombra ajena bajo Assam).
-     *   2. Si hay pago y el jugador tiene el Cáliz, pregunta si lo usa.
-     *   3. Aplica el pago final (con o sin descuento).
-     *   4. Si el jugador tiene la Alfombra del Sultán, pregunta si la usa.
-     *
-     * @param ax    columna final de Assam
-     * @param ay    fila final de Assam
-     * @param pasos número de pasos lanzados (para el mensaje)
+     * Ejecuta pago + Cáliz Dorado al terminar el movimiento.
+     * El Sultán se resuelve por separado en GameController, después de verificar eliminación.
      */
     public ResultadoPost resolverPostMovimiento(int ax, int ay, int pasos) {
         int jugador = juegoSvc.getCurrentPlayerIdx();
@@ -124,7 +117,6 @@ public class PoderesController {
         String mensajePago;
 
         if (pago > 0) {
-            // ── Paso 2: ¿tiene Cáliz? ─────────────────────────────────────────
             int pagoFinal = pago;
             boolean caliz = poderesActivados && inv[Reliquia.CALIZ_DORADO.ordinal()];
 
@@ -154,31 +146,44 @@ public class PoderesController {
                     + " Dh a " + nombreDueno + ". Coloca tu alfombra.";
             }
 
-            // ── Paso 3: aplicar el pago final ────────────────────────────────
             int[] dinero = juegoSvc.getMoney();
-            dinero[jugador] = Math.max(0, dinero[jugador] - pagoFinal);
-            if (dueno > 0) dinero[dueno - 1] += pagoFinal;
+            if (!juegoSvc.esEliminado(jugador) && (dueno <= 0 || !juegoSvc.esEliminado(dueno - 1))) {
+                int pagoFinalLimitado = juegoSvc.isPartidaRapida()
+                    ? Math.min(pagoFinal, dinero[jugador])
+                    : pagoFinal;
+                int pagoReal = Math.min(pagoFinalLimitado, dinero[jugador]);
+                dinero[jugador] = Math.max(0, dinero[jugador] - pagoFinalLimitado);
+                if (dueno > 0) dinero[dueno - 1] += pagoReal;
+            }
 
         } else {
             mensajePago = "Dado: " + pasos + " — Haz click en una casilla adyacente.";
         }
 
-        // ── Paso 4: ¿tiene Alfombra del Sultán? ──────────────────────────────
-        boolean sultan = false;
-        if (poderesActivados && inv[Reliquia.ALFOMBRA_SULTAN.ordinal()]) {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("✨ Alfombra del Sultán");
-            confirm.setHeaderText("Tienes la Alfombra del Sultán");
-            confirm.setContentText("¿Quieres usarla para colocar una segunda alfombra este turno?");
-            confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        return new ResultadoPost(mensajePago, false);
+    }
 
-            sultan = confirm.showAndWait()
-                .map(r -> r == ButtonType.YES).orElse(false);
+    /**
+     * Pregunta por la Alfombra del Sultán. Se llama desde GameController
+     * solo después de confirmar que el jugador no fue eliminado.
+     */
+    public boolean resolverSultan() {
+        int jugador = juegoSvc.getCurrentPlayerIdx();
+        boolean[] inv = juegoSvc.getInventarioJugador(jugador);
 
-            if (sultan) juegoSvc.consumirReliquia(Reliquia.ALFOMBRA_SULTAN);
-        }
+        if (!poderesActivados || !inv[Reliquia.ALFOMBRA_SULTAN.ordinal()]) return false;
 
-        return new ResultadoPost(mensajePago, sultan);
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("✨ Alfombra del Sultán");
+        confirm.setHeaderText("Tienes la Alfombra del Sultán");
+        confirm.setContentText("¿Quieres usarla para colocar una segunda alfombra este turno?");
+        confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+
+        boolean usar = confirm.showAndWait()
+            .map(r -> r == ButtonType.YES).orElse(false);
+
+        if (usar) juegoSvc.consumirReliquia(Reliquia.ALFOMBRA_SULTAN);
+        return usar;
     }
 
     // ── Utilidad ──────────────────────────────────────────────────────────────

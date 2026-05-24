@@ -69,17 +69,20 @@ public class ChatController {
         String texto = chatInput.getText().trim();
         if (texto.isEmpty()) return;
         chatInput.clear();
-        chatSvc.enviar(texto);
 
+        String hora = new SimpleDateFormat("HH:mm").format(new Date());
+        // Mostrar burbuja propia inmediatamente (sin esperar la DB)
+        Mensaje mLocal = new Mensaje(-1, usuarioActual, texto, hora);
+        agregarBurbuja(mLocal);
+        scrollAlFinal();
+
+        // Enviar a DB; el polling actualizará ultimoMensajeId cuando llegue el INSERT
         new Thread(() -> {
+            chatSvc.enviar(texto);
+            // Esperar a que el INSERT termine y luego avanzar el cursor
+            try { Thread.sleep(300); } catch (InterruptedException ignored) {}
             int nuevoId = chatSvc.obtenerUltimoIdMensaje();
-            String hora = new SimpleDateFormat("HH:mm").format(new Date());
-            Mensaje m = new Mensaje(nuevoId, usuarioActual, texto, hora);
-            Platform.runLater(() -> {
-                chatSvc.setUltimoMensajeId(nuevoId);
-                agregarBurbuja(m);
-                scrollAlFinal();
-            });
+            Platform.runLater(() -> chatSvc.setUltimoMensajeId(nuevoId));
         }, "chat-send-local").start();
     }
 

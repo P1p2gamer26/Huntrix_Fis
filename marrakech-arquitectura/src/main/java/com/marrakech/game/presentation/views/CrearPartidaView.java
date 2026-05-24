@@ -95,7 +95,7 @@ public class CrearPartidaView extends StackPane {
         btnCrear  = crearBotonRelleno("CREAR");
         botones.getChildren().addAll(btnVolver, btnCrear);
 
-        panel.getChildren().addAll(titulo, seccionCantidad, checkPoderes, checkRapida, seccionDificultad, botones);
+        panel.getChildren().addAll(titulo, seccionCantidad, checkPoderes, checkRapida, botones);
         getChildren().add(panel);
     }
 

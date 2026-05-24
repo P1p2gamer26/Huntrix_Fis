@@ -55,6 +55,7 @@ public class GameController {
     private int     miIndice = 0;
     private boolean modoMultijugador = false;
     private boolean poderesActivados = false;
+    private boolean partidaRapida    = false;
     private boolean sultanPendiente  = false;
 
     private GestionJuegoServicio juegoSvc;
@@ -83,21 +84,27 @@ public class GameController {
     }
 
     public void iniciarConJugadores(int n, String partidaId, String usuario,
-                                    int miIndice, PartidaServicio partidaSvc, boolean poderes) {
+                                    int miIndice, PartidaServicio partidaSvc, boolean poderes, boolean rapida) {
         this.partidaId        = partidaId;
         this.usuarioActual    = usuario;
         this.miIndice         = miIndice;
         this.modoMultijugador = true;
         this.partidaSvc       = partidaSvc;
         this.poderesActivados = poderes;
+        this.partidaRapida    = rapida;
 
         this.estadoSvc = new EstadoJuegoServicio(estadoRepo, partidaId);
 
-        startGame(n);
+        startGame(n, rapida);
 
-        if (miIndice == 0) estadoSvc.guardarEstadoSincrono(
-            assamSvc.getX(), assamSvc.getY(), assamSvc.getDir(), serializarEstado());
-        estadoSvc.iniciarPolling(() -> aplicarEstadoDesdeDB());
+        // Host guarda estado inicial real — guest lo recibe via polling
+        if (miIndice == 0) {
+            estadoSvc.guardarEstadoSincrono(
+                assamSvc.getX(), assamSvc.getY(), assamSvc.getDir(),
+                serializarEstado());
+        }
+        // Ambos arrancan polling
+        estadoSvc.iniciarPolling(raw -> aplicarEstadoDesdeDB(raw));
 
         chatSvc.inicializar(partidaId, usuario);
         chatCtrl.cargarHistorial();
@@ -118,9 +125,11 @@ public class GameController {
         iniciarConJugadores(n);
     }
 
-    private void startGame(int n) {
+    private void startGame(int n) { startGame(n, false); }
+
+    private void startGame(int n, boolean rapida) {
         juegoSvc = new GestionJuegoServicio();
-        juegoSvc.iniciarJuego(n);
+        juegoSvc.iniciarJuego(n, rapida);
 
         assamSvc = new AssamServicio();
 
@@ -150,7 +159,6 @@ public class GameController {
                     assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
                 tableroCtrl.limpiarHighlights();
                 actualizarUI(); actualizarControles();
-                guardarEstado();
             } else {
                 pasarTurno();
             }
@@ -172,8 +180,13 @@ public class GameController {
 
         assamCtrl.getView().toFront();
 
-        int firstPlayer = (!modoMultijugador || miIndice == 0)
-            ? new Random().nextInt(n) : 0;
+        int firstPlayer = 0;
+        if (!modoMultijugador) {
+            firstPlayer = new Random().nextInt(n);
+        }
+        // En multijugador siempre empieza el host (índice 0)
+        // El guest recibe el estado via polling
+
         juegoSvc.setCurrentPlayerIdx(firstPlayer);
         juegoSvc.setCurrentPhase(0);
         tableroCtrl.actualizarContexto(0, firstPlayer,
@@ -206,14 +219,12 @@ public class GameController {
         if (!juegoSvc.esMiTurno(modoMultijugador, miIndice)
             || juegoSvc.getCurrentPhase() != PHASE_MOVE) return;
         assamCtrl.rotarIzquierda();
-        guardarEstado();
     }
 
     @FXML protected void rotateRight() {
         if (!juegoSvc.esMiTurno(modoMultijugador, miIndice)
             || juegoSvc.getCurrentPhase() != PHASE_MOVE) return;
         assamCtrl.rotarDerecha();
-        guardarEstado();
     }
 
     @FXML protected void onRollDiceClick() {
@@ -246,18 +257,18 @@ public class GameController {
                     actualizarUI();
                 }
 
-                // Pago + Cáliz + Sultán en jerarquía correcta
+                // Pago + Cáliz en jerarquía correcta (sin Sultán todavía)
                 PoderesController.ResultadoPost resultado =
                     poderesCtrl.resolverPostMovimiento(ax, ay, pasos);
                 statusLabel.setText(resultado.mensaje);
 
-                // Verificar si el jugador actual quedó sin monedas
+                // Verificar eliminación ANTES de preguntar por el Sultán
                 int jugadorActual = juegoSvc.getCurrentPlayerIdx();
                 boolean eliminado = juegoSvc.verificarEliminacion(jugadorActual);
 
                 // Comprobar fin de partida (por monedas o por rugs)
                 if (juegoSvc.juegoTerminado()) {
-                    actualizarUI(); guardarEstado();
+                    actualizarUI(); notificarTurnoListo();
                     finJuegoCtrl.mostrar(modoMultijugador, miIndice, usuarioActual);
                     return;
                 }
@@ -272,21 +283,20 @@ public class GameController {
                 int newPhase = juegoSvc.fasePostDado();
                 juegoSvc.setCurrentPhase(newPhase);
 
-                // Si el Sultán fue activado, quedarse en fase de alfombra
-                if (resultado.sultanActivado) {
+                // Preguntar por el Sultán solo si el jugador no fue eliminado
+                boolean sultanActivado = poderesCtrl.resolverSultan();
+                if (sultanActivado) {
                     sultanPendiente = true;
                     statusLabel.setText("✨ Alfombra del Sultán — ¡coloca tu primera alfombra!");
                     tableroCtrl.actualizarContexto(newPhase, juegoSvc.getCurrentPlayerIdx(),
                         assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
                     actualizarUI(); actualizarControles();
-                    guardarEstado();
                     return;
                 }
                 tableroCtrl.actualizarContexto(newPhase, juegoSvc.getCurrentPlayerIdx(),
                     assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
                 if (juegoSvc.getRugs()[juegoSvc.getCurrentPlayerIdx()] == 0) { pasarTurno(); return; }
                 actualizarUI(); actualizarControles();
-                guardarEstado();
             }));
         });
     }
@@ -301,14 +311,17 @@ public class GameController {
             assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
         tableroCtrl.limpiarHighlights();
         actualizarUI(); actualizarControles(); actualizarStatus();
-        guardarEstado();
+        // Guarda Y notifica en un solo paso: los demás jugadores solo leen cuando esto esté listo
+        notificarTurnoListo();
     }
 
-    private void aplicarEstadoDesdeDB() {
-        String raw = estadoSvc.cargarUltimoEstado();
+    private void aplicarEstadoDesdeDB(String raw) {
         if (raw == null) return;
         EstadoDB est = EstadoJuegoServicio.parsearEstado(raw);
-        if (est == null || est.turno <= estadoSvc.getUltimoTurnoVisto()) return;
+        if (est == null) return;
+
+        estadoSvc.setUltimoTurnoVisto(est.turno);
+        estadoSvc.setEstadoVersion(est.turno);
 
         assamSvc.setPosition(est.ax, est.ay);
         assamSvc.setDir(est.adir);
@@ -316,20 +329,22 @@ public class GameController {
 
         juegoSvc.aplicarEstado(raw);
 
-        estadoSvc.setUltimoTurnoVisto(est.turno);
-        estadoSvc.setEstadoVersion(est.turno);
-
         tableroCtrl.actualizarContexto(juegoSvc.getCurrentPhase(), juegoSvc.getCurrentPlayerIdx(),
             assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
-        redibujarTablero(); // usa redibujarConReliquias si poderes activos
+        redibujarTablero();
         tableroCtrl.limpiarHighlights();
 
         if (juegoSvc.getCurrentPhase() == 2 && juegoSvc.getFirstCarpetX() >= 0
-            && juegoSvc.esMiTurno(modoMultijugador, miIndice))
+                && juegoSvc.esMiTurno(modoMultijugador, miIndice))
             tableroCtrl.highlightTile(juegoSvc.getFirstCarpetX(), juegoSvc.getFirstCarpetY());
 
         assamCtrl.getView().toFront();
         actualizarUI(); actualizarControles(); actualizarStatus();
+
+        // Es mi turno ahora — desmarcar listo para que no re-disparemos el mismo estado
+        if (estadoSvc != null && juegoSvc.esMiTurno(modoMultijugador, miIndice))
+            estadoSvc.desmarcarListo();
+
         if (juegoSvc.juegoTerminado() && !endScreen.isVisible())
             finJuegoCtrl.mostrar(modoMultijugador, miIndice, usuarioActual);
     }
@@ -450,8 +465,16 @@ public class GameController {
             tableroCtrl.redibujar(assamCtrl.getView());
     }
 
-    private void guardarEstado() {
+    /** Guarda el estado Y lo marca como listo — los otros jugadores leen solo cuando se llama esto. */
+    private void notificarTurnoListo() {
         if (estadoSvc != null)
+            estadoSvc.notificarTurnoListo(assamSvc.getX(), assamSvc.getY(),
+                assamSvc.getDir(), serializarEstado());
+    }
+
+    /** Guardado simple sin marcar listo (casos terminales: fin de juego, eliminación). */
+    private void guardarEstado() {
+        if (estadoSvc != null && juegoSvc.esMiTurno(modoMultijugador, miIndice))
             estadoSvc.guardarEstado(assamSvc.getX(), assamSvc.getY(),
                 assamSvc.getDir(), serializarEstado());
     }
