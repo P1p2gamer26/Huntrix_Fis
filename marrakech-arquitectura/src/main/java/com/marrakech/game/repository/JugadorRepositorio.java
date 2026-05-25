@@ -14,28 +14,40 @@ public class JugadorRepositorio implements IJugadorRepositorio {
 
     public JugadorRepositorio(EstadisticasRepositorio estadisticasRepo) {
         this.estadisticasRepo = estadisticasRepo;
-        agregarColumnasExtra();
+        garantizarTablaJugador();
     }
 
     // ── Creación ──────────────────────────────────────────────────────────────
 
     @Override
     public boolean crearJugador(String nombre, String correo, String password) {
-        String sql = "INSERT INTO Jugador (nombre_usuario, correo, password, " +
-                     "fecha_registro, estado) VALUES (?, ?, ?, CURRENT_TIMESTAMP, 'ACTIVO')";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql,
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            String sql = "INSERT INTO Jugador (nombre_usuario, correo, password, " +
+                         "fecha_registro, estado) VALUES (?, ?, ?, CURRENT_TIMESTAMP, 'ACTIVO')";
+            try (PreparedStatement stmt = conn.prepareStatement(sql,
                                          PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, nombre);
-            stmt.setString(2, correo);
-            stmt.setString(3, password);
-            stmt.executeUpdate();
-            ResultSet keys = stmt.getGeneratedKeys();
-            if (keys.next()) estadisticasRepo.inicializarEstadisticas(keys.getInt(1));
+                stmt.setString(1, nombre);
+                stmt.setString(2, correo);
+                stmt.setString(3, password);
+                stmt.executeUpdate();
+                ResultSet keys = stmt.getGeneratedKeys();
+                if (keys.next()) {
+                    estadisticasRepo.inicializarEstadisticas(keys.getInt(1), conn);
+                }
+            }
+            conn.commit();
             return true;
         } catch (Exception e) {
+            if (conn != null) try { conn.rollback(); } catch (Exception ignored) {}
             System.err.println("[JugadorRepositorio] Error creando jugador: " + e.getMessage());
+            e.printStackTrace();
             return false;
+        } finally {
+            if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (Exception ignored) {}
         }
     }
 
@@ -67,11 +79,10 @@ public class JugadorRepositorio implements IJugadorRepositorio {
 
     /**
      * Intenta autenticar al jugador.
-     * @return null=credenciales incorrectas, "SESION_ACTIVA"=ya hay sesión, nombre=éxito
+     * @return null=credenciales incorrectas, "SESION_ACTIVA"=ya hay sesión activa, nombre=éxito
      */
     @Override
     public String loginJugador(String apodo, String password) {
-        agregarColumnasExtra();
         String sql = "SELECT nombre_usuario, sesion_activa FROM Jugador " +
                      "WHERE nombre_usuario = ? AND password = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -81,10 +92,13 @@ public class JugadorRepositorio implements IJugadorRepositorio {
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) return null;
             String nombre = rs.getString("nombre_usuario");
-            if (rs.getBoolean("sesion_activa")) marcarSesion(nombre, false);
+            if (rs.getBoolean("sesion_activa")) return "SESION_ACTIVA";
             marcarSesion(nombre, true);
             return nombre;
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            System.err.println("[JugadorRepositorio] Error en loginJugador: " + e.getMessage());
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -149,7 +163,7 @@ public class JugadorRepositorio implements IJugadorRepositorio {
 
     @Override
     public boolean guardarFoto(String nombreUsuario, File archivoImagen) {
-        agregarColumnasExtra();
+        garantizarTablaJugador();
         String sql = "UPDATE Jugador SET foto = ? WHERE nombre_usuario = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -163,7 +177,7 @@ public class JugadorRepositorio implements IJugadorRepositorio {
 
     @Override
     public byte[] getFoto(String nombreUsuario) {
-        agregarColumnasExtra();
+        garantizarTablaJugador();
         String sql = "SELECT foto FROM Jugador WHERE nombre_usuario = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -179,7 +193,7 @@ public class JugadorRepositorio implements IJugadorRepositorio {
 
     // ── Inicialización de tabla (idempotente) ──────────────────────────────────
 
-    private void agregarColumnasExtra() {
+    public void garantizarTablaJugador() {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement st = conn.createStatement()) {
             st.execute("CREATE TABLE IF NOT EXISTS Jugador (" +
@@ -187,12 +201,14 @@ public class JugadorRepositorio implements IJugadorRepositorio {
                 "nombre_usuario VARCHAR(50) UNIQUE NOT NULL, " +
                 "correo VARCHAR(100) UNIQUE NOT NULL, " +
                 "password VARCHAR(255) NOT NULL, " +
-                "estado VARCHAR(15))");
-            st.execute("ALTER TABLE Jugador ADD COLUMN IF NOT EXISTS fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
-            st.execute("ALTER TABLE Jugador ADD COLUMN IF NOT EXISTS foto BLOB");
-            st.execute("ALTER TABLE Jugador ADD COLUMN IF NOT EXISTS sesion_activa BOOLEAN DEFAULT FALSE");
+                "fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "estado VARCHAR(15) DEFAULT 'ACTIVO', " +
+                "foto BLOB, " +
+                "sesion_activa BOOLEAN DEFAULT FALSE" +
+                ")");
         } catch (Exception e) {
-            System.err.println("[JugadorRepositorio] Error en tabla Jugador: " + e.getMessage());
+            System.err.println("[JugadorRepositorio] Error creando tabla Jugador: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

@@ -52,7 +52,7 @@ class AuthServicioTest {
         verify(jugadorRepo, never()).crearJugador(any(), any(), any());
     }
 
-    // ── CASO COMPLEJO 3: login con sesión ya activa en otro dispositivo ────────
+    // ── CASO COMPLEJO 3: login con sesión ya activa ────────────────────────────
 
     @Test
     void login_sesionActiva_retornaCentinela() {
@@ -116,18 +116,15 @@ class AuthServicioTest {
     }
 
     @Test
-    void login_exitoso_retornaNombreUsuario() {
-        when(jugadorRepo.loginJugador("Luis", "pass")).thenReturn("Luis");
-
-        String resultado = authSvc.login("Luis", "pass");
-
-        assertEquals("Luis", resultado);
-    }
-
-    @Test
     void cerrarSesion_delegaAlRepositorio() {
         authSvc.cerrarSesion("Carlos");
         verify(jugadorRepo).cerrarSesion("Carlos");
+    }
+
+    @Test
+    void login_exitoso_retornaNombreUsuario() {
+        when(jugadorRepo.loginJugador("Luis", "pass")).thenReturn("Luis");
+        assertEquals("Luis", authSvc.login("Luis", "pass"));
     }
 
     @Test

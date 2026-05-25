@@ -69,9 +69,10 @@ public class AuthController {
             String correo = v.getCampoCorreo().getText().trim();
             String pass   = v.getCampoContrasena().getText().trim();
             String res = authSvc.registrarYLogin(apodo, correo, pass);
-            if ("APODO_EXISTE".equals(res))  { v.mostrarError("Ese apodo ya está en uso."); return; }
-            if ("CORREO_EXISTE".equals(res)) { v.mostrarError("Ese correo ya está registrado."); return; }
-            if ("ERROR_BD".equals(res))      { v.mostrarError("Error al guardar los datos. Intenta de nuevo."); return; }
+            if ("APODO_EXISTE".equals(res))   { v.mostrarError("Ese apodo ya está en uso."); return; }
+            if ("CORREO_EXISTE".equals(res))  { v.mostrarError("Ese correo ya está registrado."); return; }
+            if ("EMAIL_INVALIDO".equals(res)) { v.mostrarError("El formato del correo no es válido."); return; }
+            if ("ERROR_BD".equals(res))       { v.mostrarError("Error al guardar los datos. Intenta de nuevo."); return; }
             usuarioActual = apodo;
             mostrarMenu();
         });
@@ -86,7 +87,7 @@ public class AuthController {
             String apodo = v.getCampoApodo().getText().trim();
             String pass  = v.getCampoContrasena().getText().trim();
             String res   = authSvc.login(apodo, pass);
-            if (res == null)               { v.mostrarError("Apodo o contraseña incorrectos."); return; }
+            if (res == null) { v.mostrarError("Apodo o contraseña incorrectos."); return; }
             if ("SESION_ACTIVA".equals(res)) {
                 v.mostrarError("Esta cuenta ya tiene una sesión abierta en otro dispositivo.");
                 return;
@@ -99,7 +100,7 @@ public class AuthController {
 
     public void mostrarMenu() {
         musicaSvc.reproducir(MusicaServicio.Track.MENU);
-        MenuView v = new MenuView(usuarioActual);
+        MenuView v = new MenuView(usuarioActual, partidaSvc.obtenerRanking());
         v.getBtnJugar().setOnAction(e -> mostrarModoOnline());
         v.getBtnJugarLocal().setOnAction(e -> mostrarJuegoLocal());
         v.getBtnReglas().setOnAction(e -> mostrarReglas());
@@ -200,20 +201,22 @@ public class AuthController {
         });
 
         v.setOnJuegoIniciado(() -> {
-            // Reintentar hasta 3 veces para asegurar que el usuario esté en la lista
-            Partida act = null;
-            int miIdx = -1;
-            for (int intento = 0; intento < 3 && miIdx < 0; intento++) {
-                act = partidaSvc.obtenerPartida(partida.id);
-                if (act != null) miIdx = act.jugadores.indexOf(usuarioActual);
-                if (miIdx < 0) {
-                    try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+            new Thread(() -> {
+                Partida act = null;
+                int miIdx = -1;
+                for (int intento = 0; intento < 3 && miIdx < 0; intento++) {
+                    act = partidaSvc.obtenerPartida(partida.id);
+                    if (act != null) miIdx = act.jugadores.indexOf(usuarioActual);
+                    if (miIdx < 0) {
+                        try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+                    }
                 }
-            }
-            final int n   = act != null ? act.maxJugadores : 2;
-            final int idx = miIdx >= 0 ? miIdx : 1;
-            boolean rapidaAct = act != null && act.partidaRapida;
-            mostrarJuego(n, partida.id, usuarioActual, idx, v.isPoderesActivados(), rapidaAct);
+                final int n   = act != null ? act.maxJugadores : 2;
+                final int idx = miIdx >= 0 ? miIdx : 1;
+                final boolean rapidaAct = act != null && act.partidaRapida;
+                Platform.runLater(() ->
+                    mostrarJuego(n, partida.id, usuarioActual, idx, v.isPoderesActivados(), rapidaAct));
+            }, "guest-init").start();
         });
 
         stage.setScene(new Scene(v, width, height));

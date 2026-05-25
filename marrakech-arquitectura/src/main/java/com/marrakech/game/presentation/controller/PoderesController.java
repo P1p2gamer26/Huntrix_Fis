@@ -48,9 +48,11 @@ public class PoderesController {
                             [Reliquia.BRUJULA_MERCADER.ordinal()]) {
 
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("🧭 Brújula del Mercader");
+            confirm.setTitle("[B] Brújula del Mercader");
             confirm.setHeaderText("Tienes la Brújula del Mercader");
-            confirm.setContentText("¿Quieres usarla para elegir cuántas casillas mover?");
+            confirm.setContentText(
+                "La Brújula te permite elegir exactamente cuántas casillas se moverá Assam (1-6)\n\n" +
+                "Si no la usas, se lanzará el dado normalmente.");
             confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
             boolean usar = confirm.showAndWait()
@@ -58,9 +60,9 @@ public class PoderesController {
 
             if (usar) {
                 ChoiceDialog<Integer> dialogo = new ChoiceDialog<>(1, List.of(1, 2, 3, 4, 5, 6));
-                dialogo.setTitle("🧭 Brújula del Mercader");
-                dialogo.setHeaderText("Elige cuántas casillas mover a Assam");
-                dialogo.setContentText("Pasos:");
+                dialogo.setTitle("[B] Brújula del Mercader");
+                dialogo.setHeaderText("¿Cuántos pasos moverá Assam?");
+                dialogo.setContentText("Elige un número entre 1 y 6:");
 
                 int elegido = dialogo.showAndWait().orElse(0);
                 if (elegido > 0) {
@@ -124,9 +126,12 @@ public class PoderesController {
                 int pagoMitad = pago / 2;
 
                 Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-                confirm.setTitle("🏆 Cáliz Dorado");
+                confirm.setTitle("[C] Cáliz Dorado");
                 confirm.setHeaderText("Debes pagar " + pago + " Dh a " + nombreDueno);
-                confirm.setContentText("¿Usas el Cáliz Dorado para pagar solo " + pagoMitad + " Dh?");
+                confirm.setContentText(
+                    "El Cáliz Dorado reduce el pago a la mitad.\n" +
+                    "Pagarías solo " + pagoMitad + " Dh en vez de " + pago + " Dh.\n\n" +
+                    "¿Quieres usarlo?");
                 confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
                 boolean usar = confirm.showAndWait()
@@ -135,7 +140,7 @@ public class PoderesController {
                 if (usar) {
                     pagoFinal = pagoMitad;
                     juegoSvc.consumirReliquia(Reliquia.CALIZ_DORADO);
-                    mensajePago = "🏆 Cáliz Dorado — pagaste solo " + pagoFinal
+                    mensajePago = "[C] Cáliz Dorado - pagaste solo " + pagoFinal
                         + " Dh en vez de " + pago + ". Coloca tu alfombra.";
                 } else {
                     mensajePago = "Dado: " + pasos + " — Pagaste " + pago
@@ -174,9 +179,12 @@ public class PoderesController {
         if (!poderesActivados || !inv[Reliquia.ALFOMBRA_SULTAN.ordinal()]) return false;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("✨ Alfombra del Sultán");
+        confirm.setTitle("[A] Alfombra del Sultán");
         confirm.setHeaderText("Tienes la Alfombra del Sultán");
-        confirm.setContentText("¿Quieres usarla para colocar una segunda alfombra este turno?");
+        confirm.setContentText(
+            "La Alfombra del Sultán te permite colocar DOS alfombras en un solo turno.\n\n" +
+            "Colocarás la primera y luego podrás colocar una segunda.\n\n" +
+            "¿Quieres usarla?");
         confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
         boolean usar = confirm.showAndWait()

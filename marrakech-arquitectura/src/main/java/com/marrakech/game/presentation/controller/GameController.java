@@ -13,8 +13,10 @@ import com.marrakech.game.service.GestionJuegoServicio.Reliquia;
 import com.marrakech.game.service.MusicaServicio;
 import com.marrakech.game.service.PartidaServicio;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -23,6 +25,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -44,7 +47,8 @@ public class GameController {
     @FXML private Label     resultadoLabel, winnerLabel, finalScores;
     @FXML private Button    btnVolverSala, btnVolverMenu;
     @FXML private Canvas    diceCanvas;
-    @FXML private VBox      chatPanel, chatBox;
+    @FXML private VBox      chatPanel, chatBox, poderesLegendPanel;
+    @FXML private VBox      leftPanel, notificacionesPanel;
     @FXML private ScrollPane chatScroll;
     @FXML private TextField  chatInput;
     @FXML private Button     chatSendBtn;
@@ -157,7 +161,7 @@ public class GameController {
         tableroCtrl.setOnCarpetPlaced(() -> {
             if (sultanPendiente) {
                 sultanPendiente = false;
-                statusLabel.setText("✨ Alfombra del Sultán — coloca tu segunda alfombra.");
+                statusLabel.setText("[A] Alfombra del Sultán — coloca tu segunda alfombra.");
                 juegoSvc.setCurrentPhase(1);
                 tableroCtrl.actualizarContexto(1, juegoSvc.getCurrentPlayerIdx(),
                     assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
@@ -178,6 +182,17 @@ public class GameController {
 
         chatCtrl.inicializar(modoMultijugador);
         if (chatSvc != null) chatCtrl.setServicios(chatSvc, partidaId);
+
+        if (poderesLegendPanel != null) {
+            if (poderesActivados) {
+                construirLeyendaPoderes();
+                poderesLegendPanel.setVisible(true);
+                poderesLegendPanel.setManaged(true);
+            } else {
+                poderesLegendPanel.setVisible(false);
+                poderesLegendPanel.setManaged(false);
+            }
+        }
 
         panelJ3.setVisible(n >= 3); panelJ3.setManaged(n >= 3);
         panelJ4.setVisible(n >= 4); panelJ4.setManaged(n >= 4);
@@ -247,9 +262,11 @@ public class GameController {
 
                 Reliquia recogida = poderesCtrl.recogerReliquiasEnRecorrido(path, pasos);
                 if (recogida != null) {
-                    statusLabel.setText(recogida.emoji + " ¡Recogiste: " + recogida.nombre + "!");
+                    statusLabel.setText(recogida.icono + " \u00a1Recogiste: " + recogida.nombre + "!");
                     redibujarTablero();
                     actualizarUI();
+                    agregarNotificacion("[+] Recogiste " + recogida.icono + " "
+                        + recogida.nombre + " — " + recogida.descripcion);
                 }
 
                 PoderesController.ResultadoPost resultado =
@@ -266,7 +283,7 @@ public class GameController {
                 }
 
                 if (eliminado) {
-                    statusLabel.setText("💀 " + playerName(jugadorActual) + " se quedó sin monedas y fue eliminado.");
+                    statusLabel.setText("[X] " + playerName(jugadorActual) + " se quedo sin monedas y fue eliminado.");
                     actualizarUI(); guardarEstado();
                     pasarTurno();
                     return;
@@ -278,7 +295,7 @@ public class GameController {
                 boolean sultanActivado = poderesCtrl.resolverSultan();
                 if (sultanActivado) {
                     sultanPendiente = true;
-                    statusLabel.setText("✨ Alfombra del Sultán — ¡coloca tu primera alfombra!");
+                    statusLabel.setText("[A] Alfombra del Sultán — coloca tu primera alfombra!");
                     tableroCtrl.actualizarContexto(newPhase, juegoSvc.getCurrentPlayerIdx(),
                         assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
                     actualizarUI(); actualizarControles();
@@ -292,16 +309,101 @@ public class GameController {
         });
     }
 
+    private void construirLeyendaPoderes() {
+        poderesLegendPanel.getChildren().clear();
+        poderesLegendPanel.setStyle("-fx-background-color:rgba(10,4,0,0.92);"
+            + "-fx-border-color:#C9922A;-fx-border-width:1.5px;-fx-border-radius:8px;-fx-background-radius:8px;"
+            + "-fx-padding:10 10 10 10;");
+
+        Label titulo = new Label("[*]  L E Y E N D A   D E   P O D E R E S");
+        titulo.setStyle("-fx-font-size:12px;-fx-font-weight:bold;-fx-text-fill:#F0D060;"
+            + "-fx-padding:0 0 6 0;-fx-effect:dropshadow(gaussian,rgba(240,208,96,0.3),6,0.3,0,0);");
+        titulo.setMaxWidth(Double.MAX_VALUE);
+        titulo.setAlignment(javafx.geometry.Pos.CENTER);
+        poderesLegendPanel.getChildren().add(titulo);
+
+        Label sub = new Label("Reliquias m\u00E1gicas del zoco");
+        sub.setStyle("-fx-font-size:9px;-fx-text-fill:#9E7A3A;-fx-padding:0 0 6 0;");
+        sub.setMaxWidth(Double.MAX_VALUE);
+        sub.setAlignment(javafx.geometry.Pos.CENTER);
+        poderesLegendPanel.getChildren().add(sub);
+
+        for (Reliquia r : Reliquia.values()) {
+            Label encabezado = new Label(r.icono + "  " + r.nombre);
+            encabezado.setStyle("-fx-font-size:12px;-fx-font-weight:bold;-fx-text-fill:#E8D4A0;-fx-padding:6 0 1 0;");
+            encabezado.setMaxWidth(Double.MAX_VALUE);
+            poderesLegendPanel.getChildren().add(encabezado);
+
+            Label desc = new Label(r.descripcion);
+            desc.setStyle("-fx-font-size:10px;-fx-text-fill:#B89860;-fx-padding:0 0 0 12;");
+            desc.setWrapText(true);
+            desc.setMaxWidth(Double.MAX_VALUE);
+            poderesLegendPanel.getChildren().add(desc);
+
+            Label flavor = new Label("\u201C" + r.leyenda + "\u201D");
+            flavor.setStyle("-fx-font-size:9px;-fx-font-style:italic;-fx-text-fill:#7A5A30;"
+                + "-fx-padding:1 0 3 12;");
+            flavor.setWrapText(true);
+            flavor.setMaxWidth(Double.MAX_VALUE);
+            poderesLegendPanel.getChildren().add(flavor);
+        }
+
+        Label sep = new Label(" \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 ");
+        sep.setStyle("-fx-font-size:9px;-fx-text-fill:#5C3A10;-fx-padding:6 0 4 0;");
+        sep.setMaxWidth(Double.MAX_VALUE);
+        poderesLegendPanel.getChildren().add(sep);
+
+        Label invLabel = new Label("Tus reliquias:");
+        invLabel.setStyle("-fx-font-size:10px;-fx-font-weight:bold;-fx-text-fill:#C9922A;");
+        invLabel.setMaxWidth(Double.MAX_VALUE);
+        invLabel.setUserData("inventario-label");
+        poderesLegendPanel.getChildren().add(invLabel);
+    }
+
+    private void agregarNotificacion(String texto) {
+        Label notif = new Label(texto);
+        notif.setWrapText(true);
+        notif.setAlignment(Pos.CENTER_LEFT);
+        notif.setMaxWidth(Double.MAX_VALUE);
+        notif.setStyle("-fx-background-color:rgba(201,146,42,0.18);"
+            + "-fx-background-radius:6px;-fx-border-color:rgba(201,146,42,0.4);"
+            + "-fx-border-width:1px;-fx-border-radius:6px;"
+            + "-fx-padding:6 6;-fx-text-fill:#F0D060;"
+            + "-fx-font-size:11px;-fx-font-weight:bold;");
+        notificacionesPanel.getChildren().add(notif);
+
+        PauseTransition pt = new PauseTransition(javafx.util.Duration.seconds(8));
+        pt.setOnFinished(e -> Platform.runLater(() ->
+            notificacionesPanel.getChildren().remove(notif)));
+        pt.play();
+    }
+
+    private void notificarAparicionReliquia(Reliquia r) {
+        agregarNotificacion("[*] " + r.icono + "  " + r.nombre
+            + " — " + r.descripcion);
+    }
+
     private void pasarTurno() {
         juegoSvc.pasarTurno();
 
-        if (poderesActivados) juegoSvc.intentarAparecerReliquia(assamSvc.getX(), assamSvc.getY());
+        Reliquia reliquiaNueva = null;
+        if (poderesActivados) {
+            reliquiaNueva = juegoSvc.intentarAparecerReliquia(assamSvc.getX(), assamSvc.getY());
+        }
 
         redibujarTablero();
         tableroCtrl.actualizarContexto(juegoSvc.getCurrentPhase(), juegoSvc.getCurrentPlayerIdx(),
             assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
         tableroCtrl.limpiarHighlights();
-        actualizarUI(); actualizarControles(); actualizarStatus();
+        actualizarUI(); actualizarControles();
+
+        if (reliquiaNueva != null) {
+            notificarAparicionReliquia(reliquiaNueva);
+            statusLabel.setText("\u2192 Turno de " + playerName(juegoSvc.getCurrentPlayerIdx())
+                + " [*] Aparecio " + reliquiaNueva.icono + " " + reliquiaNueva.nombre + " en el tablero!");
+        } else {
+            actualizarStatus();
+        }
         notificarTurnoListo();
     }
 
@@ -331,6 +433,7 @@ public class GameController {
         assamCtrl.getView().toFront();
         actualizarUI(); actualizarControles(); actualizarStatus();
 
+        // Solo el jugador cuyo turno acaba de comenzar desmarca listo
         if (estadoSvc != null && juegoSvc.esMiTurno(modoMultijugador, miIndice))
             estadoSvc.desmarcarListo();
 
@@ -339,14 +442,14 @@ public class GameController {
     }
 
     @FXML private void volverSala() {
-        if (!confirmarSalida()) return;
+        if (!endScreen.isVisible() && !confirmarSalida()) return;
         if (estadoSvc != null) estadoSvc.detenerPolling();
         if (chatSvc   != null) chatSvc.detenerPolling();
         if (onVolverSala != null) onVolverSala.run();
     }
 
     @FXML private void volverMenu() {
-        if (!confirmarSalida()) return;
+        if (!endScreen.isVisible() && !confirmarSalida()) return;
         if (estadoSvc != null) estadoSvc.detenerPolling();
         if (chatSvc   != null) chatSvc.detenerPolling();
         if (onVolverMenu != null) onVolverMenu.run();
@@ -410,19 +513,39 @@ public class GameController {
 
                 boolean[] inv = juegoSvc.getInventarioJugador(i);
                 StringBuilder sb = new StringBuilder();
-                for (int r = 0; r < Reliquia.values().length; r++)
-                    if (inv[r]) sb.append(Reliquia.values()[r].emoji).append(" ");
+                for (int r = 0; r < Reliquia.values().length; r++) {
+                    if (inv[r]) sb.append(Reliquia.values()[r].icono).append(" ");
+                }
 
                 if (sb.length() > 0) {
                     Label lblRel = new Label(sb.toString().trim());
                     lblRel.setUserData("reliquias-label");
                     lblRel.setStyle("-fx-font-size:14px;-fx-text-fill:#D4A017;");
+                    Tooltip tip = new Tooltip(armarTooltipReliquias(inv));
+                    tip.setStyle("-fx-font-size:10px;-fx-background-color:rgba(10,4,0,0.95);-fx-text-fill:#F0D060;-fx-border-color:#C9922A;-fx-padding:6 8;");
+                    Tooltip.install(lblRel, tip);
                     pl[i].getChildren().add(lblRel);
                 }
             }
         }
         turnLabel.setText(juegoSvc.esMiTurno(modoMultijugador, miIndice)
             ? "TU TURNO" : "TURNO: " + playerName(cpIdx));
+
+        if (poderesActivados && poderesLegendPanel != null) {
+            boolean[] inv = juegoSvc.getInventarioJugador(cpIdx);
+            for (var n : poderesLegendPanel.getChildren()) {
+                if (n instanceof Label && "inventario-label".equals(n.getUserData())) {
+                    StringBuilder txt = new StringBuilder("Tus reliquias:");
+                    for (int r = 0; r < Reliquia.values().length; r++) {
+                        if (inv[r]) txt.append("\n  ").append(Reliquia.values()[r].icono)
+                            .append(" ").append(Reliquia.values()[r].nombre);
+                    }
+                    if (txt.length() == 13) txt.append("\n  (ninguna)");
+                    ((Label) n).setText(txt.toString());
+                    break;
+                }
+            }
+        }
     }
 
     private String playerName(int idx) {
@@ -443,6 +566,18 @@ public class GameController {
 
     @FXML private void onSendChat() {
         chatCtrl.enviar();
+    }
+
+    private String armarTooltipReliquias(boolean[] inv) {
+        StringBuilder sb = new StringBuilder("Reliquias:\n");
+        for (int r = 0; r < Reliquia.values().length; r++) {
+            if (inv[r]) {
+                Reliquia rel = Reliquia.values()[r];
+                sb.append(rel.icono).append(" ").append(rel.nombre).append("\n  ")
+                    .append(rel.descripcion).append("\n");
+            }
+        }
+        return sb.toString().trim();
     }
 
     private void redibujarTablero() {

@@ -20,14 +20,30 @@ class EstadisticasRepositorioTest {
         try (Connection c = DatabaseConnection.getConnection();
              Statement s = c.createStatement()) {
             s.execute("SET REFERENTIAL_INTEGRITY FALSE");
+            s.execute("DROP TABLE IF EXISTS Poder");
+            s.execute("DROP TABLE IF EXISTS EstadoPartida");
+            s.execute("DROP TABLE IF EXISTS Participacion");
+            s.execute("DROP TABLE IF EXISTS Partida");
+            s.execute("DROP TABLE IF EXISTS ConfiguracionPartida");
+            s.execute("DROP TABLE IF EXISTS Mensajechat");
+            s.execute("DROP TABLE IF EXISTS Sala");
+            s.execute("DROP TABLE IF EXISTS partida_jugadores");
+            s.execute("DROP TABLE IF EXISTS partidas");
+            s.execute("DROP TABLE IF EXISTS ranking");
+            s.execute("DROP TABLE IF EXISTS chat_mensajes");
+            s.execute("DROP TABLE IF EXISTS estado_juego");
             s.execute("DROP TABLE IF EXISTS Estadisticas");
             s.execute("DROP TABLE IF EXISTS Jugador");
             s.execute("SET REFERENTIAL_INTEGRITY TRUE");
             s.execute("CREATE TABLE IF NOT EXISTS Jugador (" +
                 "id_jugador INT AUTO_INCREMENT PRIMARY KEY," +
                 "nombre_usuario VARCHAR(50) UNIQUE NOT NULL," +
-                "correo VARCHAR(100)," +
-                "password VARCHAR(255))");
+                "correo VARCHAR(100) UNIQUE NOT NULL," +
+                "password VARCHAR(255) NOT NULL," +
+                "fecha_registro TIMESTAMP," +
+                "estado VARCHAR(15)," +
+                "foto BLOB," +
+                "sesion_activa BOOLEAN DEFAULT FALSE)");
             s.execute("CREATE TABLE IF NOT EXISTS Estadisticas (" +
                 "id_estadistica INT AUTO_INCREMENT PRIMARY KEY," +
                 "partidas_jugadas INT DEFAULT 0," +
@@ -41,7 +57,7 @@ class EstadisticasRepositorioTest {
         repo = new EstadisticasRepositorio();
         try (Connection c = DatabaseConnection.getConnection();
              Statement s = c.createStatement()) {
-            s.execute("INSERT INTO Jugador (nombre_usuario) VALUES ('statsUser')");
+            s.execute("INSERT INTO Jugador (nombre_usuario, correo, password) VALUES ('statsUser', 'stats@test.com', 'pass')");
             var rs = s.executeQuery("SELECT id_jugador FROM Jugador WHERE nombre_usuario = 'statsUser'");
             rs.next(); idJugador = rs.getInt(1);
         }

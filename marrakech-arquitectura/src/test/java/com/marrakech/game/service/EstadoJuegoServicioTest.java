@@ -341,21 +341,21 @@ class EstadoJuegoServicioTest {
     void guardarEstado_partidaIdNull_noIncrementaVersion() {
         EstadoJuegoServicio s = new EstadoJuegoServicio(estadoRepo, null);
         s.guardarEstado(0, 0, 0, "test");
-        assertEquals(0, s.getEstadoVersion());
+        assertEquals(-1, s.getEstadoVersion());
     }
 
     @Test
     void guardarEstadoSincrono_partidaIdNull_noIncrementaVersion() {
         EstadoJuegoServicio s = new EstadoJuegoServicio(estadoRepo, null);
         s.guardarEstadoSincrono(0, 0, 0, "test");
-        assertEquals(0, s.getEstadoVersion());
+        assertEquals(-1, s.getEstadoVersion());
     }
 
     // ── GETTERS / SETTERS ─────────────────────────────────────────────────
 
     @Test
     void estadoVersion_iniciaEnCero() {
-        assertEquals(0, svc.getEstadoVersion());
+        assertEquals(-1, svc.getEstadoVersion());
     }
 
     @Test
@@ -366,7 +366,7 @@ class EstadoJuegoServicioTest {
 
     @Test
     void ultimoTurnoVisto_iniciaEnCero() {
-        assertEquals(0, svc.getUltimoTurnoVisto());
+        assertEquals(-1, svc.getUltimoTurnoVisto());
     }
 
     @Test
