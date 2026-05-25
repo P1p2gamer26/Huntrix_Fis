@@ -1,10 +1,13 @@
 package com.marrakech.game.repository;
 
-import com.marrakech.game.infrastructure.database.DatabaseConnection;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.marrakech.game.infrastructure.database.DatabaseConnection;
 
 /** Acceso a datos de mensajes de chat. */
 public class ChatRepositorio implements IChatRepositorio {
@@ -41,15 +44,20 @@ public class ChatRepositorio implements IChatRepositorio {
 
     @Override
     public void enviarMensaje(String partidaId, String usuario, String texto) {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO chat_mensajes (partida_id, usuario, texto, hora) " +
-                "VALUES (?, ?, ?, FORMATDATETIME(CURRENT_TIMESTAMP, 'HH:mm'))")) {
+        System.out.println("[CHAT-REPO] Guardando: partidaId=" + partidaId + ", usuario=" + usuario + ", texto=" + texto);
+            try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(
+            "INSERT INTO chat_mensajes (partida_id, usuario, texto, hora) " +
+            "VALUES (?, ?, ?, FORMATDATETIME(CURRENT_TIMESTAMP, 'HH:mm'))")) {
             ps.setString(1, partidaId);
             ps.setString(2, usuario);
             ps.setString(3, texto.length() > 500 ? texto.substring(0, 500) : texto);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+            System.out.println("[CHAT-REPO] ✓ Guardado OK");
+        }   catch (Exception e) { 
+                System.err.println("[CHAT-REPO] ✗ ERROR: " + e.getMessage());
+                e.printStackTrace(); 
+            }
     }
 
     @Override

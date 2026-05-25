@@ -2,6 +2,7 @@ package com.marrakech.game.presentation.controller;
 
 import java.util.Random;
 
+import com.marrakech.game.presentation.render.GameRenderEngine;
 import com.marrakech.game.repository.IEstadoJuegoRepositorio;
 import com.marrakech.game.service.AssamServicio;
 import com.marrakech.game.service.ChatServicio;
@@ -11,16 +12,22 @@ import com.marrakech.game.service.GestionJuegoServicio;
 import com.marrakech.game.service.GestionJuegoServicio.Reliquia;
 import com.marrakech.game.service.MusicaServicio;
 import com.marrakech.game.service.PartidaServicio;
-import com.marrakech.game.presentation.render.GameRenderEngine;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 public class GameController {
 
@@ -97,13 +104,11 @@ public class GameController {
 
         startGame(n, rapida);
 
-        // Host guarda estado inicial real — guest lo recibe via polling
         if (miIndice == 0) {
             estadoSvc.guardarEstadoSincrono(
                 assamSvc.getX(), assamSvc.getY(), assamSvc.getDir(),
                 serializarEstado());
         }
-        // Ambos arrancan polling
         estadoSvc.iniciarPolling(raw -> aplicarEstadoDesdeDB(raw));
 
         chatSvc.inicializar(partidaId, usuario);
@@ -151,7 +156,6 @@ public class GameController {
 
         tableroCtrl.setOnCarpetPlaced(() -> {
             if (sultanPendiente) {
-                // Primera alfombra del Sultán colocada — permitir la segunda
                 sultanPendiente = false;
                 statusLabel.setText("✨ Alfombra del Sultán — coloca tu segunda alfombra.");
                 juegoSvc.setCurrentPhase(1);
@@ -184,8 +188,6 @@ public class GameController {
         if (!modoMultijugador) {
             firstPlayer = new Random().nextInt(n);
         }
-        // En multijugador siempre empieza el host (índice 0)
-        // El guest recibe el estado via polling
 
         juegoSvc.setCurrentPlayerIdx(firstPlayer);
         juegoSvc.setCurrentPhase(0);
@@ -208,11 +210,6 @@ public class GameController {
         statusLabel.setText(modoMultijugador
             ? "Conectando... Eres " + playerName(miIndice) + ". Espera el inicio."
             : "Rota a Assam y lanza el dado.");
-
-        // ══════════════════════════════════════════════════════════════════════
-        // AQUÍ VAN LOS SUPERPODERES
-        // (poderesActivados == true cuando el jugador activó el toggle)
-        // ══════════════════════════════════════════════════════════════════════
     }
 
     @FXML protected void rotateLeft() {
@@ -242,14 +239,12 @@ public class GameController {
 
         GameRenderEngine renderEngine = new GameRenderEngine(boardGrid, diceCanvas);
         renderEngine.animarDado(pasos, () -> {
-            // Guardar el path antes de que animarMovimiento actualice la posición de Assam
             int[][] path = assamSvc.computePath(pasos);
 
             assamCtrl.animarMovimiento(pasos, () -> Platform.runLater(() -> {
                 assamCtrl.getView().toFront();
                 int ax = assamSvc.getX(), ay = assamSvc.getY();
 
-                // Recoger reliquias en cada casilla del recorrido (solo si poderes activos)
                 Reliquia recogida = poderesCtrl.recogerReliquiasEnRecorrido(path, pasos);
                 if (recogida != null) {
                     statusLabel.setText(recogida.emoji + " ¡Recogiste: " + recogida.nombre + "!");
@@ -257,16 +252,13 @@ public class GameController {
                     actualizarUI();
                 }
 
-                // Pago + Cáliz en jerarquía correcta (sin Sultán todavía)
                 PoderesController.ResultadoPost resultado =
                     poderesCtrl.resolverPostMovimiento(ax, ay, pasos);
                 statusLabel.setText(resultado.mensaje);
 
-                // Verificar eliminación ANTES de preguntar por el Sultán
                 int jugadorActual = juegoSvc.getCurrentPlayerIdx();
                 boolean eliminado = juegoSvc.verificarEliminacion(jugadorActual);
 
-                // Comprobar fin de partida (por monedas o por rugs)
                 if (juegoSvc.juegoTerminado()) {
                     actualizarUI(); notificarTurnoListo();
                     finJuegoCtrl.mostrar(modoMultijugador, miIndice, usuarioActual);
@@ -283,7 +275,6 @@ public class GameController {
                 int newPhase = juegoSvc.fasePostDado();
                 juegoSvc.setCurrentPhase(newPhase);
 
-                // Preguntar por el Sultán solo si el jugador no fue eliminado
                 boolean sultanActivado = poderesCtrl.resolverSultan();
                 if (sultanActivado) {
                     sultanPendiente = true;
@@ -311,7 +302,6 @@ public class GameController {
             assamSvc.getX(), assamSvc.getY(), juegoSvc.getRugs());
         tableroCtrl.limpiarHighlights();
         actualizarUI(); actualizarControles(); actualizarStatus();
-        // Guarda Y notifica en un solo paso: los demás jugadores solo leen cuando esto esté listo
         notificarTurnoListo();
     }
 
@@ -341,7 +331,6 @@ public class GameController {
         assamCtrl.getView().toFront();
         actualizarUI(); actualizarControles(); actualizarStatus();
 
-        // Es mi turno ahora — desmarcar listo para que no re-disparemos el mismo estado
         if (estadoSvc != null && juegoSvc.esMiTurno(modoMultijugador, miIndice))
             estadoSvc.desmarcarListo();
 
@@ -415,9 +404,7 @@ public class GameController {
                 }
             }
 
-            // ── Inventario de reliquias ───────────────────────────────────────
             if (poderesActivados && pl[i] != null) {
-                // Eliminar label de reliquias anterior si existe
                 pl[i].getChildren().removeIf(n ->
                     n instanceof Label && "reliquias-label".equals(n.getUserData()));
 
@@ -465,14 +452,12 @@ public class GameController {
             tableroCtrl.redibujar(assamCtrl.getView());
     }
 
-    /** Guarda el estado Y lo marca como listo — los otros jugadores leen solo cuando se llama esto. */
     private void notificarTurnoListo() {
         if (estadoSvc != null)
             estadoSvc.notificarTurnoListo(assamSvc.getX(), assamSvc.getY(),
                 assamSvc.getDir(), serializarEstado());
     }
 
-    /** Guardado simple sin marcar listo (casos terminales: fin de juego, eliminación). */
     private void guardarEstado() {
         if (estadoSvc != null && juegoSvc.esMiTurno(modoMultijugador, miIndice))
             estadoSvc.guardarEstado(assamSvc.getX(), assamSvc.getY(),

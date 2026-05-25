@@ -1,4 +1,4 @@
-package com.marrakech.game.presentation.controller;
+﻿package com.marrakech.game.presentation.controller;
 
 import com.marrakech.game.repository.ChatRepositorio.Mensaje;
 import com.marrakech.game.service.ChatServicio;
@@ -57,11 +57,13 @@ public class ChatController {
     public void cargarNuevos() {
         if (chatSvc == null) return;
         java.util.List<Mensaje> nuevos = chatSvc.obtenerMensajesDesde(chatSvc.getUltimoMensajeId());
+        System.out.println("[CHAT-CTRL] Polling: ultimoId=" + chatSvc.getUltimoMensajeId() + ", nuevos=" + nuevos.size());
         for (Mensaje m : nuevos) {
+            System.out.println("[CHAT-CTRL] Mensaje: id=" + m.id + ", usuario=" + m.usuario + ", texto=" + m.texto);
             if (!m.usuario.equals(usuarioActual)) agregarBurbuja(m);
             chatSvc.setUltimoMensajeId(m.id);
         }
-        scrollAlFinal();
+        if (!nuevos.isEmpty()) scrollAlFinal();
     }
 
     public void enviar() {

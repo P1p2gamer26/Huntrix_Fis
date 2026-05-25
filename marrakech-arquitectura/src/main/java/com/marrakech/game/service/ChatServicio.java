@@ -1,23 +1,17 @@
 package com.marrakech.game.service;
 
-import com.marrakech.game.repository.IChatRepositorio;
+import java.util.List;
+
 import com.marrakech.game.repository.ChatRepositorio.Mensaje;
+import com.marrakech.game.repository.IChatRepositorio;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.util.Duration;
 
-import java.util.List;
-
-/**
- * Gestiona el chat en partida: historial, polling y envío de mensajes.
- * Recibe IChatRepositorio por constructor (inyección de dependencias).
- */
 public class ChatServicio {
 
     private final IChatRepositorio chatRepo;
-
     private String   partidaId;
     private String   usuarioActual;
     private int      ultimoMensajeId;
@@ -27,7 +21,6 @@ public class ChatServicio {
         this.chatRepo = chatRepo;
     }
 
-    /** Prepara el servicio para una partida concreta. */
     public void inicializar(String partidaId, String usuarioActual) {
         this.partidaId      = partidaId;
         this.usuarioActual  = usuarioActual;
@@ -35,7 +28,6 @@ public class ChatServicio {
         this.ultimoMensajeId = chatRepo.obtenerUltimoId(partidaId);
     }
 
-    /** Carga todos los mensajes anteriores (historial al entrar). */
     public List<Mensaje> cargarHistorial() {
         List<Mensaje> historial = chatRepo.obtenerMensajes(partidaId, 0);
         if (!historial.isEmpty())
@@ -43,26 +35,20 @@ public class ChatServicio {
         return historial;
     }
 
-    /** Arranca el polling cada 1 segundo; llama onNuevosMensajes en el hilo UI. */
-    public void iniciarPolling(Runnable onNuevosMensajes) {
-        chatTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e ->
-            new Thread(() -> {
-                List<Mensaje> nuevos = chatRepo.obtenerMensajes(partidaId, ultimoMensajeId);
-                if (!nuevos.isEmpty()) {
-                    ultimoMensajeId = nuevos.get(nuevos.size() - 1).id;
-                    Platform.runLater(onNuevosMensajes);
-                }
-            }, "chat-poller").start()
-        ));
+    public void iniciarPolling(Runnable onNuevos) {
+        if (chatTimeline != null) chatTimeline.stop();
+            chatTimeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
+        System.out.println("[CHAT-POLLING] partidaId=" + partidaId + ", ultimoId=" + ultimoMensajeId);
+            onNuevos.run();
+        }));
         chatTimeline.setCycleCount(Timeline.INDEFINITE);
         chatTimeline.play();
+        System.out.println("[CHAT-POLLING] Iniciado para partidaId=" + partidaId);
     }
 
-    /** Envía un mensaje en hilo separado para no bloquear la UI. */
     public void enviar(String texto) {
         if (texto == null || texto.isEmpty()) return;
-        new Thread(() -> chatRepo.enviarMensaje(partidaId, usuarioActual, texto),
-                   "chat-send").start();
+        new Thread(() -> chatRepo.enviarMensaje(partidaId, usuarioActual, texto), "chat-send").start();
     }
 
     public void detenerPolling() {
@@ -76,8 +62,6 @@ public class ChatServicio {
     public int obtenerUltimoIdMensaje() {
         return chatRepo.obtenerUltimoId(partidaId);
     }
-
-    // ── Getters ───────────────────────────────────────────────────────────────
 
     public String getPartidaId()               { return partidaId; }
     public String getUsuarioActual()           { return usuarioActual; }
