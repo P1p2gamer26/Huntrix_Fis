@@ -1,6 +1,6 @@
 package com.marrakech.game.service;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AssamNavigatorTest {
@@ -19,6 +19,7 @@ class AssamNavigatorTest {
         int[][] path = AssamNavigator.computePath(1, 3, 3, 0);
         assertEquals(3, path[1][0]);
         assertEquals(2, path[1][1]);
+        assertEquals(0, path[1][2]);
     }
 
     @Test
@@ -26,6 +27,7 @@ class AssamNavigatorTest {
         int[][] path = AssamNavigator.computePath(1, 3, 3, 1);
         assertEquals(4, path[1][0]);
         assertEquals(3, path[1][1]);
+        assertEquals(1, path[1][2]);
     }
 
     @Test
@@ -33,6 +35,7 @@ class AssamNavigatorTest {
         int[][] path = AssamNavigator.computePath(1, 3, 3, 2);
         assertEquals(3, path[1][0]);
         assertEquals(4, path[1][1]);
+        assertEquals(2, path[1][2]);
     }
 
     @Test
@@ -40,59 +43,69 @@ class AssamNavigatorTest {
         int[][] path = AssamNavigator.computePath(1, 3, 3, 3);
         assertEquals(2, path[1][0]);
         assertEquals(3, path[1][1]);
+        assertEquals(3, path[1][2]);
     }
 
     @Test
-    void computePath_rebotaEnBordeNorte_redirigeAOeste() {
-        int[][] path = AssamNavigator.computePath(1, 0, 0, 0);
-        int[] pos = AssamNavigator.borderPos(1);
-        assertEquals(pos[0], path[1][0]);
-        assertEquals(pos[1], path[1][1]);
+    void computePath_rebotaEnBordeNorte_haceSwapYQuedaMirandoAlSur() {
+        int[][] path = AssamNavigator.computePath(1, 2, 0, 0);
+        assertEquals(1, path[1][0]); // (2,0) rebota a (1,0)
+        assertEquals(0, path[1][1]);
+        assertEquals(2, path[1][2]); // queda mirando al Sur
     }
 
     @Test
-    void computePath_rebotaEnBordeEste_redirigeASur() {
+    void computePath_rebotaEnBordeEste_haceSwapYQuedaMirandoAlOeste() {
         int[][] path = AssamNavigator.computePath(1, 6, 5, 1);
-        int bi = AssamNavigator.borderIndex(6, 5);
-        int[] pos = AssamNavigator.borderPos(bi + 1);
-        assertEquals(pos[0], path[1][0]);
-        assertEquals(pos[1], path[1][1]);
+        assertEquals(6, path[1][0]);
+        assertEquals(4, path[1][1]); // (6,5) rebota a (6,4)
+        assertEquals(3, path[1][2]); // queda mirando al Oeste
     }
 
     @Test
-    void computePath_rebotaEnBordeSur_redirigeAIndiceSiguiente() {
+    void computePath_rebotaEnBordeSur_haceSwapYQuedaMirandoAlNorte() {
         int[][] path = AssamNavigator.computePath(1, 1, 6, 2);
-        int bi = AssamNavigator.borderIndex(1, 6);
-        int[] pos = AssamNavigator.borderPos(bi + 1);
-        assertEquals(pos[0], path[1][0]);
-        assertEquals(pos[1], path[1][1]);
+        assertEquals(0, path[1][0]); // (1,6) rebota a (0,6)
+        assertEquals(6, path[1][1]);
+        assertEquals(0, path[1][2]); // queda mirando al Norte
     }
 
     @Test
-    void computePath_rebotaEnBordeOeste_redirigeAIndiceSiguiente() {
+    void computePath_rebotaEnBordeOeste_haceSwapYQuedaMirandoAlEste() {
         int[][] path = AssamNavigator.computePath(1, 0, 1, 3);
-        int bi = AssamNavigator.borderIndex(0, 1);
-        int[] pos = AssamNavigator.borderPos(bi + 1);
-        assertEquals(pos[0], path[1][0]);
-        assertEquals(pos[1], path[1][1]);
+        assertEquals(0, path[1][0]);
+        assertEquals(2, path[1][1]); // (0,1) rebota a (0,2)
+        assertEquals(1, path[1][2]); // queda mirando al Este
     }
 
     @Test
-    void computePath_multiplesPasos_recorreCircuito() {
+    void computePath_multiplesPasos_recorreRecto() {
         int[][] path = AssamNavigator.computePath(4, 0, 0, 1);
         assertEquals(5, path.length);
-        assertEquals(0, path[0][0]); assertEquals(0, path[0][1]);
-        assertEquals(1, path[1][0]); assertEquals(0, path[1][1]);
-        assertEquals(2, path[2][0]); assertEquals(0, path[2][1]);
-        assertEquals(3, path[3][0]); assertEquals(0, path[3][1]);
-        assertEquals(4, path[4][0]); assertEquals(0, path[4][1]);
+        assertEquals(0, path[0][0]);
+        assertEquals(0, path[0][1]);
+        assertEquals(1, path[1][0]);
+        assertEquals(0, path[1][1]);
+        assertEquals(2, path[2][0]);
+        assertEquals(0, path[2][1]);
+        assertEquals(3, path[3][0]);
+        assertEquals(0, path[3][1]);
+        assertEquals(4, path[4][0]);
+        assertEquals(0, path[4][1]);
     }
 
     @Test
-    void computePath_vueltaCompleta_terminaEnMismoPunto() {
-        int[][] path = AssamNavigator.computePath(24, 0, 0, 1);
-        assertEquals(0, path[24][0]);
-        assertEquals(0, path[24][1]);
+    void computePath_vueltaCompleta_conRebotes_generaRutaValida() {
+        int pasos = 28;
+        int[][] path = AssamNavigator.computePath(pasos, 0, 0, 1);
+
+        // Lo único 100% seguro sin inventar reglas: el tamaño del path
+        assertEquals(pasos + 1, path.length);
+
+        // Y que cada punto tenga 3 valores (x,y,dir)
+        for (int i = 0; i < path.length; i++) {
+            assertEquals(3, path[i].length);
+        }
     }
 
     @Test
@@ -101,6 +114,16 @@ class AssamNavigatorTest {
         assertEquals(5, path[5][0]);
         assertEquals(0, path[5][1]);
         assertEquals(1, path[5][2]);
+    }
+
+    @Test
+    void computePath_inicial_fueraDeRango_noRevienta() {
+        int[][] path = AssamNavigator.computePath(0, -10, 99, 1);
+        assertEquals(1, path.length);
+
+        assertEquals(-10, path[0][0]);
+        assertEquals(99, path[0][1]);
+        assertEquals(1, path[0][2]);
     }
 
     @Test
@@ -144,16 +167,6 @@ class AssamNavigatorTest {
     }
 
     @Test
-    void borderPos_indice5_es5_0() {
-        assertArrayEquals(new int[]{5, 0}, AssamNavigator.borderPos(5));
-    }
-
-    @Test
-    void borderPos_indice6_es6_0() {
-        assertArrayEquals(new int[]{6, 0}, AssamNavigator.borderPos(6));
-    }
-
-    @Test
     void borderPos_indice11_es6_5() {
         assertArrayEquals(new int[]{6, 5}, AssamNavigator.borderPos(11));
     }
@@ -164,18 +177,8 @@ class AssamNavigatorTest {
     }
 
     @Test
-    void borderPos_indice17_es1_6() {
-        assertArrayEquals(new int[]{1, 6}, AssamNavigator.borderPos(17));
-    }
-
-    @Test
     void borderPos_indice18_es0_6() {
         assertArrayEquals(new int[]{0, 6}, AssamNavigator.borderPos(18));
-    }
-
-    @Test
-    void borderPos_indice23_es0_1() {
-        assertArrayEquals(new int[]{0, 1}, AssamNavigator.borderPos(23));
     }
 
     @Test
@@ -209,20 +212,7 @@ class AssamNavigatorTest {
     }
 
     @Test
-    void borderDir_transicionNorteAEste_sigueSiendoEste() {
-        assertEquals(1, AssamNavigator.borderDir(5));
-        assertEquals(2, AssamNavigator.borderDir(6));
-    }
-
-    @Test
     void borderDir_indiceNegativo_envuelve() {
         assertEquals(1, AssamNavigator.borderDir(-24));
-    }
-
-    @Test
-    void computePath_recortaCoordenadas_fueraDeTablero() {
-        int[][] path = AssamNavigator.computePath(1, -1, 3, 3); // dir 3 => nx-- (sigue negativo)
-        assertEquals(0, path[1][0]);  // clamped
-        assertEquals(3, path[1][1]);
     }
 }

@@ -9,6 +9,14 @@ import static org.mockito.Mockito.*;
 
 class EstadoJuegoServicioTest {
 
+    private static int[][] posReliquiaVacia() {
+        return new int[][] { {-1, -1} };
+    }
+
+    private static boolean[][] inventarioVacio(int jugadores) {
+        return new boolean[jugadores][1];
+    }
+
     private IEstadoJuegoRepositorio estadoRepo;
     private EstadoJuegoServicio svc;
 
@@ -22,22 +30,31 @@ class EstadoJuegoServicioTest {
 
     @Test
     void serializar_dosJugadores_formatoCorrecto() {
-        String r = EstadoJuegoServicio.serializarEstado(2, new int[]{30,20}, new int[]{15,10},
-            new int[7][7], 0, 0, -1, -1, new int[7][7]);
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{30,20}, new int[]{15,10},
+                new int[7][7], 0, 0, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2)
+        );
         assertTrue(r.startsWith("30,20;15,10;"));
     }
 
     @Test
     void serializar_tresJugadores_tresMonedas() {
-        String r = EstadoJuegoServicio.serializarEstado(3, new int[]{10,20,30}, new int[]{5,5,5},
-            new int[7][7], 1, 0, -1, -1, new int[7][7]);
+        String r = EstadoJuegoServicio.serializarEstado(
+                3, new int[]{10,20,30}, new int[]{5,5,5},
+                new int[7][7], 1, 0, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(3)
+        );
         assertTrue(r.startsWith("10,20,30;5,5,5;"));
     }
 
     @Test
     void serializar_cuatroJugadores_cuatroValores() {
-        String r = EstadoJuegoServicio.serializarEstado(4, new int[]{30,22,15,8}, new int[]{15,13,7,4},
-            new int[7][7], 2, 1, 3, 4, new int[7][7]);
+        String r = EstadoJuegoServicio.serializarEstado(
+                4, new int[]{30,22,15,8}, new int[]{15,13,7,4},
+                new int[7][7], 2, 1, 3, 4, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(4)
+        );
         assertTrue(r.startsWith("30,22,15,8;"));
         assertTrue(r.contains("15,13,7,4;"));
     }
@@ -46,15 +63,21 @@ class EstadoJuegoServicioTest {
 
     @Test
     void serializar_dineroCero_seCodifica() {
-        String r = EstadoJuegoServicio.serializarEstado(2, new int[]{0,0}, new int[]{15,15},
-            new int[7][7], 0, 0, -1, -1, new int[7][7]);
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{0,0}, new int[]{15,15},
+                new int[7][7], 0, 0, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2)
+        );
         assertTrue(r.startsWith("0,0;15,15;"));
     }
 
     @Test
     void serializar_alfombrasCero_seCodifica() {
-        String r = EstadoJuegoServicio.serializarEstado(2, new int[]{30,20}, new int[]{0,0},
-            new int[7][7], 0, 0, -1, -1, new int[7][7]);
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{30,20}, new int[]{0,0},
+                new int[7][7], 0, 0, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2)
+        );
         assertTrue(r.contains(";0,0;"));
     }
 
@@ -63,8 +86,11 @@ class EstadoJuegoServicioTest {
     @Test
     void serializar_currentPlayerIdx_seCodifica() {
         for (int idx = 0; idx < 4; idx++) {
-            String r = EstadoJuegoServicio.serializarEstado(4, new int[]{10,10,10,10}, new int[]{5,5,5,5},
-                new int[7][7], idx, 0, -1, -1, new int[7][7]);
+            String r = EstadoJuegoServicio.serializarEstado(
+                    4, new int[]{10,10,10,10}, new int[]{5,5,5,5},
+                    new int[7][7], idx, 0, -1, -1, new int[7][7],
+                    posReliquiaVacia(), inventarioVacio(4)
+            );
             String[] parts = r.split(";");
             assertEquals(String.valueOf(idx), parts[3]);
         }
@@ -73,8 +99,11 @@ class EstadoJuegoServicioTest {
     @Test
     void serializar_currentPhase_seCodifica() {
         for (int ph = 0; ph <= 2; ph++) {
-            String r = EstadoJuegoServicio.serializarEstado(2, new int[]{10,10}, new int[]{5,5},
-                new int[7][7], 0, ph, -1, -1, new int[7][7]);
+            String r = EstadoJuegoServicio.serializarEstado(
+                    2, new int[]{10,10}, new int[]{5,5},
+                    new int[7][7], 0, ph, -1, -1, new int[7][7],
+                    posReliquiaVacia(), inventarioVacio(2)
+            );
             String[] parts = r.split(";");
             assertEquals(String.valueOf(ph), parts[4]);
         }
@@ -82,8 +111,11 @@ class EstadoJuegoServicioTest {
 
     @Test
     void serializar_firstCarpetNegativo_seCodifica() {
-        String r = EstadoJuegoServicio.serializarEstado(2, new int[]{10,10}, new int[]{5,5},
-            new int[7][7], 0, 1, -1, -1, new int[7][7]);
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{10,10}, new int[]{5,5},
+                new int[7][7], 0, 1, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2)
+        );
         String[] parts = r.split(";");
         assertEquals("-1", parts[5]);
         assertEquals("-1", parts[6]);
@@ -91,8 +123,11 @@ class EstadoJuegoServicioTest {
 
     @Test
     void serializar_firstCarpetConValores_seCodifica() {
-        String r = EstadoJuegoServicio.serializarEstado(2, new int[]{10,10}, new int[]{5,5},
-            new int[7][7], 0, 1, 3, 4, new int[7][7]);
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{10,10}, new int[]{5,5},
+                new int[7][7], 0, 1, 3, 4, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2)
+        );
         String[] parts = r.split(";");
         assertEquals("3", parts[5]);
         assertEquals("4", parts[6]);
@@ -104,8 +139,13 @@ class EstadoJuegoServicioTest {
     void serializar_tileOwner_matrizCompleta() {
         int[][] owner = new int[7][7];
         owner[0][0] = 1; owner[6][6] = 2; owner[3][3] = 3;
-        String r = EstadoJuegoServicio.serializarEstado(2, new int[]{10,10}, new int[]{5,5},
-            owner, 0, 0, -1, -1, new int[7][7]);
+
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{10,10}, new int[]{5,5},
+                owner, 0, 0, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2)
+        );
+
         String rows = r.split(";")[2];
         String[] filas = rows.split("/");
         assertEquals(7, filas.length);
@@ -116,8 +156,11 @@ class EstadoJuegoServicioTest {
 
     @Test
     void serializar_tileOwner_todoCero() {
-        String r = EstadoJuegoServicio.serializarEstado(2, new int[]{10,10}, new int[]{5,5},
-            new int[7][7], 0, 0, -1, -1, new int[7][7]);
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{10,10}, new int[]{5,5},
+                new int[7][7], 0, 0, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2)
+        );
         String rows = r.split(";")[2];
         String[] filas = rows.split("/");
         assertEquals(7, filas.length);
@@ -128,8 +171,11 @@ class EstadoJuegoServicioTest {
 
     @Test
     void serializar_carpetOrientation_todoCero() {
-        String r = EstadoJuegoServicio.serializarEstado(2, new int[]{10,10}, new int[]{5,5},
-            new int[7][7], 0, 0, -1, -1, new int[7][7]);
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{10,10}, new int[]{5,5},
+                new int[7][7], 0, 0, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2)
+        );
         String orientPart = r.split(";")[7];
         String[] filas = orientPart.split("/");
         assertEquals(7, filas.length);
@@ -140,8 +186,13 @@ class EstadoJuegoServicioTest {
     void serializar_carpetOrientation_valoresMixtos() {
         int[][] orient = new int[7][7];
         orient[0][0] = 1; orient[1][2] = -1; orient[6][6] = 3;
-        String r = EstadoJuegoServicio.serializarEstado(2, new int[]{10,10}, new int[]{5,5},
-            new int[7][7], 0, 0, -1, -1, orient);
+
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{10,10}, new int[]{5,5},
+                new int[7][7], 0, 0, -1, -1, orient,
+                posReliquiaVacia(), inventarioVacio(2)
+        );
+
         String orientPart = r.split(";")[7];
         assertTrue(orientPart.startsWith("1,0,"));
         assertTrue(orientPart.contains("-1,"));
@@ -153,8 +204,12 @@ class EstadoJuegoServicioTest {
         for (int v = -1; v <= 3; v++)
             for (int i = 0; i < Math.min(5, 7); i++)
                 if (v + 1 + i * 5 < 49) orient[(v + 1 + i * 5) % 7][(v + 1 + i * 5) / 7] = v;
-        assertDoesNotThrow(() -> EstadoJuegoServicio.serializarEstado(2,
-            new int[]{10,10}, new int[]{5,5}, new int[7][7], 0, 0, -1, -1, orient));
+
+        assertDoesNotThrow(() -> EstadoJuegoServicio.serializarEstado(
+                2, new int[]{10,10}, new int[]{5,5},
+                new int[7][7], 0, 0, -1, -1, orient,
+                posReliquiaVacia(), inventarioVacio(2)
+        ));
     }
 
     // ── PARSEAR: casos válidos ─────────────────────────────────────────────
@@ -162,9 +217,9 @@ class EstadoJuegoServicioTest {
     @Test
     void parsear_formatoValido_completo() {
         String raw = "7|2|5|0|30,20;15,10;0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/" +
-            "0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/;" +
-            "0;0;-1;-1;0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/" +
-            "0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/";
+                "0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/;" +
+                "0;0;-1;-1;0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/" +
+                "0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/0,0,0,0,0,0,0,/";
         EstadoDB e = EstadoJuegoServicio.parsearEstado(raw);
         assertNotNull(e);
         assertEquals(7, e.turno);
@@ -237,8 +292,13 @@ class EstadoJuegoServicioTest {
     void roundtrip_dosJugadores_conPrimeraAlfombra() {
         int[][] owner = new int[7][7]; owner[2][3] = 1;
         int[][] orient = new int[7][7]; orient[2][3] = 2;
-        String tablero = EstadoJuegoServicio.serializarEstado(2, new int[]{30,25}, new int[]{12,10},
-            owner, 1, 0, -1, -1, orient);
+
+        String tablero = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{30,25}, new int[]{12,10},
+                owner, 1, 0, -1, -1, orient,
+                posReliquiaVacia(), inventarioVacio(2)
+        );
+
         String raw = "5|3|4|1|" + tablero;
         EstadoDB e = EstadoJuegoServicio.parsearEstado(raw);
         assertNotNull(e);
