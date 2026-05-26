@@ -30,6 +30,23 @@ jobs:
       - name: Build and test
         run: mvn -B -f marrakech-arquitectura/pom.xml clean verify
 
+      - name: Coverage summary
+        run: |
+          python3 -c "
+          import xml.etree.ElementTree as ET
+          tree = ET.parse('marrakech-arquitectura/target/site/jacoco/jacoco.xml')
+          root = tree.getroot()
+          print()
+          print('  Type          Covered/Total    Percent')
+          print('  ' + '-' * 36)
+          for typ in ('INSTRUCTION','BRANCH','LINE','METHOD','CLASS'):
+              for c in root.findall('.//counter[@type=\"'+typ+'\"]'):
+                  m = int(c.get('missed')); v = int(c.get('covered'))
+                  t = m + v; p = v / t * 100 if t else 0
+                  print(f'  {typ:12s}  {v:>6d}/{t:<6d}  ({p:5.1f}%)')
+          print()
+          "
+
       - name: Upload surefire reports
         if: always()
         uses: actions/upload-artifact@v4
