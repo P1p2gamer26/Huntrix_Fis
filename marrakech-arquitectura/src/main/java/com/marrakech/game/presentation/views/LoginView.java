@@ -2,10 +2,22 @@ package com.marrakech.game.presentation.views;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -13,11 +25,14 @@ import javafx.scene.text.Text;
 
 public class LoginView extends StackPane {
 
-    private Button       btnEntrar;
-    private Button       btnVolver;
-    private TextField    campoApodo;
+    private Button        btnEntrar;
+    private Button        btnVolver;
+    private TextField     campoApodo;
     private PasswordField campoContrasena;
-    private Label        lblError;
+    private TextField     campoContrasenaVisible;
+    private Button        btnOjito;
+    private boolean       contrasenaVisible = false;
+    private Label         lblError;
 
     public LoginView() {
         configurarFondo();
@@ -35,6 +50,7 @@ public class LoginView extends StackPane {
         overlay.setStyle("-fx-background-color:rgba(0,0,0,0.45);");
         overlay.prefWidthProperty().bind(widthProperty());
         overlay.prefHeightProperty().bind(heightProperty());
+        overlay.setMouseTransparent(true);
         getChildren().add(overlay);
     }
 
@@ -55,8 +71,60 @@ public class LoginView extends StackPane {
         titulo.setFont(Font.font("Georgia", FontWeight.BOLD, 28));
         titulo.setFill(Color.web("#D4A017"));
 
-        campoApodo      = crearCampoTexto("Apodo");
-        campoContrasena = crearCampoPassword("Contraseña");
+        campoApodo = crearCampoTexto("Apodo");
+
+        String estiloField =
+            "-fx-background-color:rgba(15,5,0,0.65);" +
+            "-fx-text-fill:#E8C97A;" +
+            "-fx-prompt-text-fill:#9E7A3A;" +
+            "-fx-border-color:#8B6914;" +
+            "-fx-border-width:1;" +
+            "-fx-border-radius:3;" +
+            "-fx-background-radius:3;" +
+            "-fx-font-size:13;";
+
+        campoContrasena = new PasswordField();
+        campoContrasena.setPromptText("Contraseña");
+        campoContrasena.setPrefHeight(38);
+        campoContrasena.setStyle(estiloField);
+        HBox.setHgrow(campoContrasena, Priority.ALWAYS);
+
+        campoContrasenaVisible = new TextField();
+        campoContrasenaVisible.setPromptText("Contraseña");
+        campoContrasenaVisible.setPrefHeight(38);
+        campoContrasenaVisible.setStyle(estiloField);
+        campoContrasenaVisible.setVisible(false);
+        campoContrasenaVisible.setManaged(false);
+        HBox.setHgrow(campoContrasenaVisible, Priority.ALWAYS);
+
+        campoContrasena.textProperty().addListener((obs, o, n) -> {
+            if (!contrasenaVisible) campoContrasenaVisible.setText(n);
+        });
+        campoContrasenaVisible.textProperty().addListener((obs, o, n) -> {
+            if (contrasenaVisible) campoContrasena.setText(n);
+        });
+
+        btnOjito = new Button("👁");
+        btnOjito.setPrefHeight(38);
+        btnOjito.setPrefWidth(42);
+        btnOjito.setStyle(
+            "-fx-background-color:rgba(15,5,0,0.65);" +
+            "-fx-text-fill:#9E7A3A;" +
+            "-fx-border-color:#8B6914;" +
+            "-fx-border-width:1;" +
+            "-fx-border-radius:3;" +
+            "-fx-background-radius:3;" +
+            "-fx-cursor:hand;" +
+            "-fx-font-size:14;");
+        btnOjito.setOnAction(e -> toggleContrasena());
+
+        VBox stackPass = new VBox();
+        stackPass.getChildren().addAll(campoContrasena, campoContrasenaVisible);
+        HBox.setHgrow(stackPass, Priority.ALWAYS);
+
+        HBox filaPass = new HBox(4, stackPass, btnOjito);
+        filaPass.setAlignment(Pos.CENTER_LEFT);
+        filaPass.setMaxWidth(Double.MAX_VALUE);
 
         lblError = new Label("");
         lblError.setWrapText(true);
@@ -72,22 +140,50 @@ public class LoginView extends StackPane {
         btnEntrar = crearBotonRelleno("ENTRAR");
         btnVolver = crearBotonContorno("VOLVER");
 
-        panel.getChildren().addAll(titulo, campoApodo, campoContrasena,
-                                   lblError, btnEntrar, btnVolver);
+        panel.getChildren().addAll(titulo, campoApodo, filaPass, lblError, btnEntrar, btnVolver);
         getChildren().add(panel);
+    }
+
+    private void toggleContrasena() {
+        contrasenaVisible = !contrasenaVisible;
+        if (contrasenaVisible) {
+            campoContrasenaVisible.setText(campoContrasena.getText());
+            campoContrasena.setVisible(false);
+            campoContrasena.setManaged(false);
+            campoContrasenaVisible.setVisible(true);
+            campoContrasenaVisible.setManaged(true);
+            btnOjito.setStyle(
+                "-fx-background-color:rgba(201,146,42,0.25);" +
+                "-fx-text-fill:#D4A017;" +
+                "-fx-border-color:#C9922A;" +
+                "-fx-border-width:1;" +
+                "-fx-border-radius:3;" +
+                "-fx-background-radius:3;" +
+                "-fx-cursor:hand;" +
+                "-fx-font-size:14;");
+        } else {
+            campoContrasena.setText(campoContrasenaVisible.getText());
+            campoContrasenaVisible.setVisible(false);
+            campoContrasenaVisible.setManaged(false);
+            campoContrasena.setVisible(true);
+            campoContrasena.setManaged(true);
+            btnOjito.setStyle(
+                "-fx-background-color:rgba(15,5,0,0.65);" +
+                "-fx-text-fill:#9E7A3A;" +
+                "-fx-border-color:#8B6914;" +
+                "-fx-border-width:1;" +
+                "-fx-border-radius:3;" +
+                "-fx-background-radius:3;" +
+                "-fx-cursor:hand;" +
+                "-fx-font-size:14;");
+        }
     }
 
     public boolean validarCampos() {
         String apodo = campoApodo.getText().trim();
         String pass  = campoContrasena.getText();
-        if (apodo.isEmpty()) {
-            mostrarError("Ingresa tu apodo.");
-            return false;
-        }
-        if (pass.isEmpty()) {
-            mostrarError("Ingresa tu contraseña.");
-            return false;
-        }
+        if (apodo.isEmpty()) { mostrarError("Ingresa tu apodo."); return false; }
+        if (pass.isEmpty())  { mostrarError("Ingresa tu contraseña."); return false; }
         return true;
     }
 
@@ -96,28 +192,10 @@ public class LoginView extends StackPane {
         lblError.setVisible(true);
     }
 
-    public void limpiarError() {
-        lblError.setVisible(false);
-    }
+    public void limpiarError() { lblError.setVisible(false); }
 
     private TextField crearCampoTexto(String placeholder) {
         TextField campo = new TextField();
-        campo.setPromptText(placeholder);
-        campo.setPrefHeight(38);
-        campo.setStyle(
-            "-fx-background-color:rgba(15,5,0,0.65);" +
-            "-fx-text-fill:#E8C97A;" +
-            "-fx-prompt-text-fill:#9E7A3A;" +
-            "-fx-border-color:#8B6914;" +
-            "-fx-border-width:1;" +
-            "-fx-border-radius:3;" +
-            "-fx-background-radius:3;" +
-            "-fx-font-size:13;");
-        return campo;
-    }
-
-    private PasswordField crearCampoPassword(String placeholder) {
-        PasswordField campo = new PasswordField();
         campo.setPromptText(placeholder);
         campo.setPrefHeight(38);
         campo.setStyle(
@@ -152,8 +230,8 @@ public class LoginView extends StackPane {
         return btn;
     }
 
-    public Button        getBtnEntrar()        { return btnEntrar; }
-    public Button        getBtnVolver()        { return btnVolver; }
-    public TextField     getCampoApodo()       { return campoApodo; }
-    public PasswordField getCampoContrasena()  { return campoContrasena; }
+    public Button        getBtnEntrar()       { return btnEntrar; }
+    public Button        getBtnVolver()       { return btnVolver; }
+    public TextField     getCampoApodo()      { return campoApodo; }
+    public PasswordField getCampoContrasena() { return campoContrasena; }
 }

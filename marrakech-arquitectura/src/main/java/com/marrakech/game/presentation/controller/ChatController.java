@@ -1,4 +1,4 @@
-package com.marrakech.game.presentation.controller;
+﻿package com.marrakech.game.presentation.controller;
 
 import com.marrakech.game.repository.ChatRepositorio.Mensaje;
 import com.marrakech.game.service.ChatServicio;
@@ -73,15 +73,12 @@ public class ChatController {
         chatInput.clear();
 
         String hora = new SimpleDateFormat("HH:mm").format(new Date());
-        // Mostrar burbuja propia inmediatamente (sin esperar la DB)
         Mensaje mLocal = new Mensaje(-1, usuarioActual, texto, hora);
         agregarBurbuja(mLocal);
         scrollAlFinal();
 
-        // Enviar a DB; el polling actualizará ultimoMensajeId cuando llegue el INSERT
         new Thread(() -> {
             chatSvc.enviar(texto);
-            // Esperar a que el INSERT termine y luego avanzar el cursor
             try { Thread.sleep(300); } catch (InterruptedException ignored) {}
             int nuevoId = chatSvc.obtenerUltimoIdMensaje();
             Platform.runLater(() -> chatSvc.setUltimoMensajeId(nuevoId));
@@ -90,14 +87,34 @@ public class ChatController {
 
     private void agregarBurbuja(Mensaje m) {
         boolean esPropio = m.usuario.equals(usuarioActual);
+
         Label lblTexto = new Label(m.texto);
-        lblTexto.setWrapText(true); lblTexto.setMaxWidth(160);
-        lblTexto.setStyle("-fx-font-size:12px;-fx-text-fill:" + (esPropio ? "#1A0A00" : "#F0E0B0") + ";");
+        lblTexto.setWrapText(true);
+        lblTexto.setMaxWidth(155);
+        lblTexto.setTextFill(javafx.scene.paint.Color.web(esPropio ? "#1A0A00" : "#FFFFFF"));
+        lblTexto.setStyle("-fx-font-size:12px;-fx-font-weight:" + (esPropio ? "bold" : "normal") + ";");
+
         Label lblMeta = new Label(m.usuario + "  " + m.hora);
-        lblMeta.setStyle("-fx-font-size:10px;-fx-text-fill:" + (esPropio ? "#5A3010" : "#9E7A3A") + ";");
+        lblMeta.setTextFill(javafx.scene.paint.Color.web(esPropio ? "#5A3010" : "#F0C060"));
+        lblMeta.setStyle("-fx-font-size:10px;");
+
         VBox burbuja = new VBox(2, lblTexto, lblMeta);
-        burbuja.getStyleClass().add(esPropio ? "burbuja-propia" : "burbuja-ajena");
         burbuja.setMaxWidth(170);
+        if (esPropio) {
+            burbuja.setStyle(
+                "-fx-background-color:#C9922A;" +
+                "-fx-background-radius:10 10 2 10;" +
+                "-fx-padding:6 10 6 10;");
+        } else {
+            burbuja.setStyle(
+                "-fx-background-color:rgba(80,45,5,0.95);" +
+                "-fx-border-color:#C9922A;" +
+                "-fx-border-width:1;" +
+                "-fx-background-radius:10 10 10 2;" +
+                "-fx-border-radius:10 10 10 2;" +
+                "-fx-padding:6 10 6 10;");
+        }
+
         HBox fila = new HBox(burbuja);
         fila.setAlignment(esPropio ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
         fila.setPadding(new Insets(1, 0, 1, 0));

@@ -123,7 +123,8 @@
                 <Pane minWidth="640.0" minHeight="601.0"
                       prefWidth="640.0" prefHeight="601.0"
                       maxWidth="640.0" maxHeight="601.0"
-                      styleClass="board-pane">
+                      styleClass="board-pane"
+                      style="-fx-background-image: url('/images/FT_Marrakech.png'); -fx-background-size: cover; -fx-background-position: center;">
                   <children>
                     <GridPane fx:id="boardGrid"
                               layoutX="106.0" layoutY="87.0"
