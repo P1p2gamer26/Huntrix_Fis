@@ -37,6 +37,9 @@ buildNumber.properties
 
 # IDEs #
 .idea/
+
+# opencode #
+.claude/
 *.iml
 *.iws
 .project

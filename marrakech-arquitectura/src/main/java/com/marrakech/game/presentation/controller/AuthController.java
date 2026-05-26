@@ -253,7 +253,7 @@ public class AuthController {
             Scene scene = new Scene(root, width, height);
             try {
                 scene.getStylesheets().add(
-                    getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
+                    getClass().getResource("/com/marrakech/game/styles.css").toExternalForm());
             } catch (Exception ignored) {}
             stage.setScene(scene);
             gc.setServicios(musicaSvc, chatSvc);
@@ -276,7 +276,7 @@ public class AuthController {
             Scene scene = new Scene(root, width, height);
             try {
                 scene.getStylesheets().add(
-                    getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
+                    getClass().getResource("/com/marrakech/game/styles.css").toExternalForm());
             } catch (Exception ignored) {}
             stage.setScene(scene);
             gc.setServicios(musicaSvc, chatSvc);
