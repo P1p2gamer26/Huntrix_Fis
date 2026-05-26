@@ -1,12 +1,22 @@
 package com.marrakech.game.presentation.controller;
 
+import com.marrakech.game.presentation.views.ConfiguracionView;
+import com.marrakech.game.presentation.views.CrearPartidaView;
+import com.marrakech.game.presentation.views.LoginView;
+import com.marrakech.game.presentation.views.MenuView;
+import com.marrakech.game.presentation.views.ModoOnlineView;
+import com.marrakech.game.presentation.views.PerfilView;
+import com.marrakech.game.presentation.views.RegisterView;
+import com.marrakech.game.presentation.views.ReglasView;
+import com.marrakech.game.presentation.views.SalaEsperaView;
+import com.marrakech.game.presentation.views.UnirsePartidaView;
+import com.marrakech.game.presentation.views.WelcomeView;
 import com.marrakech.game.repository.IEstadoJuegoRepositorio;
 import com.marrakech.game.repository.PartidaRepositorio.Partida;
 import com.marrakech.game.service.AuthServicio;
 import com.marrakech.game.service.ChatServicio;
 import com.marrakech.game.service.MusicaServicio;
 import com.marrakech.game.service.PartidaServicio;
-import com.marrakech.game.presentation.views.*;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -72,7 +82,8 @@ public class AuthController {
             if ("APODO_EXISTE".equals(res))  { v.mostrarError("Ese apodo ya está en uso."); return; }
             if ("CORREO_EXISTE".equals(res)) { v.mostrarError("Ese correo ya está registrado."); return; }
             if ("ERROR_BD".equals(res))      { v.mostrarError("Error al guardar los datos. Intenta de nuevo."); return; }
-            usuarioActual = apodo;
+            if ("SESION_ACTIVA".equals(res)) { v.mostrarError("Esta cuenta ya tiene una sesión abierta en otro dispositivo."); return; }
+            usuarioActual = res;
             mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));

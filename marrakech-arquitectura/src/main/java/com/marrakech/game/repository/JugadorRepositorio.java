@@ -1,11 +1,14 @@
 package com.marrakech.game.repository;
 
-import com.marrakech.game.infrastructure.database.DatabaseConnection;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.File;
 import java.io.InputStream;
-import java.sql.*;
-import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+import com.marrakech.game.infrastructure.database.DatabaseConnection;
 
 /** Acceso a datos de la tabla Jugador. Implementa {@link IJugadorRepositorio}. */
 public class JugadorRepositorio implements IJugadorRepositorio {
@@ -73,15 +76,15 @@ public class JugadorRepositorio implements IJugadorRepositorio {
     public String loginJugador(String apodo, String password) {
         agregarColumnasExtra();
         String sql = "SELECT nombre_usuario, sesion_activa FROM Jugador " +
-                     "WHERE nombre_usuario = ? AND password = ?";
+        "WHERE nombre_usuario = ? AND password = ?";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, apodo);
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
-            if (!rs.next()) return null;
+            if (!rs.next()) return null;                          // credenciales malas
             String nombre = rs.getString("nombre_usuario");
-            if (rs.getBoolean("sesion_activa")) marcarSesion(nombre, false);
+            if (rs.getBoolean("sesion_activa")) return "SESION_ACTIVA"; // bloqueado
             marcarSesion(nombre, true);
             return nombre;
         } catch (Exception e) { e.printStackTrace(); }

@@ -20,7 +20,9 @@ public class AuthServicio {
         if (jugadorRepo.nombreExiste(apodo))  return "APODO_EXISTE";
         if (jugadorRepo.correoExiste(correo)) return "CORREO_EXISTE";
         if (!jugadorRepo.crearJugador(apodo, correo, password)) return "ERROR_BD";
-        return jugadorRepo.loginJugador(apodo, password);
+        String resultado = jugadorRepo.loginJugador(apodo, password);
+        if ("SESION_ACTIVA".equals(resultado)) return "SESION_ACTIVA";
+        return resultado;
     }
 
     public String login(String apodo, String password) {
