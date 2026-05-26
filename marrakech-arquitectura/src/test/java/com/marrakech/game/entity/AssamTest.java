@@ -5,15 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AssamTest {
 
-    private Assam assam;
-
-    @BeforeEach
-    void setUp() {
-        assam = new Assam(3, 3);
-    }
-
     @Test
     void testCrearAssam() {
+        Assam assam = new Assam(3, 3);
         assertNotNull(assam);
         assertEquals(3, assam.getX());
         assertEquals(3, assam.getY());
@@ -21,15 +15,17 @@ class AssamTest {
     }
 
     @Test
-    void testSetPosition() {
-        assam.setPosition(5, 2);
+    void testCrearAssamOtraPosicion() {
+        Assam assam = new Assam(5, 2);
         assertEquals(5, assam.getX());
         assertEquals(2, assam.getY());
     }
 
     @Test
-    void testSetOrientation() {
-        assam.setOrientation(2);
+    void testCrearAssamConOrientacionPersonalizada() {
+        Assam assam = new Assam(1, 4, 2);
+        assertEquals(1, assam.getX());
+        assertEquals(4, assam.getY());
         assertEquals(2, assam.getOrientation());
     }
 }

@@ -123,6 +123,18 @@ class PartidaServicioTest {
     }
 
     @Test
+    void salirPartida_delegaAlRepositorio() {
+        svc.salirPartida("MRK-SALIR", "Jugador");
+        verify(partidaRepo).salirPartida("MRK-SALIR", "Jugador");
+    }
+
+    @Test
+    void abandonarPartida_delegaAlRepositorio() {
+        svc.abandonarPartida("MRK-ABAND");
+        verify(partidaRepo).abandonarPartida("MRK-ABAND");
+    }
+
+    @Test
     void limpiarSalasViejas_cubreForYIf() {
         IPartidaRepositorio repo = org.mockito.Mockito.mock(IPartidaRepositorio.class);
 

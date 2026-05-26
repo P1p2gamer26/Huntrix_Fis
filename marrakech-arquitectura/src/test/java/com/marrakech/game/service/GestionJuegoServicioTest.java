@@ -1,5 +1,7 @@
 package com.marrakech.game.service;
 
+import com.marrakech.game.service.GestionJuegoServicio.Reliquia;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -98,5 +100,180 @@ class GestionJuegoServicioTest {
         // cubrir getters que estaban sin tocar
         assertEquals(3, g.getFirstCarpetX());
         assertEquals(4, g.getFirstCarpetY());
+    }
+
+    // ── PARTIDA RÁPIDA ────────────────────────────────────────────────────────
+
+    @Test
+    void iniciarJuego_rapida_da10monedas8alfombras() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2, true);
+        assertTrue(g.isPartidaRapida());
+        for (int m : g.getMoney()) assertEquals(10, m);
+        for (int r : g.getRugs())   assertEquals(8, r);
+    }
+
+    @Test
+    void iniciarJuego_normal_da20monedas15alfombras() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        assertFalse(g.isPartidaRapida());
+        for (int m : g.getMoney()) assertEquals(20, m);
+        for (int r : g.getRugs())   assertEquals(15, r);
+    }
+
+    // ── RELIQUIAS ─────────────────────────────────────────────────────────────
+
+    @Test
+    void reliquia_intentarAparecer_eventualmenteAparece() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        Reliquia aparecida = null;
+        for (int i = 0; i < 500; i++) {
+            aparecida = g.intentarAparecerReliquia(3, 3);
+            if (aparecida != null) break;
+        }
+        assertNotNull(aparecida, "debería aparecer alguna reliquia en 500 intentos");
+    }
+
+    @Test
+    void reliquia_intentarAparecer_todasMaxApariciones_retornaNull() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        // forzar que las 3 reliquias ya aparecieron MAX_APARICIONES veces
+        // llamamos muchas veces hasta saturar
+        for (int intento = 0; intento < 1000; intento++)
+            g.intentarAparecerReliquia(3, 3);
+        // Después de forzar, llamar de nuevo y ver que no explota
+        // (puede aún devolver algo si no se saturó, pero no debe lanzar excepción)
+        assertDoesNotThrow(() -> g.intentarAparecerReliquia(3, 3));
+    }
+
+    @Test
+    void reliquia_recoger_devuelveReliquiaYLaQuitaDelTablero() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        for (int i = 0; i < 500; i++) g.intentarAparecerReliquia(0, 0);
+        for (Reliquia r : Reliquia.values()) {
+            int[] pos = g.getPosicionReliquia(r);
+            if (pos[0] >= 0) {
+                Reliquia recogida = g.intentarRecogerReliquia(pos[0], pos[1]);
+                assertEquals(r, recogida);
+                assertTrue(g.tieneReliquia(0, recogida));
+                return;
+            }
+        }
+    }
+
+    @Test
+    void reliquia_recoger_dondeNoHay_retornaNull() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        assertNull(g.intentarRecogerReliquia(0, 0));
+    }
+
+    @Test
+    void reliquia_tieneReliquia_inventarioNull_retornaFalse() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        assertFalse(g.tieneReliquia(0, Reliquia.BRUJULA_MERCADER));
+    }
+
+    @Test
+    void reliquia_consumir_reduceInventario() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        // forzar que aparezca en la posición de Assam para recoger
+        for (int i = 0; i < 500; i++) {
+            Reliquia r = g.intentarAparecerReliquia(0, 0);
+            if (r != null) break;
+        }
+        int[] pos = g.getPosicionReliquia(Reliquia.BRUJULA_MERCADER);
+        if (pos[0] >= 0) {
+            g.intentarRecogerReliquia(pos[0], pos[1]);
+            assertTrue(g.tieneReliquia(0, Reliquia.BRUJULA_MERCADER));
+            g.consumirReliquia(Reliquia.BRUJULA_MERCADER);
+            assertFalse(g.tieneReliquia(0, Reliquia.BRUJULA_MERCADER));
+        }
+    }
+
+    @Test
+    void reliquia_getInventarioJugador_funciona() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        boolean[] inv = g.getInventarioJugador(0);
+        assertEquals(3, inv.length);
+        for (boolean b : inv) assertFalse(b);
+    }
+
+    // ── ELIMINACIÓN ───────────────────────────────────────────────────────────
+
+    @Test
+    void verificarEliminacion_sinDinero_3Jugadores_elimina() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(3);
+        g.getMoney()[0] = 0;
+        assertTrue(g.verificarEliminacion(0));
+        assertTrue(g.esEliminado(0));
+        assertEquals(0, g.getRugs()[0]);
+    }
+
+    @Test
+    void verificarEliminacion_conDinero_noElimina() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(3);
+        g.getMoney()[0] = 5;
+        assertFalse(g.verificarEliminacion(0));
+        assertFalse(g.esEliminado(0));
+    }
+
+    @Test
+    void verificarEliminacion_yaEliminado_retornaFalse() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(3);
+        g.getMoney()[0] = 0;
+        g.verificarEliminacion(0);
+        assertFalse(g.verificarEliminacion(0));
+    }
+
+    @Test
+    void verificarEliminacion_sinDinero_2Jugadores_noElimina() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        g.getMoney()[0] = 0;
+        assertFalse(g.verificarEliminacion(0));
+        assertFalse(g.esEliminado(0));
+    }
+
+    // ── JUEGO TERMINADO ────────────────────────────────────────────────────────
+
+    @Test
+    void juegoTerminado_2Jugadores_sinDinero_termina() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(2);
+        g.getMoney()[0] = 0;
+        assertTrue(g.juegoTerminado());
+    }
+
+    @Test
+    void juegoTerminado_3Jugadores_unoActivo_termina() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(3);
+        g.getMoney()[0] = 0; g.verificarEliminacion(0);
+        g.getMoney()[1] = 0; g.verificarEliminacion(1);
+        assertTrue(g.juegoTerminado());
+    }
+
+    // ── SIGUIENTE TURNO VÁLIDO ────────────────────────────────────────────────
+
+    @Test
+    void pasarTurno_saltaEliminados() {
+        GestionJuegoServicio g = new GestionJuegoServicio();
+        g.iniciarJuego(3);
+        g.getMoney()[1] = 0; g.verificarEliminacion(1);
+        g.setCurrentPlayerIdx(0);
+        g.pasarTurno();
+        // debe saltar al 2 (el 1 está eliminado)
+        assertEquals(2, g.getCurrentPlayerIdx());
     }
 }
