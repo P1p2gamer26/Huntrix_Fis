@@ -8,7 +8,7 @@ import java.util.List;
 /** Contrato de persistencia para partidas y ranking. */
 public interface IPartidaRepositorio {
     String crearPartida(String nombreCreador, int maxJugadores, boolean poderes,
-                        String dificultad);
+                        boolean rapida, String dificultad);
     boolean unirsePartida(String id, String nombreJugador);
     void iniciarPartida(String id);
     Partida obtenerPartida(String id);

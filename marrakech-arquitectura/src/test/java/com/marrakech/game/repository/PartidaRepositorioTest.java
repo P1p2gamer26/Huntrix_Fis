@@ -55,7 +55,7 @@ class PartidaRepositorioTest {
 
     @Test @Order(1)
     void crearPartida_retornaIdValido() {
-        String id = repo.crearPartida("host1", 4, false, "normal");
+        String id = repo.crearPartida("host1", 4, false, false, "normal");
         assertNotNull(id);
         assertTrue(id.startsWith("MRK-"));
         assertEquals(8, id.length());
@@ -63,11 +63,12 @@ class PartidaRepositorioTest {
 
     @Test @Order(2)
     void obtenerPartida_devuelvePartidaCreada() {
-        String id = repo.crearPartida("owner", 2, true, "rapida");
+        String id = repo.crearPartida("owner", 2, true, true, "rapida");
         Partida p = repo.obtenerPartida(id);
         assertNotNull(p);
         assertEquals(2, p.maxJugadores);
         assertTrue(p.poderesActivados);
+        assertTrue(p.partidaRapida);
         assertEquals("rapida", p.dificultad);
     }
 
@@ -78,7 +79,7 @@ class PartidaRepositorioTest {
 
     @Test @Order(4)
     void unirsePartida_agregaJugador() {
-        String id = repo.crearPartida("host2", 4, false, "normal");
+        String id = repo.crearPartida("host2", 4, false, false, "normal");
         assertTrue(repo.unirsePartida(id, "player1"));
         Partida p = repo.obtenerPartida(id);
         assertEquals(2, p.jugadores.size());
@@ -87,7 +88,7 @@ class PartidaRepositorioTest {
 
     @Test @Order(5)
     void unirsePartida_salaLlena_retornaFalse() {
-        String id = repo.crearPartida("host3", 2, false, "normal");
+        String id = repo.crearPartida("host3", 2, false, false, "normal");
         repo.unirsePartida(id, "player1");
         assertFalse(repo.unirsePartida(id, "player2"));
     }
@@ -99,13 +100,13 @@ class PartidaRepositorioTest {
 
     @Test @Order(7)
     void unirsePartida_jugadorYaEnSala_retornaTrue() {
-        String id = repo.crearPartida("host4", 4, false, "normal");
+        String id = repo.crearPartida("host4", 4, false, false, "normal");
         assertTrue(repo.unirsePartida(id, "host4"));
     }
 
     @Test @Order(8)
     void iniciarPartida_cambiaEstado() {
-        String id = repo.crearPartida("host5", 2, false, "normal");
+        String id = repo.crearPartida("host5", 2, false, false, "normal");
         repo.iniciarPartida(id);
         Partida p = repo.obtenerPartida(id);
         assertEquals("INICIADA", p.estado);
@@ -113,8 +114,8 @@ class PartidaRepositorioTest {
 
     @Test @Order(9)
     void listarPartidas_soloRetornaEsperando() {
-        String id1 = repo.crearPartida("a", 2, false, "nor");
-        String id2 = repo.crearPartida("b", 2, false, "nor");
+        String id1 = repo.crearPartida("a", 2, false, false, "nor");
+        String id2 = repo.crearPartida("b", 2, false, false, "nor");
         repo.iniciarPartida(id2);
         List<Partida> list = repo.listarPartidas();
         for (Partida p : list) assertEquals("ESPERANDO", p.estado);
@@ -151,7 +152,7 @@ class PartidaRepositorioTest {
 
     @Test @Order(13)
     void resumen_formatoCorrecto() {
-        String id = repo.crearPartida("host", 4, false, "nor");
+        String id = repo.crearPartida("host", 4, false, false, "nor");
         Partida p = repo.obtenerPartida(id);
         String resumen = p.resumen();
         assertTrue(resumen.contains("(1/4)"));
