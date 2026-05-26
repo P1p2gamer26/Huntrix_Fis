@@ -32,24 +32,24 @@ jobs:
 
       - name: Coverage summary
         run: |
-          python3 -c "
-          import xml.etree.ElementTree as ET
+          python3 << 'EOF'
+          import xml.etree.ElementTree as ET, os
           tree = ET.parse('marrakech-arquitectura/target/site/jacoco/jacoco.xml')
           root = tree.getroot()
-          print()
-          print('┌──────────────────────┬─────────────────┬───────────────┐')
-          print('│ Metric               │ Covered / Total │ Percentage    │')
-          print('├──────────────────────┼─────────────────┼───────────────┤')
-          for m_type, m_name in [('INSTRUCTION','Instructions'),('BRANCH','Branches'),
-                                  ('LINE','Lines'),('METHOD','Methods'),('CLASS','Classes')]:
-              c = root.find(f'./counter[@type=\"{m_type}\"]')
+          md = '### 📊 Code Coverage (Servicios)\n\n'
+          md += '| Metric | Covered / Total | Percentage |\n| :--- | :---: | :---: |\n'
+          for t,n in [('INSTRUCTION','Instructions'),('BRANCH','Branches'),
+                       ('LINE','Lines'),('METHOD','Methods'),('CLASS','Classes')]:
+              c = root.find(f'./counter[@type="{t}"]')
               if c is not None:
-                  m = int(c.get('missed')); v = int(c.get('covered'))
-                  t = m + v; p = v / t * 100 if t else 0
-                  print(f'│ {m_name:<20} │ {v}/{t:<13} │ {p:>10.2f}% │')
-          print('└──────────────────────┴─────────────────┴───────────────┘')
-          print()
-          "
+                  m=int(c.get('missed')); v=int(c.get('covered'))
+                  tot=m+v; p=v/tot*100 if tot else 0
+                  md += f'| **{n}** | {v}/{tot} | {p:.2f}% |\n'
+          sp = os.environ.get('GITHUB_STEP_SUMMARY')
+          if sp:
+              with open(sp, 'a') as f: f.write(md)
+          print(md)
+          EOF
 
       - name: Upload surefire reports
         if: always()
