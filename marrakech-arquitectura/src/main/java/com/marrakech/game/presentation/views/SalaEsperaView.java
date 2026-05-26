@@ -25,6 +25,7 @@ public class SalaEsperaView extends StackPane {
     private Label    lblEstado;
     private Timeline pollingTimeline;
     private Runnable onJuegoIniciado;
+    private Runnable onJugadorAbandono;
     private boolean  esHost;
     private boolean  juegoYaIniciado = false;
     private final String[] colores = {"#e74c3c","#3498db","#2ecc71","#f39c12"};
@@ -122,6 +123,23 @@ public class SalaEsperaView extends StackPane {
             new Thread(() -> {
                 Partida actualizada = partidaSvc.obtenerPartida(partida.id);
                 if (actualizada == null) return;
+
+                // Detectar si alguien abandonó la sala
+                if ("ABANDONADA".equalsIgnoreCase(actualizada.estado.trim())) {
+                    Platform.runLater(() -> {
+                        detenerPolling();
+                        if (onJugadorAbandono != null) onJugadorAbandono.run();
+                    });
+                    return;
+                }
+                if (actualizada.jugadores.size() < partida.jugadores.size()) {
+                    Platform.runLater(() -> {
+                        detenerPolling();
+                        if (onJugadorAbandono != null) onJugadorAbandono.run();
+                    });
+                    return;
+                }
+
                 this.partida = actualizada;
                 Platform.runLater(() -> {
                     construirListaJugadores();
@@ -135,7 +153,6 @@ public class SalaEsperaView extends StackPane {
                     } else {
                         lblEstado.setText("Jugadores: " + actualizada.jugadores.size() + "/" + actualizada.maxJugadores
                             + " — Esperando que el host inicie...");
-                        // Guest detecta cuando el host inicia
                         if ("INICIADA".equalsIgnoreCase(actualizada.estado.trim()) && !juegoYaIniciado) {
                             juegoYaIniciado = true;
                             detenerPolling();
@@ -154,6 +171,7 @@ public class SalaEsperaView extends StackPane {
     }
 
     public void setOnJuegoIniciado(Runnable callback) { this.onJuegoIniciado = callback; }
+    public void setOnJugadorAbandono(Runnable callback) { this.onJugadorAbandono = callback; }
 
     private VBox construirInfoPartida() {
         VBox info = new VBox(6);
@@ -166,7 +184,7 @@ public class SalaEsperaView extends StackPane {
         grid.setHgap(30); grid.setVgap(6);
         String[][] datos = {
             {"Modo:", "Competitivo", "Poderes:", partida.poderesActivados ? "Activados" : "Desactivados"},
-            {"Tiempo/turno:", partida.partidaRapida ? "20s" : "45s", "Dificultad:", partida.dificultad},
+            {"Tiempo/turno:", "45s", "Dificultad:", partida.dificultad},
             {"Jugadores:", partida.jugadores.size() + "/" + partida.maxJugadores, "Estado:", partida.estado},
         };
         for (int row = 0; row < datos.length; row++) {

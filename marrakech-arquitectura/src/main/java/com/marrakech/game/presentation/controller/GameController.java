@@ -16,6 +16,9 @@ import com.marrakech.game.service.PartidaServicio;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
@@ -66,7 +69,6 @@ public class GameController {
     private int     miIndice = 0;
     private boolean modoMultijugador = false;
     private boolean poderesActivados = false;
-    private boolean partidaRapida    = false;
     private boolean sultanPendiente  = false;
 
     private GestionJuegoServicio juegoSvc;
@@ -76,6 +78,7 @@ public class GameController {
     private PartidaServicio      partidaSvc;
     private MusicaServicio       musicaSvc;
     private IEstadoJuegoRepositorio estadoRepo;
+    private Timeline abandonoPolling;
 
     private TableroController tableroCtrl;
     private AssamController   assamCtrl;
@@ -95,18 +98,17 @@ public class GameController {
     }
 
     public void iniciarConJugadores(int n, String partidaId, String usuario,
-                                    int miIndice, PartidaServicio partidaSvc, boolean poderes, boolean rapida) {
+                                    int miIndice, PartidaServicio partidaSvc, boolean poderes) {
         this.partidaId        = partidaId;
         this.usuarioActual    = usuario;
         this.miIndice         = miIndice;
         this.modoMultijugador = true;
         this.partidaSvc       = partidaSvc;
         this.poderesActivados = poderes;
-        this.partidaRapida    = rapida;
 
         this.estadoSvc = new EstadoJuegoServicio(estadoRepo, partidaId);
 
-        startGame(n, rapida);
+        startGame(n);
 
         if (miIndice == 0) {
             estadoSvc.guardarEstadoSincrono(
@@ -118,6 +120,8 @@ public class GameController {
         chatSvc.inicializar(partidaId, usuario);
         chatCtrl.cargarHistorial();
         chatSvc.iniciarPolling(() -> chatCtrl.cargarNuevos());
+
+        iniciarPollingAbandono();
     }
 
     public void iniciarConJugadores(int n) {
@@ -134,11 +138,9 @@ public class GameController {
         iniciarConJugadores(n);
     }
 
-    private void startGame(int n) { startGame(n, false); }
-
-    private void startGame(int n, boolean rapida) {
+    private void startGame(int n) {
         juegoSvc = new GestionJuegoServicio();
-        juegoSvc.iniciarJuego(n, rapida);
+        juegoSvc.iniciarJuego(n);
 
         assamSvc = new AssamServicio();
 
@@ -443,16 +445,51 @@ public class GameController {
 
     @FXML private void volverSala() {
         if (!endScreen.isVisible() && !confirmarSalida()) return;
+        if (partidaSvc != null && partidaId != null) {
+            partidaSvc.abandonarPartida(partidaId);
+            partidaSvc.salirPartida(partidaId, usuarioActual);
+        }
         if (estadoSvc != null) estadoSvc.detenerPolling();
         if (chatSvc   != null) chatSvc.detenerPolling();
+        if (abandonoPolling != null) abandonoPolling.stop();
         if (onVolverSala != null) onVolverSala.run();
     }
 
     @FXML private void volverMenu() {
         if (!endScreen.isVisible() && !confirmarSalida()) return;
+        if (partidaSvc != null && partidaId != null) {
+            partidaSvc.abandonarPartida(partidaId);
+            partidaSvc.salirPartida(partidaId, usuarioActual);
+        }
         if (estadoSvc != null) estadoSvc.detenerPolling();
         if (chatSvc   != null) chatSvc.detenerPolling();
+        if (abandonoPolling != null) abandonoPolling.stop();
         if (onVolverMenu != null) onVolverMenu.run();
+    }
+
+    private void iniciarPollingAbandono() {
+        if (partidaSvc == null || partidaId == null) return;
+        abandonoPolling = new Timeline(new KeyFrame(Duration.seconds(2), e ->
+            new Thread(() -> {
+                var p = partidaSvc.obtenerPartida(partidaId);
+                if (p == null) return;
+                if ("ABANDONADA".equalsIgnoreCase(p.estado.trim())) {
+                    Platform.runLater(() -> {
+                        if (abandonoPolling != null) abandonoPolling.stop();
+                        if (estadoSvc != null) estadoSvc.detenerPolling();
+                        if (chatSvc   != null) chatSvc.detenerPolling();
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Partida abandonada");
+                        alert.setHeaderText("El otro jugador abandonó la partida");
+                        alert.setContentText("Volviendo al menú...");
+                        alert.showAndWait();
+                        if (onVolverMenu != null) onVolverMenu.run();
+                    });
+                }
+            }, "abandono-poller").start()
+        ));
+        abandonoPolling.setCycleCount(Timeline.INDEFINITE);
+        abandonoPolling.play();
     }
 
     private boolean confirmarSalida() {

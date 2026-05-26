@@ -85,7 +85,7 @@ public class PartidaRepositorio implements IPartidaRepositorio {
 
     @Override
     public String crearPartida(String nombreCreador, int maxJugadores,
-                               boolean poderes, boolean rapida, String dificultad) {
+                               boolean poderes, String dificultad) {
         String id     = generarId();
         String nombre = nombreCreador.isEmpty() ? "Sala-" + id : nombreCreador + "'s Sala";
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -93,7 +93,7 @@ public class PartidaRepositorio implements IPartidaRepositorio {
                     "INSERT INTO partidas VALUES (?, ?, ?, ?, ?, ?, 'ESPERANDO')")) {
                 ps.setString(1, id); ps.setString(2, nombre);
                 ps.setInt(3, maxJugadores); ps.setBoolean(4, poderes);
-                ps.setBoolean(5, rapida);   ps.setString(6, dificultad);
+                ps.setBoolean(5, false);    ps.setString(6, dificultad);
                 ps.executeUpdate();
             }
             try (PreparedStatement ps = conn.prepareStatement(
@@ -178,6 +178,31 @@ public class PartidaRepositorio implements IPartidaRepositorio {
             ps.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error registrando victoria: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void salirPartida(String id, String usuario) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM partida_jugadores WHERE partida_id = ? AND usuario = ?")) {
+            ps.setString(1, id.toUpperCase());
+            ps.setString(2, usuario);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error saliendo de partida: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void abandonarPartida(String id) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                "UPDATE partidas SET estado = 'ABANDONADA' WHERE id = ?")) {
+            ps.setString(1, id.toUpperCase());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error abandonando partida: " + e.getMessage());
         }
     }
 
