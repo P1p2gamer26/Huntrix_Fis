@@ -84,7 +84,6 @@
                 <includes>
                     <include>**/*Test.java</include>
                 </includes>
-
             </configuration>
         </plugin>
         <plugin>

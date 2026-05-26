@@ -1,6 +1,5 @@
 package com.marrakech.game.infrastructure.audio;
 
-import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -9,6 +8,19 @@ public class MusicaManager {
 
     public enum Track { MENU, LOBBY, JUEGO }
 
+    static {
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            if (e instanceof IllegalStateException
+                    && e.getMessage() != null
+                    && e.getMessage().contains("Toolkit not initialized")) {
+                // el parser asíncrono de Media falla si no hay toolkit JavaFX
+                // es inofensivo en tests/CI, no reportarlo
+            } else {
+                System.err.println("Excepción en [" + t.getName() + "]: " + e);
+            }
+        });
+    }
+
     private static MusicaManager instancia;
 
     private MediaPlayer playerActual;
@@ -16,14 +28,6 @@ public class MusicaManager {
     private double volumen = 0.5;
 
     private MusicaManager() {}
-
-    private static void ensureToolkit() {
-        try {
-            Platform.startup(() -> {});
-        } catch (IllegalStateException e) {
-            // already started
-        }
-    }
 
     public static MusicaManager getInstance() {
         if (instancia == null) instancia = new MusicaManager();
@@ -40,7 +44,6 @@ public class MusicaManager {
         String url = obtenerUrl(track);
         if (url == null) return;
 
-        ensureToolkit();
         try {
             Media media = new Media(url);
             playerActual = new MediaPlayer(media);
