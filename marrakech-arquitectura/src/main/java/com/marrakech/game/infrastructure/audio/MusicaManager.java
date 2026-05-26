@@ -1,5 +1,6 @@
 package com.marrakech.game.infrastructure.audio;
 
+import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -16,6 +17,14 @@ public class MusicaManager {
 
     private MusicaManager() {}
 
+    private static void ensureToolkit() {
+        try {
+            Platform.startup(() -> {});
+        } catch (IllegalStateException e) {
+            // already started
+        }
+    }
+
     public static MusicaManager getInstance() {
         if (instancia == null) instancia = new MusicaManager();
         return instancia;
@@ -31,6 +40,7 @@ public class MusicaManager {
         String url = obtenerUrl(track);
         if (url == null) return;
 
+        ensureToolkit();
         try {
             Media media = new Media(url);
             playerActual = new MediaPlayer(media);
