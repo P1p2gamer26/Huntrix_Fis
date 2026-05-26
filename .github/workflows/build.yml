@@ -69,37 +69,59 @@ jobs:
     name: Code Coverage
     runs-on: ubuntu-latest
     needs: build
-    permissions:
-      checks: write
-      actions: read
-      contents: read
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
       - name: Download Jacoco Report
         uses: actions/download-artifact@v4
         with:
           name: jacoco-xml
-          path: marrakech-arquitectura/target/site/jacoco/
+          path: jacoco-report
 
-      - name: Generate Code Coverage Summary
-        id: coverage_summary
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: marrakech-arquitectura/target/site/jacoco/jacoco.xml
-          badge: true
-          fail_below_min: false
-          format: markdown
-          hide_branch_rate: false
-          hide_complexity: true
-          indicators: true
-          output: both
-
-      - name: Publish Coverage Job Summary
+      - name: Generate per-class coverage report
         run: |
-          cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+          python3 << 'EOF'
+          import xml.etree.ElementTree as ET, os
+          tree = ET.parse('jacoco-report/jacoco.xml')
+          root = tree.getroot()
+
+          md = '## 📊 Code Coverage by Package\n\n'
+          md += '| Package | Instructions | Branches | Lines | Methods |\n'
+          md += '| :--- | :---: | :---: | :---: | :---: |\n'
+
+          for pkg in root.findall('.//package'):
+              name = pkg.get('name')
+              counters = {}
+              for c in pkg.findall('counter'):
+                  counters[c.get('type')] = c
+              def fmt(typ):
+                  c = counters.get(typ)
+                  if c is None: return '—'
+                  m = int(c.get('missed')); v = int(c.get('covered'))
+                  t = m + v; p = v / t * 100 if t else 0
+                  return f'{v}/{t} ({p:.1f}%)'
+              md += f'| `{name}` | {fmt("INSTRUCTION")} | {fmt("BRANCH")} | {fmt("LINE")} | {fmt("METHOD")} |\n'
+
+          md += '\n### 📁 Per-Class Detail\n\n'
+          md += '| Class | Instructions | Branches | Lines |\n'
+          md += '| :--- | :---: | :---: | :---: |\n'
+          for cls in root.findall('.//class'):
+              cname = cls.get('name').replace('/', '.')
+              counters = {}
+              for c in cls.findall('counter'):
+                  counters[c.get('type')] = c
+              def fmt(typ):
+                  c = counters.get(typ)
+                  if c is None: return '—'
+                  m = int(c.get('missed')); v = int(c.get('covered'))
+                  t = m + v; p = v / t * 100 if t else 0
+                  return f'{v}/{t} ({p:.1f}%)'
+              md += f'| `{cname}` | {fmt("INSTRUCTION")} | {fmt("BRANCH")} | {fmt("LINE")} |\n'
+
+          sp = os.environ.get('GITHUB_STEP_SUMMARY')
+          if sp:
+              with open(sp, 'a') as f: f.write(md)
+          print(md)
+          EOF
 
   junit:
     name: JUnit Test Report
