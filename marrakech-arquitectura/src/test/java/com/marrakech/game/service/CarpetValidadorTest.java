@@ -234,4 +234,84 @@ class CarpetValidadorTest {
         owner[3][3] = 1;
         assertEquals(0, CarpetValidador.contarContiguas(0, 0, 1, owner));
     }
+
+    // ── noTapaAlfombraCompleta ───────────────────────────────────────────────
+
+    @Test
+    void noTapaAlfombraCompleta_celdasDeDistintasAlfombras_valido() {
+        int[][] ori = new int[7][7];
+        ori[2][2] = 1; ori[2][3] = -1; // alfombra vertical
+        ori[3][3] = 2; ori[4][3] = -1; // alfombra horizontal
+        int[][] owner = {{0}};
+        assertTrue(CarpetValidador.noTapaAlfombraCompleta(2, 3, 3, 3, 0, owner, ori));
+    }
+
+    @Test
+    void noTapaAlfombraCompleta_celdasMismaAlfombraOtroJugador_invalido() {
+        int[][] ori = new int[7][7];
+        ori[2][2] = 1; ori[2][3] = -1; // alfombra vertical
+        int[][] owner = new int[7][7];
+        owner[2][2] = 2; // dueño=2 (≠ currentPlayer+1=1) → tapa alfombra ajena completa
+        assertFalse(CarpetValidador.noTapaAlfombraCompleta(2, 2, 2, 3, 0, owner, ori));
+    }
+
+    @Test
+    void noTapaAlfombraCompleta_celdasMismaAlfombraJugadorActual_valido() {
+        int[][] ori = new int[7][7];
+        ori[2][2] = 1; ori[2][3] = -1; // alfombra vertical
+        int[][] owner = new int[7][7];
+        owner[2][2] = 1; // tileOwner == currentPlayer + 1 => (0 + 1) == 1 → mismo jugador
+        assertTrue(CarpetValidador.noTapaAlfombraCompleta(2, 2, 2, 3, 0, owner, ori));
+    }
+
+    @Test
+    void noTapaAlfombraCompleta_unaCeldaNull_valeTrue() {
+        int[][] ori = new int[7][7];
+        ori[2][2] = 1; ori[2][3] = -1;
+        // ambigua: celda (3,3) no tiene orientación → getCabeza devuelve null
+        int[][] owner = {{0}};
+        assertTrue(CarpetValidador.noTapaAlfombraCompleta(2, 3, 3, 3, 0, owner, ori));
+    }
+
+    @Test
+    void noTapaAlfombraCompleta_cabeza1Null_valido() {
+        int[][] ori = new int[7][7];
+        ori[3][3] = 1; ori[3][4] = -1;
+        int[][] owner = {{0}};
+        assertTrue(CarpetValidador.noTapaAlfombraCompleta(0, 0, 3, 4, 0, owner, ori));
+    }
+
+    @Test
+    void noTapaAlfombraCompleta_cabeza2Null_valido() {
+        int[][] ori = new int[7][7];
+        ori[3][3] = 1; ori[3][4] = -1;
+        int[][] owner = {{0}};
+        assertTrue(CarpetValidador.noTapaAlfombraCompleta(3, 4, 0, 0, 0, owner, ori));
+    }
+
+    // ── getCabeza (indirecto) ─────────────────────────────────────────────────
+
+    @Test
+    void getCabeza_menos1_conCabezaArriba_retornaCabeza() {
+        int[][] ori = new int[7][7];
+        ori[2][3] = -1;
+        ori[2][2] = 1;
+        // llamamos indirectamente via noTapaAlfombraCompleta
+        assertTrue(CarpetValidador.noTapaAlfombraCompleta(2, 3, 0, 0, 0, new int[7][7], ori));
+    }
+
+    @Test
+    void getCabeza_menos1_conCabezaIzquierda_retornaCabeza() {
+        int[][] ori = new int[7][7];
+        ori[3][2] = -1;
+        ori[2][2] = 2;
+        assertTrue(CarpetValidador.noTapaAlfombraCompleta(3, 2, 0, 0, 0, new int[7][7], ori));
+    }
+
+    @Test
+    void getCabeza_menos1_sinCabeza_retornaNull() {
+        int[][] ori = new int[7][7];
+        ori[2][3] = -1;
+        assertTrue(CarpetValidador.noTapaAlfombraCompleta(2, 3, 0, 0, 0, new int[7][7], ori));
+    }
 }

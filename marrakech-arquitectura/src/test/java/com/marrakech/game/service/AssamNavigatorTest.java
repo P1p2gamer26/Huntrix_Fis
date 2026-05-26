@@ -1,6 +1,8 @@
 package com.marrakech.game.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AssamNavigatorTest {
@@ -221,5 +223,44 @@ class AssamNavigatorTest {
         int[][] path = AssamNavigator.computePath(1, -1, 3, 3);
         assertEquals(0, path[1][0]);
         assertEquals(3, path[1][1]);
+    }
+
+    @ParameterizedTest(name = "rebote [{index}] ({0},{1}) dir={2} -> ({3},{4}) dir={5}")
+    @CsvSource({
+        // esquinas
+        "0,0,0, 0,0,1",
+        "0,0,3, 0,0,2",
+        "6,6,2, 6,6,3",
+        "6,6,1, 6,6,0",
+        // borde norte
+        "1,0,0, 2,0,2",
+        "3,0,0, 4,0,2",
+        "4,0,0, 3,0,2",
+        "5,0,0, 6,0,2",
+        "6,0,0, 5,0,2",
+        // borde este
+        "6,0,1, 6,1,3",
+        "6,1,1, 6,0,3",
+        "6,2,1, 6,3,3",
+        "6,3,1, 6,2,3",
+        "6,4,1, 6,5,3",
+        // borde sur
+        "5,6,2, 4,6,0",
+        "4,6,2, 5,6,0",
+        "3,6,2, 2,6,0",
+        "2,6,2, 3,6,0",
+        "0,6,2, 1,6,0",
+        // borde oeste
+        "0,6,3, 0,5,1",
+        "0,5,3, 0,6,1",
+        "0,4,3, 0,3,1",
+        "0,3,3, 0,4,1",
+        "0,2,3, 0,1,1"
+    })
+    void computePath_rebotes_parametrizados(int sx, int sy, int sdir, int ex, int ey, int edir) {
+        int[][] path = AssamNavigator.computePath(1, sx, sy, sdir);
+        assertEquals(ex, path[1][0], "x");
+        assertEquals(ey, path[1][1], "y");
+        assertEquals(edir, path[1][2], "dir");
     }
 }

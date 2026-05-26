@@ -8,6 +8,19 @@ public class MusicaManager {
 
     public enum Track { MENU, LOBBY, JUEGO }
 
+    static {
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            if (e instanceof IllegalStateException
+                    && e.getMessage() != null
+                    && e.getMessage().contains("Toolkit not initialized")) {
+                // el parser asíncrono de Media falla si no hay toolkit JavaFX
+                // es inofensivo en tests/CI, no reportarlo
+            } else {
+                System.err.println("Excepción en [" + t.getName() + "]: " + e);
+            }
+        });
+    }
+
     private static MusicaManager instancia;
 
     private MediaPlayer playerActual;

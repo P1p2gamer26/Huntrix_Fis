@@ -116,6 +116,20 @@ class AuthServicioTest {
     }
 
     @Test
+    void registrar_creacionExitosa_peroLoginSesionActiva_retornaSesionActiva() {
+        when(jugadorRepo.nombreExiste("Nuevo")).thenReturn(false);
+        when(jugadorRepo.correoExiste("nuevo@test.com")).thenReturn(false);
+        when(jugadorRepo.crearJugador("Nuevo", "nuevo@test.com", "pass123")).thenReturn(true);
+        when(jugadorRepo.loginJugador("Nuevo", "pass123")).thenReturn("SESION_ACTIVA");
+
+        String resultado = authSvc.registrarYLogin("Nuevo", "nuevo@test.com", "pass123");
+
+        assertEquals("SESION_ACTIVA", resultado);
+        verify(jugadorRepo).crearJugador("Nuevo", "nuevo@test.com", "pass123");
+        verify(jugadorRepo).loginJugador("Nuevo", "pass123");
+    }
+
+    @Test
     void cerrarSesion_delegaAlRepositorio() {
         authSvc.cerrarSesion("Carlos");
         verify(jugadorRepo).cerrarSesion("Carlos");

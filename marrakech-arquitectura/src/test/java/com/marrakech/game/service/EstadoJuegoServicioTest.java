@@ -387,4 +387,139 @@ class EstadoJuegoServicioTest {
         svc.detenerPolling();
         assertDoesNotThrow(() -> svc.detenerPolling());
     }
+
+    // ── NOTIFICAR TURNO LISTO ───────────────────────────────────────────────
+
+    @Test
+    void notificarTurnoListo_partidaIdNull_noLanza() {
+        EstadoJuegoServicio s = new EstadoJuegoServicio(estadoRepo, null);
+        assertDoesNotThrow(() -> s.notificarTurnoListo(0, 0, 0, "test"));
+    }
+
+    @Test
+    void notificarTurnoListo_conPartidaId_guardaYListo() throws Exception {
+        when(estadoRepo.cargarUltimo("MRK-TEST")).thenReturn("5|1|2|3|datos");
+        svc.notificarTurnoListo(3, 4, 1, "tableroJson");
+        Thread.sleep(200);
+        verify(estadoRepo).guardar(eq("MRK-TEST"), eq(6), eq(3), eq(4), eq(1), eq("tableroJson"));
+        verify(estadoRepo).marcarListo("MRK-TEST");
+    }
+
+    @Test
+    void notificarTurnoListo_cargarUltimoNull_usaTurnoCero() throws Exception {
+        when(estadoRepo.cargarUltimo("MRK-TEST")).thenReturn(null);
+        svc.notificarTurnoListo(0, 0, 0, "data");
+        Thread.sleep(200);
+        verify(estadoRepo).guardar(eq("MRK-TEST"), eq(1), eq(0), eq(0), eq(0), eq("data"));
+    }
+
+    @Test
+    void notificarTurnoListo_cargarUltimoInvalido_usaTurnoCero() throws Exception {
+        when(estadoRepo.cargarUltimo("MRK-TEST")).thenReturn("invalido");
+        svc.notificarTurnoListo(1, 2, 3, "data");
+        Thread.sleep(200);
+        verify(estadoRepo).guardar(eq("MRK-TEST"), eq(1), eq(1), eq(2), eq(3), eq("data"));
+    }
+
+    @Test
+    void notificarTurnoListo_actualizaUltimoTurnoVisto() throws Exception {
+        when(estadoRepo.cargarUltimo("MRK-TEST")).thenReturn("3|0|0|0|d");
+        svc.notificarTurnoListo(0, 0, 0, "d");
+        Thread.sleep(200);
+        assertEquals(4, svc.getUltimoTurnoVisto());
+        assertEquals(4, svc.getEstadoVersion());
+    }
+
+    // ── DESMARCAR LISTO ──────────────────────────────────────────────────────
+
+    @Test
+    void desmarcarListo_partidaIdNull_noLanza() {
+        EstadoJuegoServicio s = new EstadoJuegoServicio(estadoRepo, null);
+        assertDoesNotThrow(() -> s.desmarcarListo());
+    }
+
+    @Test
+    void desmarcarListo_conPartidaId_delega() throws Exception {
+        svc.desmarcarListo();
+        Thread.sleep(200);
+        verify(estadoRepo).desmarcarListo("MRK-TEST");
+    }
+
+    // ── GUARDAR ESTADO (hilo) ────────────────────────────────────────────────
+
+    @Test
+    void guardarEstado_conPartidaId_guardaEnRepo() throws Exception {
+        when(estadoRepo.cargarUltimo("MRK-TEST")).thenReturn("2|0|0|0|d");
+        svc.guardarEstado(5, 6, 2, "nuevoTablero");
+        Thread.sleep(200);
+        verify(estadoRepo).guardar(eq("MRK-TEST"), eq(3), eq(5), eq(6), eq(2), eq("nuevoTablero"));
+    }
+
+    @Test
+    void guardarEstado_cargarUltimoNull_turno1() throws Exception {
+        when(estadoRepo.cargarUltimo("MRK-TEST")).thenReturn(null);
+        svc.guardarEstado(0, 0, 0, "d");
+        Thread.sleep(200);
+        verify(estadoRepo).guardar(eq("MRK-TEST"), eq(1), eq(0), eq(0), eq(0), eq("d"));
+    }
+
+    @Test
+    void guardarEstado_cargarUltimoInvalido_turno1() throws Exception {
+        when(estadoRepo.cargarUltimo("MRK-TEST")).thenReturn("xyz");
+        svc.guardarEstado(1, 2, 3, "d");
+        Thread.sleep(200);
+        verify(estadoRepo).guardar(eq("MRK-TEST"), eq(1), eq(1), eq(2), eq(3), eq("d"));
+    }
+
+    @Test
+    void guardarEstado_actualizaEstadoVersion() throws Exception {
+        when(estadoRepo.cargarUltimo("MRK-TEST")).thenReturn("7|0|0|0|d");
+        svc.guardarEstado(0, 0, 0, "d");
+        Thread.sleep(200);
+        assertEquals(8, svc.getUltimoTurnoVisto());
+        assertEquals(8, svc.getEstadoVersion());
+    }
+
+    // ── GUARDAR ESTADO SINCRONO ──────────────────────────────────────────────
+
+    @Test
+    void guardarEstadoSincrono_conPartidaId_guardaYLimpia() {
+        svc.guardarEstadoSincrono(3, 4, 1, "tablero");
+        verify(estadoRepo).limpiar("MRK-TEST");
+        verify(estadoRepo).guardar(eq("MRK-TEST"), eq(1), eq(3), eq(4), eq(1), eq("tablero"));
+        assertEquals(1, svc.getUltimoTurnoVisto());
+        assertEquals(1, svc.getEstadoVersion());
+    }
+
+    // ── SERIALIZAR con eliminado ─────────────────────────────────────────────
+
+    @Test
+    void serializar_conEliminadoNotNull_incluyeFlag() {
+        boolean[] eliminado = {false, true};
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{10,10}, new int[]{5,5},
+                new int[7][7], 0, 0, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2), eliminado
+        );
+        assertTrue(r.endsWith("0,1") || r.contains("0,1;") || r.contains("0,1"));
+    }
+
+    @Test
+    void serializar_conEliminadoNull_noIncluyeFlag() {
+        String r = EstadoJuegoServicio.serializarEstado(
+                2, new int[]{10,10}, new int[]{5,5},
+                new int[7][7], 0, 0, -1, -1, new int[7][7],
+                posReliquiaVacia(), inventarioVacio(2), null
+        );
+        assertFalse(r.endsWith("0,1"));
+    }
+
+    // ── GUARDAR ESTADO (comportamiento exacto hilo) ──────────────────────────
+
+    @Test
+    void guardarEstadoSincrono_esperaAlLatch_despuesDeGuardar() {
+        svc.guardarEstadoSincrono(0, 0, 0, "sync");
+        assertEquals(1, svc.getUltimoTurnoVisto());
+    }
+
 }

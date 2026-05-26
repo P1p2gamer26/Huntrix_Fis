@@ -6,15 +6,16 @@ public class Assam {
     private int orientation;
 
     public Assam(int x, int y) {
+        this(x, y, 0);
+    }
+
+    public Assam(int x, int y, int orientation) {
         this.x = x;
         this.y = y;
-        this.orientation = 0;
+        this.orientation = orientation;
     }
 
     public int getX() { return x; }
     public int getY() { return y; }
     public int getOrientation() { return orientation; }
-
-    public void setPosition(int x, int y) { this.x = x; this.y = y; }
-    public void setOrientation(int orientation) { this.orientation = orientation; }
 }
