@@ -215,4 +215,11 @@ class AssamNavigatorTest {
     void borderDir_indiceNegativo_envuelve() {
         assertEquals(1, AssamNavigator.borderDir(-24));
     }
+
+    @Test
+    void computePath_recortaCoordenadas_fueraDeTablero() {
+        int[][] path = AssamNavigator.computePath(1, -1, 3, 3);
+        assertEquals(0, path[1][0]);
+        assertEquals(3, path[1][1]);
+    }
 }
