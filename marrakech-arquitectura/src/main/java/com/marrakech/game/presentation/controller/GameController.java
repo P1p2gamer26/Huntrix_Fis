@@ -41,6 +41,7 @@ public class GameController {
     @FXML private HBox      gameScreen;
     @FXML private StackPane endScreen;
     @FXML private CheckBox  checkPoderesLocal;
+    @FXML private CheckBox  checkRapidaLocal;
     @FXML private GridPane  boardGrid;
     @FXML private Label     turnLabel, statusLabel, diceResultLabel, diceValueLabel;
     @FXML private Button    rollDiceBtn;
@@ -69,6 +70,7 @@ public class GameController {
     private int     miIndice = 0;
     private boolean modoMultijugador = false;
     private boolean poderesActivados = false;
+    private boolean partidaRapida    = false;
     private boolean sultanPendiente  = false;
 
     private GestionJuegoServicio juegoSvc;
@@ -98,17 +100,18 @@ public class GameController {
     }
 
     public void iniciarConJugadores(int n, String partidaId, String usuario,
-                                    int miIndice, PartidaServicio partidaSvc, boolean poderes) {
+                                    int miIndice, PartidaServicio partidaSvc, boolean poderes, boolean rapida) {
         this.partidaId        = partidaId;
         this.usuarioActual    = usuario;
         this.miIndice         = miIndice;
         this.modoMultijugador = true;
         this.partidaSvc       = partidaSvc;
         this.poderesActivados = poderes;
+        this.partidaRapida    = rapida;
 
         this.estadoSvc = new EstadoJuegoServicio(estadoRepo, partidaId);
 
-        startGame(n);
+        startGame(n, rapida);
 
         if (miIndice == 0) {
             estadoSvc.guardarEstadoSincrono(
@@ -135,12 +138,16 @@ public class GameController {
 
     private void iniciarConJugadoresLocal(int n) {
         this.poderesActivados = checkPoderesLocal != null && checkPoderesLocal.isSelected();
-        iniciarConJugadores(n);
+        boolean rapida = checkRapidaLocal != null && checkRapidaLocal.isSelected();
+        this.partidaRapida = rapida;
+        startGame(n, rapida);
     }
 
-    private void startGame(int n) {
+    private void startGame(int n) { startGame(n, false); }
+
+    private void startGame(int n, boolean rapida) {
         juegoSvc = new GestionJuegoServicio();
-        juegoSvc.iniciarJuego(n);
+        juegoSvc.iniciarJuego(n, rapida);
 
         assamSvc = new AssamServicio();
 

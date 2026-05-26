@@ -31,6 +31,9 @@
         <CheckBox fx:id="checkPoderesLocal"
                   text="[*] Activar superpoderes"
                   style="-fx-font-size:15px;-fx-text-fill:#D4A017;-fx-mark-color:#C9922A;"/>
+        <CheckBox fx:id="checkRapidaLocal"
+                  text="[!] Partida rápida"
+                  style="-fx-font-size:15px;-fx-text-fill:#D4A017;-fx-mark-color:#C9922A;"/>
         <Label text="¿Cuántos jugadores?" style="-fx-font-size:20px;-fx-text-fill:#E8D4A0;"/>
         <HBox alignment="CENTER" spacing="20.0">
           <Button text="2 Jugadores" styleClass="btn" onAction="#startWith2" mnemonicParsing="false"/>

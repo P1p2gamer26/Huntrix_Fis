@@ -153,8 +153,11 @@ public class PoderesController {
 
             int[] dinero = juegoSvc.getMoney();
             if (!juegoSvc.esEliminado(jugador) && (dueno <= 0 || !juegoSvc.esEliminado(dueno - 1))) {
-                int pagoReal = Math.min(pagoFinal, dinero[jugador]);
-                dinero[jugador] = Math.max(0, dinero[jugador] - pagoFinal);
+                int pagoFinalLimitado = juegoSvc.isPartidaRapida()
+                    ? Math.min(pagoFinal, dinero[jugador])
+                    : pagoFinal;
+                int pagoReal = Math.min(pagoFinalLimitado, dinero[jugador]);
+                dinero[jugador] = Math.max(0, dinero[jugador] - pagoFinalLimitado);
                 if (dueno > 0) dinero[dueno - 1] += pagoReal;
             }
 

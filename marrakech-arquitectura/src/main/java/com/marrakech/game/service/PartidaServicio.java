@@ -19,8 +19,8 @@ public class PartidaServicio {
     }
 
     public String crearPartida(String creador, int maxJugadores,
-                               boolean poderes, String dificultad) {
-        return partidaRepo.crearPartida(creador, maxJugadores, poderes, dificultad);
+                               boolean poderes, boolean rapida, String dificultad) {
+        return partidaRepo.crearPartida(creador, maxJugadores, poderes, rapida, dificultad);
     }
 
     /**

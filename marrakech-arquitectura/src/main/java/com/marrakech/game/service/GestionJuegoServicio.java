@@ -161,17 +161,23 @@ public class GestionJuegoServicio {
     private int numPlayers;
     private int[] money;
     private int[] rugs;
+    private boolean partidaRapida = false;
     private final int[][] tileOwner = new int[7][7];
     private final int[][] carpetOrientation = new int[7][7];
     private int currentPlayerIdx;
     private int currentPhase;
     private int firstCarpetX = -1, firstCarpetY = -1;
 
-    public void iniciarJuego(int n) {
+    public void iniciarJuego(int n) { iniciarJuego(n, false); }
+
+    public void iniciarJuego(int n, boolean partidaRapida) {
         this.numPlayers = n;
         this.money = new int[n];
         this.rugs = new int[n];
-        for (int i = 0; i < n; i++) { money[i] = 20; rugs[i] = 15; }
+        this.partidaRapida = partidaRapida;
+        int monedas = partidaRapida ? 10 : 20;
+        int alfombras = partidaRapida ? 8 : 15;
+        for (int i = 0; i < n; i++) { money[i] = monedas; rugs[i] = alfombras; }
         for (int r = 0; r < 7; r++)
             for (int c = 0; c < 7; c++) {
                 tileOwner[c][r] = 0;
@@ -424,6 +430,7 @@ public class GestionJuegoServicio {
     public int getCurrentPhase() { return currentPhase; }
     public int getFirstCarpetX() { return firstCarpetX; }
     public int getFirstCarpetY() { return firstCarpetY; }
+    public boolean isPartidaRapida() { return partidaRapida; }
     public void setCurrentPlayerIdx(int idx) { this.currentPlayerIdx = idx; }
     public void setCurrentPhase(int phase) { this.currentPhase = phase; }
     public void setNumPlayers(int n) { this.numPlayers = n; }

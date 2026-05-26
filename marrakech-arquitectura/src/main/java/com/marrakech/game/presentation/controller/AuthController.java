@@ -157,7 +157,7 @@ public class AuthController {
         v.getBtnCrear().setOnAction(e -> {
             String id = partidaSvc.crearPartida(
                 usuarioActual, v.getCantidadJugadores(),
-                v.isPoderesActivados(), "Normal");
+                v.isPoderesActivados(), v.isPartidaRapida(), "Normal");
             Partida creada = partidaSvc.obtenerPartida(id);
             if (creada != null) mostrarSalaEspera(creada, true);
         });
@@ -212,8 +212,9 @@ public class AuthController {
                     int idx = confirmada.jugadores.indexOf(usuarioActual);
                     if (idx >= 0) idxOk = idx;
                 }
+                final boolean rapidaF = confirmada != null && confirmada.partidaRapida;
                 final int idxFinal = idxOk;
-                Platform.runLater(() -> mostrarJuego(nFinal, pidFinal, usuarioActual, idxFinal, poderesF));
+                Platform.runLater(() -> mostrarJuego(nFinal, pidFinal, usuarioActual, idxFinal, poderesF, rapidaF));
             }, "host-delay").start();
         });
 
@@ -230,7 +231,8 @@ public class AuthController {
             }
             final int n   = act != null ? act.maxJugadores : 2;
             final int idx = miIdx >= 0 ? miIdx : 1;
-            mostrarJuego(n, partida.id, usuarioActual, idx, v.isPoderesActivados());
+            boolean rapidaAct = act != null && act.partidaRapida;
+            mostrarJuego(n, partida.id, usuarioActual, idx, v.isPoderesActivados(), rapidaAct);
         });
 
         stage.setScene(new Scene(v, width, height));
@@ -272,7 +274,7 @@ public class AuthController {
         }
     }
 
-    private void mostrarJuego(int n, String partidaId, String usuario, int miIndice, boolean poderes) {
+    private void mostrarJuego(int n, String partidaId, String usuario, int miIndice, boolean poderes, boolean rapida) {
         musicaSvc.reproducir(MusicaServicio.Track.JUEGO);
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -287,7 +289,7 @@ public class AuthController {
             stage.setScene(scene);
             gc.setServicios(musicaSvc, chatSvc);
             gc.setEstadoRepositorio(estadoRepo);
-            gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc, poderes);
+            gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc, poderes, rapida);
             gc.setOnVolverSala(() -> mostrarModoOnline());
             gc.setOnVolverMenu(() -> mostrarMenu());
         } catch (Exception e) {

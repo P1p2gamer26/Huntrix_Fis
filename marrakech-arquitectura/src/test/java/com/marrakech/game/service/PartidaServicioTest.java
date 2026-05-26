@@ -55,13 +55,13 @@ class PartidaServicioTest {
 
     @Test
     void crear_partidaNueva_retornaIdValido() {
-        when(partidaRepo.crearPartida("Host", 3, true, "DIFICIL"))
+        when(partidaRepo.crearPartida("Host", 3, true, false, "DIFICIL"))
             .thenReturn("MRK-ABCD");
 
-        String id = svc.crearPartida("Host", 3, true, "DIFICIL");
+        String id = svc.crearPartida("Host", 3, true, false, "DIFICIL");
 
         assertEquals("MRK-ABCD", id);
-        verify(partidaRepo).crearPartida("Host", 3, true, "DIFICIL");
+        verify(partidaRepo).crearPartida("Host", 3, true, false, "DIFICIL");
     }
 
     // ── CASO COMPLEJO 4: obtenerRanking con múltiples jugadores ordenados ──────
