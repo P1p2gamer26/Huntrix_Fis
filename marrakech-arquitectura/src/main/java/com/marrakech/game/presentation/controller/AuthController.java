@@ -1,12 +1,22 @@
 package com.marrakech.game.presentation.controller;
 
+import com.marrakech.game.presentation.views.ConfiguracionView;
+import com.marrakech.game.presentation.views.CrearPartidaView;
+import com.marrakech.game.presentation.views.LoginView;
+import com.marrakech.game.presentation.views.MenuView;
+import com.marrakech.game.presentation.views.ModoOnlineView;
+import com.marrakech.game.presentation.views.PerfilView;
+import com.marrakech.game.presentation.views.RegisterView;
+import com.marrakech.game.presentation.views.ReglasView;
+import com.marrakech.game.presentation.views.SalaEsperaView;
+import com.marrakech.game.presentation.views.UnirsePartidaView;
+import com.marrakech.game.presentation.views.WelcomeView;
 import com.marrakech.game.repository.IEstadoJuegoRepositorio;
 import com.marrakech.game.repository.PartidaRepositorio.Partida;
 import com.marrakech.game.service.AuthServicio;
 import com.marrakech.game.service.ChatServicio;
 import com.marrakech.game.service.MusicaServicio;
 import com.marrakech.game.service.PartidaServicio;
-import com.marrakech.game.presentation.views.*;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -72,7 +82,8 @@ public class AuthController {
             if ("APODO_EXISTE".equals(res))  { v.mostrarError("Ese apodo ya está en uso."); return; }
             if ("CORREO_EXISTE".equals(res)) { v.mostrarError("Ese correo ya está registrado."); return; }
             if ("ERROR_BD".equals(res))      { v.mostrarError("Error al guardar los datos. Intenta de nuevo."); return; }
-            usuarioActual = apodo;
+            if ("SESION_ACTIVA".equals(res)) { v.mostrarError("Esta cuenta ya tiene una sesión abierta en otro dispositivo."); return; }
+            usuarioActual = res;
             mostrarMenu();
         });
         stage.setScene(new Scene(v, width, height));
@@ -99,7 +110,7 @@ public class AuthController {
 
     public void mostrarMenu() {
         musicaSvc.reproducir(MusicaServicio.Track.MENU);
-        MenuView v = new MenuView(usuarioActual);
+        MenuView v = new MenuView(usuarioActual, partidaSvc.obtenerRanking());
         v.getBtnJugar().setOnAction(e -> mostrarModoOnline());
         v.getBtnJugarLocal().setOnAction(e -> mostrarJuegoLocal());
         v.getBtnReglas().setOnAction(e -> mostrarReglas());
@@ -146,7 +157,7 @@ public class AuthController {
         v.getBtnCrear().setOnAction(e -> {
             String id = partidaSvc.crearPartida(
                 usuarioActual, v.getCantidadJugadores(),
-                v.isPoderesActivados(), v.isPartidaRapida(), v.getDificultad());
+                v.isPoderesActivados(), "Normal");
             Partida creada = partidaSvc.obtenerPartida(id);
             if (creada != null) mostrarSalaEspera(creada, true);
         });
@@ -173,32 +184,53 @@ public class AuthController {
         SalaEsperaView v = new SalaEsperaView(partida, esHost, partidaSvc);
 
         v.getBtnSalir().setOnAction(e -> {
+            partidaSvc.salirPartida(v.getPartidaId(), usuarioActual);
             v.detenerPolling();
             musicaSvc.reproducir(MusicaServicio.Track.MENU);
+            mostrarModoOnline();
+        });
+
+        v.setOnJugadorAbandono(() -> {
+            v.detenerPolling();
+            musicaSvc.reproducir(MusicaServicio.Track.MENU);
+            mostrarAlerta("Jugador abandonó", "El otro jugador abandonó la sala.\nVolviendo al menú...");
             mostrarModoOnline();
         });
 
         v.getBtnIniciar().setOnAction(e -> {
             v.detenerPolling();
             partidaSvc.iniciarPartida(v.getPartidaId());
-            Partida fresca = partidaSvc.obtenerPartida(v.getPartidaId());
-            int miIdx = (fresca != null) ? fresca.jugadores.indexOf(usuarioActual) : 0;
-            if (miIdx < 0) miIdx = 0;
-            final int    idxFinal = miIdx;
             final int    nFinal   = v.getNumJugadores();
             final String pidFinal = v.getPartidaId();
+            final boolean poderesF = v.isPoderesActivados();
             new Thread(() -> {
-                try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
-                Platform.runLater(() -> mostrarJuego(nFinal, pidFinal, usuarioActual, idxFinal));
+                try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
+                // Leer lista confirmada para obtener índice real del host
+                Partida confirmada = partidaSvc.obtenerPartida(pidFinal);
+                int idxOk = 0;
+                if (confirmada != null) {
+                    int idx = confirmada.jugadores.indexOf(usuarioActual);
+                    if (idx >= 0) idxOk = idx;
+                }
+                final int idxFinal = idxOk;
+                Platform.runLater(() -> mostrarJuego(nFinal, pidFinal, usuarioActual, idxFinal, poderesF));
             }, "host-delay").start();
         });
 
         v.setOnJuegoIniciado(() -> {
-            Partida act = partidaSvc.obtenerPartida(partida.id);
-            int n     = act != null ? act.maxJugadores : 2;
-            int miIdx = act != null ? act.jugadores.indexOf(usuarioActual) : 1;
-            if (miIdx < 0) miIdx = 1;
-            mostrarJuego(n, partida.id, usuarioActual, miIdx);
+            // Reintentar hasta 3 veces para asegurar que el usuario esté en la lista
+            Partida act = null;
+            int miIdx = -1;
+            for (int intento = 0; intento < 3 && miIdx < 0; intento++) {
+                act = partidaSvc.obtenerPartida(partida.id);
+                if (act != null) miIdx = act.jugadores.indexOf(usuarioActual);
+                if (miIdx < 0) {
+                    try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+                }
+            }
+            final int n   = act != null ? act.maxJugadores : 2;
+            final int idx = miIdx >= 0 ? miIdx : 1;
+            mostrarJuego(n, partida.id, usuarioActual, idx, v.isPoderesActivados());
         });
 
         stage.setScene(new Scene(v, width, height));
@@ -227,7 +259,7 @@ public class AuthController {
             Scene scene = new Scene(root, width, height);
             try {
                 scene.getStylesheets().add(
-                    getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
+                    getClass().getResource("/com/marrakech/game/styles.css").toExternalForm());
             } catch (Exception ignored) {}
             stage.setScene(scene);
             gc.setServicios(musicaSvc, chatSvc);
@@ -240,7 +272,7 @@ public class AuthController {
         }
     }
 
-    private void mostrarJuego(int n, String partidaId, String usuario, int miIndice) {
+    private void mostrarJuego(int n, String partidaId, String usuario, int miIndice, boolean poderes) {
         musicaSvc.reproducir(MusicaServicio.Track.JUEGO);
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -250,12 +282,12 @@ public class AuthController {
             Scene scene = new Scene(root, width, height);
             try {
                 scene.getStylesheets().add(
-                    getClass().getResource("/com/marrakech/game/game.css").toExternalForm());
+                    getClass().getResource("/com/marrakech/game/styles.css").toExternalForm());
             } catch (Exception ignored) {}
             stage.setScene(scene);
             gc.setServicios(musicaSvc, chatSvc);
             gc.setEstadoRepositorio(estadoRepo);
-            gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc);
+            gc.iniciarConJugadores(n, partidaId, usuario, miIndice, partidaSvc, poderes);
             gc.setOnVolverSala(() -> mostrarModoOnline());
             gc.setOnVolverMenu(() -> mostrarMenu());
         } catch (Exception e) {

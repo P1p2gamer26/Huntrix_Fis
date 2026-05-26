@@ -45,8 +45,11 @@ public class WelcomeView extends StackPane {
         overlay.setStyle("-fx-background-color: rgba(0,0,0,0.55);");
         overlay.prefWidthProperty().bind(widthProperty());
         overlay.prefHeightProperty().bind(heightProperty());
+        overlay.setMouseTransparent(true); // <-- esto
         getChildren().add(overlay);
     }
+
+
 
     private void configurarContenido() {
         VBox contenido = new VBox(22);

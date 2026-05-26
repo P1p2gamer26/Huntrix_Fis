@@ -28,7 +28,6 @@ public class CrearPartidaView extends StackPane {
     private Button btnCrear;
     private ComboBox<String> comboCantidad;
     private CheckBox checkPoderes;
-    private CheckBox checkRapida;
     private ComboBox<String> comboDificultad;
 
     public CrearPartidaView() {
@@ -79,7 +78,6 @@ public class CrearPartidaView extends StackPane {
         seccionCantidad.getChildren().add(comboCantidad);
 
         checkPoderes = crearCheckbox("Activar poderes especiales");
-        checkRapida  = crearCheckbox("Partida rápida");
 
         VBox seccionDificultad = crearSeccion("Dificultad");
         comboDificultad = new ComboBox<>();
@@ -95,7 +93,7 @@ public class CrearPartidaView extends StackPane {
         btnCrear  = crearBotonRelleno("CREAR");
         botones.getChildren().addAll(btnVolver, btnCrear);
 
-        panel.getChildren().addAll(titulo, seccionCantidad, checkPoderes, checkRapida, seccionDificultad, botones);
+        panel.getChildren().addAll(titulo, seccionCantidad, checkPoderes, botones);
         getChildren().add(panel);
     }
 
@@ -148,7 +146,6 @@ public class CrearPartidaView extends StackPane {
     public Button getBtnVolver()        { return btnVolver; }
     public Button getBtnCrear()         { return btnCrear; }
     public boolean isPoderesActivados() { return checkPoderes.isSelected(); }
-    public boolean isPartidaRapida()    { return checkRapida.isSelected(); }
     public String getDificultad()       { return comboDificultad.getValue(); }
     public int getCantidadJugadores()   { return Integer.parseInt(comboCantidad.getValue().charAt(0) + ""); }
 }

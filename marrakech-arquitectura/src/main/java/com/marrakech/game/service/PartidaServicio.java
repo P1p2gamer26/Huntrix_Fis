@@ -19,8 +19,8 @@ public class PartidaServicio {
     }
 
     public String crearPartida(String creador, int maxJugadores,
-                               boolean poderes, boolean rapida, String dificultad) {
-        return partidaRepo.crearPartida(creador, maxJugadores, poderes, rapida, dificultad);
+                               boolean poderes, String dificultad) {
+        return partidaRepo.crearPartida(creador, maxJugadores, poderes, dificultad);
     }
 
     /**
@@ -49,6 +49,14 @@ public class PartidaServicio {
 
     public void registrarVictoria(String usuario) {
         partidaRepo.registrarVictoria(usuario);
+    }
+
+    public void salirPartida(String id, String usuario) {
+        partidaRepo.salirPartida(id, usuario);
+    }
+
+    public void abandonarPartida(String id) {
+        partidaRepo.abandonarPartida(id);
     }
 
     public void limpiarSalasViejas() {

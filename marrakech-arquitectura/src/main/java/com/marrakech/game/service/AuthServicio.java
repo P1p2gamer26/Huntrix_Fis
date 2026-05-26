@@ -1,14 +1,10 @@
 package com.marrakech.game.service;
 
+import java.io.File;
+
 import com.marrakech.game.repository.IJugadorRepositorio;
 import com.marrakech.game.repository.IPartidaRepositorio;
 
-import java.io.File;
-
-/**
- * Casos de uso relacionados con autenticación y perfil de jugadores.
- * Recibe sus dependencias por constructor (inyección de dependencias).
- */
 public class AuthServicio {
 
     private final IJugadorRepositorio jugadorRepo;
@@ -19,31 +15,35 @@ public class AuthServicio {
         this.partidaRepo = partidaRepo;
     }
 
-    /**
-     * Registra un nuevo jugador y abre sesión inmediatamente.
-     * @return "APODO_EXISTE", "CORREO_EXISTE" o el nombre del jugador si todo fue bien.
-     */
     public String registrarYLogin(String apodo, String correo, String password) {
+        if (!validarEmail(correo)) return "EMAIL_INVALIDO";
         if (jugadorRepo.nombreExiste(apodo))  return "APODO_EXISTE";
         if (jugadorRepo.correoExiste(correo)) return "CORREO_EXISTE";
         if (!jugadorRepo.crearJugador(apodo, correo, password)) return "ERROR_BD";
-        jugadorRepo.loginJugador(apodo, password);
-        return apodo;
-    }
-
-    /**
-     * Autentica un jugador existente.
-     * @return null=credenciales malas, "SESION_ACTIVA"=sesión duplicada, nombre=éxito.
-     */
-    public String login(String apodo, String password) {
         String resultado = jugadorRepo.loginJugador(apodo, password);
-        if (resultado == null)               return null;
         if ("SESION_ACTIVA".equals(resultado)) return "SESION_ACTIVA";
         return resultado;
     }
 
+    public String login(String apodo, String password) {
+        return jugadorRepo.loginJugador(apodo, password);
+    }
+
     public void cerrarSesion(String nombreUsuario) {
         jugadorRepo.cerrarSesion(nombreUsuario);
+    }
+
+    private boolean validarEmail(String email) {
+        if (email == null || email.isEmpty()) return false;
+        int arrobaCount = 0;
+        int arrobaPos = -1;
+        for (int i = 0; i < email.length(); i++) {
+            if (email.charAt(i) == '@') {
+                arrobaCount++;
+                arrobaPos = i;
+            }
+        }
+        return arrobaCount == 1 && arrobaPos > 0 && arrobaPos < email.length() - 1;
     }
 
     public String getCorreo(String nombreUsuario) {

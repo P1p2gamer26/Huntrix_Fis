@@ -57,11 +57,13 @@ public class ChatController {
     public void cargarNuevos() {
         if (chatSvc == null) return;
         java.util.List<Mensaje> nuevos = chatSvc.obtenerMensajesDesde(chatSvc.getUltimoMensajeId());
+        System.out.println("[CHAT-CTRL] Polling: ultimoId=" + chatSvc.getUltimoMensajeId() + ", nuevos=" + nuevos.size());
         for (Mensaje m : nuevos) {
+            System.out.println("[CHAT-CTRL] Mensaje: id=" + m.id + ", usuario=" + m.usuario + ", texto=" + m.texto);
             if (!m.usuario.equals(usuarioActual)) agregarBurbuja(m);
             chatSvc.setUltimoMensajeId(m.id);
         }
-        scrollAlFinal();
+        if (!nuevos.isEmpty()) scrollAlFinal();
     }
 
     public void enviar() {
@@ -69,30 +71,50 @@ public class ChatController {
         String texto = chatInput.getText().trim();
         if (texto.isEmpty()) return;
         chatInput.clear();
-        chatSvc.enviar(texto);
+
+        String hora = new SimpleDateFormat("HH:mm").format(new Date());
+        Mensaje mLocal = new Mensaje(-1, usuarioActual, texto, hora);
+        agregarBurbuja(mLocal);
+        scrollAlFinal();
 
         new Thread(() -> {
+            chatSvc.enviar(texto);
+            try { Thread.sleep(300); } catch (InterruptedException ignored) {}
             int nuevoId = chatSvc.obtenerUltimoIdMensaje();
-            String hora = new SimpleDateFormat("HH:mm").format(new Date());
-            Mensaje m = new Mensaje(nuevoId, usuarioActual, texto, hora);
-            Platform.runLater(() -> {
-                chatSvc.setUltimoMensajeId(nuevoId);
-                agregarBurbuja(m);
-                scrollAlFinal();
-            });
+            Platform.runLater(() -> chatSvc.setUltimoMensajeId(nuevoId));
         }, "chat-send-local").start();
     }
 
     private void agregarBurbuja(Mensaje m) {
         boolean esPropio = m.usuario.equals(usuarioActual);
+
         Label lblTexto = new Label(m.texto);
-        lblTexto.setWrapText(true); lblTexto.setMaxWidth(160);
-        lblTexto.setStyle("-fx-font-size:12px;-fx-text-fill:" + (esPropio ? "#1A0A00" : "#F0E0B0") + ";");
+        lblTexto.setWrapText(true);
+        lblTexto.setMaxWidth(155);
+        lblTexto.setTextFill(javafx.scene.paint.Color.web(esPropio ? "#1A0A00" : "#FFFFFF"));
+        lblTexto.setStyle("-fx-font-size:12px;-fx-font-weight:" + (esPropio ? "bold" : "normal") + ";");
+
         Label lblMeta = new Label(m.usuario + "  " + m.hora);
-        lblMeta.setStyle("-fx-font-size:10px;-fx-text-fill:" + (esPropio ? "#5A3010" : "#9E7A3A") + ";");
+        lblMeta.setTextFill(javafx.scene.paint.Color.web(esPropio ? "#5A3010" : "#F0C060"));
+        lblMeta.setStyle("-fx-font-size:10px;");
+
         VBox burbuja = new VBox(2, lblTexto, lblMeta);
-        burbuja.getStyleClass().add(esPropio ? "burbuja-propia" : "burbuja-ajena");
         burbuja.setMaxWidth(170);
+        if (esPropio) {
+            burbuja.setStyle(
+                "-fx-background-color:#C9922A;" +
+                "-fx-background-radius:10 10 2 10;" +
+                "-fx-padding:6 10 6 10;");
+        } else {
+            burbuja.setStyle(
+                "-fx-background-color:rgba(80,45,5,0.95);" +
+                "-fx-border-color:#C9922A;" +
+                "-fx-border-width:1;" +
+                "-fx-background-radius:10 10 10 2;" +
+                "-fx-border-radius:10 10 10 2;" +
+                "-fx-padding:6 10 6 10;");
+        }
+
         HBox fila = new HBox(burbuja);
         fila.setAlignment(esPropio ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
         fila.setPadding(new Insets(1, 0, 1, 0));

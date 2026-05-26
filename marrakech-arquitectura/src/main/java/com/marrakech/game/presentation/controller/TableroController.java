@@ -3,8 +3,10 @@ package com.marrakech.game.presentation.controller;
 import com.marrakech.game.service.GestionJuegoServicio;
 import com.marrakech.game.service.GestionJuegoServicio.ResultadoClick;
 import com.marrakech.game.service.GestionJuegoServicio.ResultadoTipo;
+import com.marrakech.game.service.GestionJuegoServicio.Reliquia;
 import com.marrakech.game.presentation.render.GameRenderEngine;
 
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -22,6 +24,7 @@ public class TableroController {
 
     private Runnable onCarpetPlaced;
     private Runnable onGameEnded;
+    private Runnable onAlfombraCompleta;
 
     public TableroController(GridPane boardGrid, GameRenderEngine renderEngine,
                               GestionJuegoServicio juegoSvc) {
@@ -32,6 +35,7 @@ public class TableroController {
 
     public void setOnCarpetPlaced(Runnable r) { this.onCarpetPlaced = r; }
     public void setOnGameEnded(Runnable r) { this.onGameEnded = r; }
+    public void setOnAlfombraCompleta(Runnable r) { this.onAlfombraCompleta = r; }
 
     public void actualizarContexto(int phase, int playerIdx,
                                     int ax, int ay, int[] rugs) {
@@ -66,6 +70,34 @@ public class TableroController {
             juegoSvc.getTileOwner(), juegoSvc.getCarpetOrientation(), assamView);
     }
 
+    /** Redibuja el tablero y además pinta los emojis de las reliquias activas. */
+    public void redibujarConReliquias(ImageView assamView) {
+        redibujar(assamView);
+        // Limpiar labels de reliquias anteriores del grid
+        boardGrid.getChildren().removeIf(n ->
+            n instanceof javafx.scene.control.Label
+            && "reliquia-overlay".equals(n.getUserData()));
+
+        for (Reliquia rel : Reliquia.values()) {
+            int[] pos = juegoSvc.getPosicionReliquia(rel);
+            if (pos[0] < 0) continue;
+            javafx.scene.control.Label lbl = new javafx.scene.control.Label(rel.icono);
+            lbl.setUserData("reliquia-overlay");
+            lbl.setStyle("-fx-font-size:28px;"
+                + "-fx-effect:dropshadow(gaussian,rgba(10,4,0,0.9),6,0.5,0,0);"
+                + "-fx-background-color:rgba(201,146,42,0.15);"
+                + "-fx-background-radius:50%;-fx-padding:2;"
+                + "-fx-border-color:rgba(201,146,42,0.3);"
+                + "-fx-border-radius:50%;-fx-border-width:1px;");
+            lbl.setMouseTransparent(true);
+            Tooltip tip = new Tooltip(rel.icono + "  " + rel.nombre + "\n" + rel.descripcion);
+            tip.setStyle("-fx-font-size:10px;-fx-background-color:rgba(10,4,0,0.95);"
+                + "-fx-text-fill:#F0D060;-fx-border-color:#C9922A;-fx-padding:6 8;");
+            Tooltip.install(lbl, tip);
+            boardGrid.add(lbl, pos[0], pos[1]);
+        }
+    }
+
     public void highlightTile(int x, int y) {
         tiles[x][y].setStyle("-fx-background-color: rgba(255,255,255,0.25);");
     }
@@ -81,6 +113,11 @@ public class TableroController {
                 break;
             case JUEGO_TERMINADO:
                 if (onGameEnded != null) onGameEnded.run();
+                break;
+            case ALFOMBRA_COMPLETA:
+                juegoSvc.setCurrentPhase(1);
+                limpiarHighlights();
+                if (onAlfombraCompleta != null) onAlfombraCompleta.run();
                 break;
             default:
                 break;

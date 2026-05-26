@@ -1,9 +1,5 @@
 package com.marrakech.game.service;
 
-/**
- * Reglas de validación y reparación de alfombras sobre el tablero 7x7.
- * Extrae la lógica pura de posición para mantener GameController enfocado en UI.
- */
 public class CarpetValidador {
 
     private CarpetValidador() {}
@@ -12,6 +8,12 @@ public class CarpetValidador {
     public static boolean esCarpetValida(int x1, int y1, int x2, int y2) {
         return x1 >= 0 && x1 <= 6 && y1 >= 0 && y1 <= 6
             && x2 >= 0 && x2 <= 6 && y2 >= 0 && y2 <= 6;
+    }
+
+    /** Verifica que (x,y) esté en las 8 celdas del 3x3 alrededor de Assam (no en Assam mismo). */
+    public static boolean estaEnRango3x3(int x, int y, int assamX, int assamY) {
+        if (x == assamX && y == assamY) return false;
+        return Math.abs(x - assamX) <= 1 && Math.abs(y - assamY) <= 1;
     }
 
     /**
@@ -28,9 +30,41 @@ public class CarpetValidador {
     }
 
     /**
+     * Verifica que las dos celdas de la alfombra no cubran las dos mitades
+     * de una misma alfombra ajena.
+     * Retorna true si la colocación es válida.
+     */
+    public static boolean noTapaAlfombraCompleta(int x1, int y1, int x2, int y2,
+                                                  int currentPlayer, int[][] tileOwner,
+                                                  int[][] carpetOrientation) {
+        int[] cabeza1 = getCabeza(x1, y1, carpetOrientation);
+        int[] cabeza2 = getCabeza(x2, y2, carpetOrientation);
+
+        if (cabeza1 != null && cabeza2 != null
+                && cabeza1[0] == cabeza2[0] && cabeza1[1] == cabeza2[1]
+                && tileOwner[cabeza1[0]][cabeza1[1]] != currentPlayer + 1) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Retorna la celda cabeza de la alfombra a la que pertenece (x,y).
+     * Retorna null si la celda está vacía o es independiente.
+     */
+    private static int[] getCabeza(int x, int y, int[][] carpetOrientation) {
+        int ori = carpetOrientation[x][y];
+        if (ori == 1 || ori == 2) return new int[]{x, y};
+        if (ori == -1) {
+            if (y > 0 && carpetOrientation[x][y - 1] == 1) return new int[]{x, y - 1};
+            if (x > 0 && carpetOrientation[x - 1][y] == 2) return new int[]{x - 1, y};
+        }
+        return null;
+    }
+
+    /**
      * Cuando se cubre una celda que era la primera mitad de una alfombra previa,
      * convierte la segunda mitad huérfana en una celda "sola" (orientación 3).
-     * Cuando se cubre una segunda mitad (-1), limpia también su primera mitad.
      */
     public static void repararAlfombraAfectada(int col, int row, int[][] carpetOrientation) {
         int ori = carpetOrientation[col][row];
@@ -50,8 +84,7 @@ public class CarpetValidador {
     }
 
     /**
-     * Cuenta cuántas celdas contiguas pertenecen al mismo propietario (BFS/DFS).
-     * Se usa para calcular el pago cuando Assam cae en una alfombra rival.
+     * Cuenta cuántas celdas contiguas pertenecen al mismo propietario (DFS).
      */
     public static int contarContiguas(int x, int y, int owner, int[][] tileOwner) {
         return dfs(x, y, owner, new boolean[7][7], tileOwner);

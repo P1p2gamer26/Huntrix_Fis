@@ -1,5 +1,9 @@
 package com.marrakech.game.presentation.views;
 
+import java.util.List;
+
+import com.marrakech.game.repository.PartidaRepositorio.RankingEntry;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -14,6 +18,7 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -33,10 +38,10 @@ public class MenuView extends StackPane {
     private HBox   tarjetaUsuario;
     private final String usuario;
 
-    public MenuView(String usuario) {
+    public MenuView(String usuario, List<RankingEntry> ranking) {
         this.usuario = usuario == null || usuario.isEmpty() ? "Jugador" : usuario;
         configurarFondo();
-        configurarContenido();
+        configurarContenido(ranking);
         configurarTarjetaUsuario();
     }
 
@@ -54,11 +59,13 @@ public class MenuView extends StackPane {
         getChildren().add(overlay);
     }
 
-    private void configurarContenido() {
-        VBox contenido = new VBox(18);
-        contenido.setAlignment(Pos.CENTER);
-        contenido.setMaxWidth(320);
-        contenido.setPadding(new Insets(0, 0, 60, 0));
+    private void configurarContenido(List<RankingEntry> ranking) {
+        HBox filaPrincipal = new HBox(40);
+        filaPrincipal.setAlignment(Pos.CENTER);
+
+        VBox columnaCentral = new VBox(18);
+        columnaCentral.setAlignment(Pos.CENTER);
+        columnaCentral.setMaxWidth(320);
 
         Text titulo = new Text("MARRAKESH");
         titulo.setFont(Font.font("Georgia", FontWeight.BOLD, 72));
@@ -82,8 +89,55 @@ public class MenuView extends StackPane {
         botones.setAlignment(Pos.CENTER);
         botones.getChildren().addAll(btnJugar, btnJugarLocal, btnReglas, btnConfiguracion);
 
-        contenido.getChildren().addAll(titulo, botones, subtitulo);
-        getChildren().add(contenido);
+        columnaCentral.getChildren().addAll(titulo, botones, subtitulo);
+
+        VBox rankingPanel = new VBox(10);
+        rankingPanel.setAlignment(Pos.TOP_CENTER);
+        rankingPanel.setStyle("-fx-background-color:rgba(10,4,0,0.82);-fx-border-color:#8B6914;-fx-border-width:1.5px;-fx-border-radius:8px;-fx-background-radius:8px;-fx-padding:16 20;");
+        rankingPanel.setMaxWidth(280);
+        rankingPanel.setMinWidth(240);
+
+        Text rankTitulo = new Text("TOP GANADORES");
+        rankTitulo.setFont(Font.font("Georgia", FontWeight.BOLD, 16));
+        rankTitulo.setFill(Color.web("#F0D060"));
+
+        rankingPanel.getChildren().add(rankTitulo);
+
+        if (ranking == null || ranking.isEmpty()) {
+            Text vacio = new Text("Aun no hay victorias registradas.");
+            vacio.setFont(Font.font("Georgia", 12));
+            vacio.setFill(Color.web("#7A5A30"));
+            rankingPanel.getChildren().add(vacio);
+        } else {
+            int top = Math.min(ranking.size(), 5);
+            for (int i = 0; i < top; i++) {
+                RankingEntry entry = ranking.get(i);
+                HBox fila = new HBox();
+                fila.setAlignment(Pos.CENTER_LEFT);
+
+                Text posYNombre = new Text((i + 1) + ".  " + entry.usuario);
+                posYNombre.setFont(Font.font("Georgia", 13));
+                posYNombre.setFill(Color.web("#D4B87A"));
+
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                Text victorias = new Text(entry.victorias + " victorias");
+                victorias.setFont(Font.font("Georgia", FontWeight.BOLD, 13));
+                victorias.setFill(Color.web("#D4A017"));
+
+                fila.getChildren().addAll(posYNombre, spacer, victorias);
+                rankingPanel.getChildren().add(fila);
+            }
+        }
+
+        filaPrincipal.getChildren().addAll(columnaCentral);
+
+        VBox contenedorTotal = new VBox();
+        contenedorTotal.setAlignment(Pos.CENTER);
+        contenedorTotal.setPadding(new Insets(0, 0, 60, 0));
+        contenedorTotal.getChildren().add(filaPrincipal);
+        getChildren().add(contenedorTotal);
 
         btnCerrarSesion = crearBotonCerrarSesion();
         StackPane.setAlignment(btnCerrarSesion, Pos.BOTTOM_LEFT);
