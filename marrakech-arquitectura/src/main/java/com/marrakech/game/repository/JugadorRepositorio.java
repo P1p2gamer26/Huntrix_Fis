@@ -19,6 +19,10 @@ public class JugadorRepositorio implements IJugadorRepositorio {
         this.estadisticasRepo = estadisticasRepo;
         agregarColumnasExtra();
     }
+    
+    public void garantizarTablaJugador() {
+        agregarColumnasExtra();
+    }
 
     // ── Creación ──────────────────────────────────────────────────────────────
 

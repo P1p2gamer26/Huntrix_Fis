@@ -131,7 +131,7 @@ public class MenuView extends StackPane {
             }
         }
 
-        filaPrincipal.getChildren().addAll(columnaCentral, rankingPanel);
+        filaPrincipal.getChildren().addAll(columnaCentral);
 
         VBox contenedorTotal = new VBox();
         contenedorTotal.setAlignment(Pos.CENTER);

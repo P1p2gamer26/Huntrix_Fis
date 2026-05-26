@@ -64,7 +64,8 @@ public class FinJuegoController {
 
         int win = juegoSvc.calcularGanador();
 
-        if (modoMultijugador && partidaSvc != null) partidaSvc.registrarVictoria(usuarioActual);
+        if (modoMultijugador && partidaSvc != null && win == miIndice) 
+        partidaSvc.registrarVictoria(usuarioActual);
 
         boolean yoGane = !modoMultijugador || (win == miIndice);
         if (resultadoLabel != null) {

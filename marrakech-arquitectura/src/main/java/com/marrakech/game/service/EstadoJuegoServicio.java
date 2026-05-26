@@ -1,14 +1,14 @@
 package com.marrakech.game.service;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import com.marrakech.game.repository.IEstadoJuegoRepositorio;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.util.Duration;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class EstadoJuegoServicio {
 
@@ -107,7 +107,7 @@ public class EstadoJuegoServicio {
                 if (est == null) return;
 
                 // 2) Solo aplicar si hay un turno más nuevo
-                if (est.turno > ultimoTurnoVisto && (listo || est.turno > ultimoTurnoVisto + 1)) {
+                if (est.turno > ultimoTurnoVisto) {
                     ultimoTurnoVisto = est.turno;
                     estadoVersion    = est.turno;
                     final String rawFinal = raw;

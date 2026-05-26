@@ -110,7 +110,7 @@ public class AuthController {
 
     public void mostrarMenu() {
         musicaSvc.reproducir(MusicaServicio.Track.MENU);
-        MenuView v = new MenuView(usuarioActual);
+        MenuView v = new MenuView(usuarioActual, partidaSvc.obtenerRanking());
         v.getBtnJugar().setOnAction(e -> mostrarModoOnline());
         v.getBtnJugarLocal().setOnAction(e -> mostrarJuegoLocal());
         v.getBtnReglas().setOnAction(e -> mostrarReglas());
