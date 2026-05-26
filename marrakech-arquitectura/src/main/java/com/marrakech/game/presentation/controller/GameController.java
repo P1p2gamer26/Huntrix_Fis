@@ -41,6 +41,7 @@ public class GameController {
     @FXML private HBox      gameScreen;
     @FXML private StackPane endScreen;
     @FXML private CheckBox  checkPoderesLocal;
+    @FXML private CheckBox  checkRapidaLocal;
     @FXML private GridPane  boardGrid;
     @FXML private Label     turnLabel, statusLabel, diceResultLabel, diceValueLabel;
     @FXML private Button    rollDiceBtn;
@@ -137,7 +138,9 @@ public class GameController {
 
     private void iniciarConJugadoresLocal(int n) {
         this.poderesActivados = checkPoderesLocal != null && checkPoderesLocal.isSelected();
-        iniciarConJugadores(n);
+        boolean rapida = checkRapidaLocal != null && checkRapidaLocal.isSelected();
+        this.partidaRapida = rapida;
+        startGame(n, rapida);
     }
 
     private void startGame(int n) { startGame(n, false); }
