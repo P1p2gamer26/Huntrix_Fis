@@ -1,4 +1,4 @@
-﻿package com.marrakech.game.presentation.controller;
+package com.marrakech.game.presentation.controller;
 
 import com.marrakech.game.repository.ChatRepositorio.Mensaje;
 import com.marrakech.game.service.ChatServicio;
