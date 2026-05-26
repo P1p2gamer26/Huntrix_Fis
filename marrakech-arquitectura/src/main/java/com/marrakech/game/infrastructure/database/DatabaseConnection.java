@@ -14,7 +14,7 @@ public class DatabaseConnection {
     private static final String DB_DIR = System.getProperty("user.home") + "/.marrakech";
     private static final String DB_URL =
         "jdbc:h2:file:" + DB_DIR + "/marrakechdb" +
-        ";AUTO_SERVER=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_DELAY=-1";
+        ";AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=10000";
     private static final String USER     = "sa";
     private static final String PASSWORD = "";
 

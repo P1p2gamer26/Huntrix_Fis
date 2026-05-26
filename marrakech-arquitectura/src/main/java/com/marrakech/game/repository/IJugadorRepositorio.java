@@ -8,7 +8,7 @@ public interface IJugadorRepositorio {
     boolean crearJugador(String nombre, String correo, String password);
     boolean correoExiste(String correo);
     boolean nombreExiste(String nombre);
-    /** Retorna null (credenciales malas), "SESION_ACTIVA" o el nombre del jugador. */
+    /** Retorna null (credenciales malas), "SESION_ACTIVA" (ya hay sesión) o el nombre del jugador. */
     String loginJugador(String apodo, String password);
     void cerrarSesion(String nombreUsuario);
     int obtenerIdJugador(String nombre);

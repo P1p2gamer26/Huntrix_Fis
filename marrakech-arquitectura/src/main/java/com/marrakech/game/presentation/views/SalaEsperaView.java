@@ -37,8 +37,7 @@ public class SalaEsperaView extends StackPane {
         this.partidaSvc = partidaSvc;
         configurarFondo();
         configurarContenido();
-        // Arrancar polling después de que AuthController registre los callbacks
-        Platform.runLater(this::iniciarPolling);
+        iniciarPolling();
     }
 
     public SalaEsperaView(Partida partida, PartidaServicio svc) { this(partida, true, svc); }

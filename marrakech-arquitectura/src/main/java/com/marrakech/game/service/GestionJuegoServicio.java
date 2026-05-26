@@ -4,15 +4,32 @@ public class GestionJuegoServicio {
 
     // ── Reliquias ─────────────────────────────────────────────────────────────
 
-    /** Identificadores de cada reliquia. */
+    /** Identificadores de cada reliquia con su descripción y leyenda. */
     public enum Reliquia {
-        CALIZ_DORADO     ("🏆", "Cáliz Dorado"),
-        BRUJULA_MERCADER ("🧭", "Brújula del Mercader"),
-        ALFOMBRA_SULTAN  ("✨", "Alfombra del Sultán");
+        BRUJULA_MERCADER ("[B]", "Brújula del Mercader",
+            "Elige cuántos pasos moverá Assam (1-6)",
+            "Los mercaderes más astutos del zoco conocen los caminos secretos del desierto. "
+            + "Esta brújula, forjada con la arena de las dunas doradas, te permite controlar "
+            + "el destino de Assam y decidir exactamente cuántas casillas avanzará."),
+        CALIZ_DORADO     ("[C]", "Cáliz Dorado",
+            "Paga solo la mitad al aterrizar en alfombra ajena",
+            "Una copa bañada en oro del mismísimo Palacio del Sultán. Quien la posee negocia "
+            + "con la autoridad del visir: cuando debas pagar por pisar una alfombra rival, "
+            + "tu deuda se reduce a la mitad."),
+        ALFOMBRA_SULTAN  ("[A]", "Alfombra del Sultán",
+            "Coloca una segunda alfombra extra en tu turno",
+            "Tejida con hilos de luna por los genios del zoco, esta alfombra bendita te permite "
+            + "desplegar dos alfombras en un mismo turno, expandiendo tu presencia en el mercado "
+            + "con la rapidez de un vendaval del desierto.");
 
-        public final String emoji;
+        public final String icono;
         public final String nombre;
-        Reliquia(String emoji, String nombre) { this.emoji = emoji; this.nombre = nombre; }
+        public final String descripcion;
+        public final String leyenda;
+        Reliquia(String icono, String nombre, String descripcion, String leyenda) {
+            this.icono = icono; this.nombre = nombre;
+            this.descripcion = descripcion; this.leyenda = leyenda;
+        }
     }
 
     /** Máximo de veces que puede aparecer cada reliquia en una partida. */
@@ -47,9 +64,10 @@ public class GestionJuegoServicio {
      * Se llama al inicio de cada turno si los poderes están activados.
      * Solo aparece si: no está ya en el tablero, no ha llegado a MAX_APARICIONES,
      * y la probabilidad aleatoria lo permite (33% por turno).
+     * @return la reliquia que apareció, o null si no apareció ninguna.
      */
-    public void intentarAparecerReliquia(int assamX, int assamY) {
-        if (rng.nextInt(3) != 0) return;
+    public Reliquia intentarAparecerReliquia(int assamX, int assamY) {
+        if (rng.nextInt(3) != 0) return null;
 
         Reliquia[] todas = Reliquia.values();
         int[] orden = {0, 1, 2};
@@ -81,9 +99,10 @@ public class GestionJuegoServicio {
                 posicionReliquia[idx][0] = c;
                 posicionReliquia[idx][1] = r;
                 aparicionesReliquia[idx]++;
-                return;
+                return todas[idx];
             }
         }
+        return null;
     }
 
     /**
@@ -322,7 +341,8 @@ public class GestionJuegoServicio {
             firstCarpetX, firstCarpetY, carpetOrientation,
             posicionReliquia, inventarioReliquias != null
                 ? inventarioReliquias
-                : new boolean[numPlayers][Reliquia.values().length]);
+                : new boolean[numPlayers][Reliquia.values().length],
+            eliminado);
     }
 
     public void aplicarEstado(String raw) {
@@ -331,6 +351,8 @@ public class GestionJuegoServicio {
 
         String[] secciones = est.tableroJson.split(";");
         if (secciones.length < 7) return;
+
+        if (eliminado == null) eliminado = new boolean[numPlayers];
 
         String[] ms = secciones[0].split(",");
         String[] rs = secciones[1].split(",");
@@ -388,6 +410,13 @@ public class GestionJuegoServicio {
                 for (int r = 0; r < bits.length && r < Reliquia.values().length; r++)
                     inventarioReliquias[j][r] = "1".equals(bits[r]);
             }
+        }
+
+        // ── Eliminados ────────────────────────────────────────────────────────
+        if (secciones.length > 10 && eliminado != null) {
+            String[] bits = secciones[10].split(",");
+            for (int i = 0; i < bits.length && i < eliminado.length; i++)
+                eliminado[i] = "1".equals(bits[i]);
         }
     }
 

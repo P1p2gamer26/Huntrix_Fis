@@ -6,6 +6,7 @@ import com.marrakech.game.service.GestionJuegoServicio.ResultadoTipo;
 import com.marrakech.game.service.GestionJuegoServicio.Reliquia;
 import com.marrakech.game.presentation.render.GameRenderEngine;
 
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -79,11 +80,20 @@ public class TableroController {
 
         for (Reliquia rel : Reliquia.values()) {
             int[] pos = juegoSvc.getPosicionReliquia(rel);
-            if (pos[0] < 0) continue; // no está en el tablero
-            javafx.scene.control.Label lbl = new javafx.scene.control.Label(rel.emoji);
+            if (pos[0] < 0) continue;
+            javafx.scene.control.Label lbl = new javafx.scene.control.Label(rel.icono);
             lbl.setUserData("reliquia-overlay");
-            lbl.setStyle("-fx-font-size:22px;");
+            lbl.setStyle("-fx-font-size:28px;"
+                + "-fx-effect:dropshadow(gaussian,rgba(10,4,0,0.9),6,0.5,0,0);"
+                + "-fx-background-color:rgba(201,146,42,0.15);"
+                + "-fx-background-radius:50%;-fx-padding:2;"
+                + "-fx-border-color:rgba(201,146,42,0.3);"
+                + "-fx-border-radius:50%;-fx-border-width:1px;");
             lbl.setMouseTransparent(true);
+            Tooltip tip = new Tooltip(rel.icono + "  " + rel.nombre + "\n" + rel.descripcion);
+            tip.setStyle("-fx-font-size:10px;-fx-background-color:rgba(10,4,0,0.95);"
+                + "-fx-text-fill:#F0D060;-fx-border-color:#C9922A;-fx-padding:6 8;");
+            Tooltip.install(lbl, tip);
             boardGrid.add(lbl, pos[0], pos[1]);
         }
     }

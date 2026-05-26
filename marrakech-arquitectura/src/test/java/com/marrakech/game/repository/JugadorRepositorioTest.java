@@ -19,6 +19,18 @@ class JugadorRepositorioTest {
         try (Connection c = DatabaseConnection.getConnection();
              Statement s = c.createStatement()) {
             s.execute("SET REFERENTIAL_INTEGRITY FALSE");
+            s.execute("DROP TABLE IF EXISTS Poder");
+            s.execute("DROP TABLE IF EXISTS EstadoPartida");
+            s.execute("DROP TABLE IF EXISTS Participacion");
+            s.execute("DROP TABLE IF EXISTS Partida");
+            s.execute("DROP TABLE IF EXISTS ConfiguracionPartida");
+            s.execute("DROP TABLE IF EXISTS Mensajechat");
+            s.execute("DROP TABLE IF EXISTS Sala");
+            s.execute("DROP TABLE IF EXISTS partida_jugadores");
+            s.execute("DROP TABLE IF EXISTS partidas");
+            s.execute("DROP TABLE IF EXISTS ranking");
+            s.execute("DROP TABLE IF EXISTS chat_mensajes");
+            s.execute("DROP TABLE IF EXISTS estado_juego");
             s.execute("DROP TABLE IF EXISTS Estadisticas");
             s.execute("DROP TABLE IF EXISTS Jugador");
             s.execute("SET REFERENTIAL_INTEGRITY TRUE");

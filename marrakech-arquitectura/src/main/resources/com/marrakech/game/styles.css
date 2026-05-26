@@ -1,27 +1,33 @@
 /* ═══════════════════════════════════════════════════
-   MARRAKECH — styles.css   (juego)
+   MARRAKECH — Paleta "Zoco de las Especias"
+   Fondo: arcilla/terracota claro
+   Paneles: nogal profundo
+   Acentos: azafrán, latón, oro
    ═══════════════════════════════════════════════════ */
 
-/* Fondo general: degradado arena/tierra cálida */
+/* ── FONDO PRINCIPAL ─────────────────────────────── */
+
 .root-pane {
-    -fx-background-color: linear-gradient(to bottom right, #2C1A0E, #4A2C10, #2C1A0E);
-    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-background-color: linear-gradient(to bottom right, #1E0E04, #3A1C08, #1E0E04);
+    -fx-font-family: "Segoe UI", "Georgia", serif;
 }
 
-/* Paneles de jugadores y barra de turno */
+/* ── PANELES (nogal oscuro con borde dorado) ────── */
+
 .panel {
-    -fx-background-color: rgba(30, 15, 5, 0.88);
+    -fx-background-color: rgba(42, 20, 8, 0.88);
     -fx-border-color: #C8922A;
     -fx-border-width: 2px;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
-    -fx-effect: dropshadow(gaussian, rgba(200,146,42,0.35), 8, 0.3, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.3, 0, 3);
 }
 
 .title-label {
-    -fx-font-size: 17px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #F0C040;
+    -fx-text-fill: #F0D060;
+    -fx-effect: dropshadow(gaussian, rgba(240,208,96,0.35), 6, 0.3, 0, 0);
 }
 
 .status-label {
@@ -30,154 +36,224 @@
     -fx-font-style: italic;
 }
 
-.text-label {
-    -fx-font-size: 15px;
-    -fx-text-fill: #F0E0B0;
+/* ── TABLERO (marco latón, fondo arena) ─────────── */
+
+.board-pane {
+    -fx-background-color: #D4A96A;
+    -fx-border-color: transparent;
 }
 
-/* ── TABLERO ───────────────────────────────────────── */
-
-/* Marco exterior del tablero */
 .board-frame {
-    -fx-background-color: linear-gradient(to bottom, #8B4513, #5C2D0A, #8B4513);
-    -fx-border-color: #D4A017;
+    -fx-background-color: linear-gradient(135deg, #B8860B, #D4A017, #B8860B);
+    -fx-border-color: #8B6914;
     -fx-border-width: 4px;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-effect: dropshadow(gaussian, rgba(212,160,23,0.6), 18, 0.4, 0, 0);
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(139,105,20,0.5), 16, 0.35, 0, 4);
     -fx-padding: 6px;
 }
 
-/* Grid sin borde visible — solo las tiles lo tienen */
 .grid-overlay {
     -fx-background-color: transparent;
 }
 
-/* Celdas del tablero: arena dorada SÓLIDA sin transparencia */
+/* Celdas: arena del desierto con borde cuero */
 .tile {
-    -fx-background-color: #C8A84B;
-    -fx-border-color: #2A1800;
-    -fx-border-width: 1.5px;
+    -fx-background-color: #E8CC88;
+    -fx-border-color: #6B4520;
+    -fx-border-width: 1px;
     -fx-cursor: hand;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.12), 2, 0.2, 0, 1);
 }
 
 .tile:hover {
-    -fx-background-color: #E8C868;
-    -fx-border-color: #8B6914;
-    -fx-border-width: 2px;
-}
-
-/* ── CHAT ──────────────────────────────────────────── */
-
-.chat-panel {
-    -fx-background-color: rgba(20, 10, 3, 0.92);
+    -fx-background-color: #F0D898;
     -fx-border-color: #C8922A;
     -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(200,146,42,0.45), 8, 0.4, 0, 0);
+}
+
+/* ── CHAT ────────────────────────────────────────── */
+
+.chat-panel {
+    -fx-background-color: rgba(30, 14, 5, 0.92);
+    -fx-border-color: rgba(200, 146, 42, 0.5);
+    -fx-border-width: 1.5px;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
 }
 
 .chat-title {
-    -fx-font-size: 14px;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-text-fill: #F0C040;
     -fx-alignment: center;
+    -fx-padding: 6 0 4 0;
 }
 
 .chat-area {
-    -fx-background-color: rgba(15, 8, 2, 0.85);
-    -fx-border-color: #5C3A10;
+    -fx-background-color: rgba(18, 8, 2, 0.9);
+    -fx-border-color: #4A2A08;
     -fx-border-width: 1px;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.chat-area .viewport {
+    -fx-background-color: transparent;
+}
+
+.chat-area .scroll-bar:vertical {
+    -fx-background-color: rgba(20, 10, 3, 0.8);
+    -fx-background-radius: 4px;
+    -fx-pref-width: 10px;
+}
+
+.chat-area .scroll-bar:vertical .thumb {
+    -fx-background-color: #C8922A;
+    -fx-background-radius: 4px;
+}
+
+.chat-area .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.chat-area .scroll-bar:vertical .increment-button,
+.chat-area .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
 }
 
 .chat-input {
-    -fx-background-color: rgba(30, 15, 5, 0.9);
+    -fx-background-color: rgba(18, 8, 2, 0.95);
     -fx-text-fill: #F0E0B0;
     -fx-border-color: #8B6914;
     -fx-border-width: 1.5px;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-    -fx-font-size: 13px;
-    -fx-prompt-text-fill: #9E7A3A;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-font-size: 12px;
+    -fx-prompt-text-fill: #7A5A30;
+}
+
+.chat-input:focused {
+    -fx-border-color: #F0C040;
+    -fx-effect: dropshadow(gaussian, rgba(240,192,64,0.3), 6, 0.3, 0, 0);
 }
 
 .chat-send-btn {
-    -fx-background-color: #C8922A;
+    -fx-background-color: linear-gradient(to bottom, #D4A030, #B8861A);
     -fx-text-fill: #1A0A00;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-background-radius: 5px;
+    -fx-background-radius: 6px;
     -fx-cursor: hand;
-    -fx-padding: 4 10;
+    -fx-padding: 4 12;
 }
 
 .chat-send-btn:hover {
-    -fx-background-color: #F0C040;
+    -fx-background-color: linear-gradient(to bottom, #F0C040, #D4A030);
 }
 
-/* Burbuja mensaje propio */
+.chat-send-btn:pressed {
+    -fx-background-color: linear-gradient(to bottom, #B8861A, #D4A030);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
 .burbuja-propia {
-    -fx-background-color: rgba(180, 130, 30, 0.75);
-    -fx-background-radius: 8px 8px 2px 8px;
-    -fx-padding: 4 8;
+    -fx-background-color: linear-gradient(135deg, rgba(200,150,40,0.7), rgba(160,110,25,0.75));
+    -fx-background-radius: 10px 10px 3px 10px;
+    -fx-padding: 5 10;
 }
 
-/* Burbuja mensaje ajeno */
 .burbuja-ajena {
-    -fx-background-color: rgba(40, 25, 8, 0.85);
-    -fx-background-radius: 8px 8px 8px 2px;
-    -fx-border-color: #5C3A10;
+    -fx-background-color: rgba(35, 18, 5, 0.88);
+    -fx-background-radius: 10px 10px 10px 3px;
+    -fx-border-color: rgba(92, 58, 16, 0.6);
     -fx-border-width: 1px;
-    -fx-border-radius: 8px 8px 8px 2px;
-    -fx-padding: 4 8;
+    -fx-border-radius: 10px 10px 10px 3px;
+    -fx-padding: 5 10;
 }
 
-/* ── BOTONES ────────────────────────────────────────── */
+/* ── BOTONES ──────────────────────────────────────── */
 
 .btn {
-    -fx-background-color: #C8922A;
+    -fx-background-color: linear-gradient(to bottom, #D4A030, #B8860B);
     -fx-text-fill: #1A0A00;
-    -fx-font-size: 15px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-padding: 9 22;
-    -fx-background-radius: 6px;
+    -fx-background-radius: 8px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(200,146,42,0.4), 6, 0.3, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0.3, 0, 2);
 }
 
 .btn:hover {
-    -fx-background-color: #F0C040;
-    -fx-text-fill: #1A0A00;
+    -fx-background-color: linear-gradient(to bottom, #F0C840, #D4A030);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.btn:pressed {
+    -fx-background-color: linear-gradient(to bottom, #B8860B, #D4A030);
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
 }
 
 .btn:disabled {
-    -fx-background-color: #4A3010;
+    -fx-background-color: #3A2510;
     -fx-text-fill: #6A5030;
     -fx-cursor: default;
 }
 
-.btn:disabled {
-    -fx-background-color: #555555;
-    -fx-text-fill: #888888;
-    -fx-cursor: default;
-}
-
 .btn-small {
-    -fx-background-color: #3A1F08;
-    -fx-text-fill: #C8922A;
+    -fx-background-color: linear-gradient(to bottom, #4A2810, #2A1408);
+    -fx-text-fill: #D4A030;
     -fx-border-color: #8B6914;
     -fx-border-width: 1.5px;
-    -fx-border-radius: 4px;
-    -fx-background-radius: 4px;
-    -fx-font-size: 13px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-font-size: 12px;
     -fx-padding: 6 14;
     -fx-cursor: hand;
 }
 
 .btn-small:hover {
-    -fx-background-color: #5A3010;
-    -fx-text-fill: #F0C040;
+    -fx-background-color: linear-gradient(to bottom, #6B3818, #4A2810);
+    -fx-text-fill: #F0D060;
     -fx-border-color: #D4A017;
+}
+
+.btn-small:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* ── PANELES JUGADOR ─────────────────────────────── */
+
+VBox[id^="panelJ"] {
+    -fx-transition: all 0.3s ease;
+}
+
+/* ── SCROLLPANES ─────────────────────────────────── */
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ── LABELS ──────────────────────────────────────── */
+
+.label {
+    -fx-font-smoothing-type: lcd;
+}
+
+/* ── DADO ────────────────────────────────────────── */
+
+Canvas {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0.3, 0, 2);
 }

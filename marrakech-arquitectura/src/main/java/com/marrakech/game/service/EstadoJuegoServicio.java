@@ -99,12 +99,15 @@ public class EstadoJuegoServicio {
     public void iniciarPolling(java.util.function.Consumer<String> onEstadoCambiado) {
         pollingTimeline = new Timeline(new KeyFrame(Duration.millis(500), e ->
             new Thread(() -> {
-                // Solo disparar cuando el otro jugador marcó su turno como listo
-                if (!estadoRepo.estaListo(partidaId)) return;
+                // 1) Si está listo → hay estado nuevo disponible
+                boolean listo = estadoRepo.estaListo(partidaId);
                 String raw = cargarUltimoEstado();
                 if (raw == null) return;
                 EstadoDB est = parsearEstado(raw);
-                if (est != null && est.turno > ultimoTurnoVisto) {
+                if (est == null) return;
+
+                // 2) Solo aplicar si hay un turno más nuevo
+                if (est.turno > ultimoTurnoVisto && (listo || est.turno > ultimoTurnoVisto + 1)) {
                     ultimoTurnoVisto = est.turno;
                     estadoVersion    = est.turno;
                     final String rawFinal = raw;
@@ -125,6 +128,17 @@ public class EstadoJuegoServicio {
                                           int currentPhase, int firstCarpetX, int firstCarpetY,
                                           int[][] carpetOrientation,
                                           int[][] posicionReliquia, boolean[][] inventarioReliquias) {
+        return serializarEstado(numPlayers, money, rugs, tileOwner, currentPlayerIdx,
+            currentPhase, firstCarpetX, firstCarpetY, carpetOrientation,
+            posicionReliquia, inventarioReliquias, null);
+    }
+
+    public static String serializarEstado(int numPlayers, int[] money, int[] rugs,
+                                          int[][] tileOwner, int currentPlayerIdx,
+                                          int currentPhase, int firstCarpetX, int firstCarpetY,
+                                          int[][] carpetOrientation,
+                                          int[][] posicionReliquia, boolean[][] inventarioReliquias,
+                                          boolean[] eliminado) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numPlayers; i++)
             sb.append(money[i]).append(i < numPlayers - 1 ? "," : "");
@@ -155,6 +169,12 @@ public class EstadoJuegoServicio {
                 sb.append(inventarioReliquias[j][r] ? "1" : "0")
                   .append(r < inventarioReliquias[j].length - 1 ? "," : "");
             if (j < numPlayers - 1) sb.append("/");
+        }
+        sb.append(";");
+        if (eliminado != null) {
+            for (int i = 0; i < eliminado.length; i++)
+                sb.append(eliminado[i] ? "1" : "0")
+                  .append(i < eliminado.length - 1 ? "," : "");
         }
         return sb.toString();
     }
